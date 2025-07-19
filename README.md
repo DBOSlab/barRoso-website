@@ -246,5 +246,3 @@ herbarium science inspire this tool.
 Cardoso, D. (2025). *barRoso*: Biodiversity Analysis and Record
 Reconciliation for Organizing Specimen Observations.
 <https://github.com/dboslab/barRoso>
-
-<img src="inst/figures/DBOSlab_logo.png" align="left" alt="" width="150" />

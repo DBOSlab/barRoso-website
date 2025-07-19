@@ -195,5 +195,3 @@ This package is named in honor of Graziela Maciel Barroso (1912–2003), a pione
 ## Citation
 
 Cardoso, D. (2025). _barRoso_: Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations. https://github.com/dboslab/barRoso
-
-<img src="inst/figures/DBOSlab_logo.png" align="left" alt="" width="150" />
