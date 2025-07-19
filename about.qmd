@@ -1,5 +1,5 @@
 ---
-title: "About barroso"
+title: "About barRoso"
 subtitle: "Open-source tools for managing and standardizing herbarium specimen records"
 format:
   html:
@@ -31,21 +31,21 @@ format:
   }
 </style>
 
-<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='barroso logo watermark'>
+<img src='/figures/barroso_background.png' class='watermark' alt='barroso logo watermark'>
 
 
 ## Overview
 
-`barroso` (Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations) is an R package that streamlines biodiversity data cleaning, integration, and reconciliation, particularly for herbarium records. The toolkit supports workflows from data curation to label production, helping botanists, curators, and researchers analyze plant specimen collections more efficiently.
+`barRoso` (Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations) is an R package that streamlines biodiversity data cleaning, integration, and reconciliation, particularly for herbarium records. The toolkit supports workflows from data curation to label production, helping botanists, curators, and researchers analyze plant specimen collections more efficiently.
 
-Named in honor of [Graziela Maciel Barroso](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso), one of Brazil's most respected botanists, the acronym **BARROSO** also nods to its native programming environment—**R**.
+Named in honor of [Graziela Maciel Barroso](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso), one of Brazil's most respected botanists, the name **barRoso** also nods to its native programming environment—**R**.
 
 The package was originally developed for the [JABOT Virtual Herbarium](https://jabot.jbrj.gov.br), maintained by the [Rio de Janeiro Botanical Garden](https://www.gov.br/jbrj), but it is generalizable to other biodiversity repositories such as [GBIF](https://www.gbif.org), [SEINet](https://swbiodiversity.org/seinet), [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), and [speciesLink](https://specieslink.net).
 The package was originally developed to support the cleaning and reconciliation of plant specimen records retrieved from the [Global Biodiversity Information Facility (GBIF)](https://www.gbif.org), but its flexible design makes it broadly applicable to other biodiversity data sources. These include national and institutional repositories such as the [JABOT Virtual Herbarium](https://jabot.jbrj.gov.br), maintained by the [Rio de Janeiro Botanical Garden](https://www.gov.br/jbrj) and [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), as well as [SEINet](https://swbiodiversity.org/seinet) and [speciesLink](https://specieslink.net).
 
 ## Package Description
 
-Package: `barroso`  
+Package: `barRoso`  
 Type: R Package  
 Version: 1.0.0  
 
@@ -59,11 +59,11 @@ Author and Maintainer: Domingos Cardoso ([\@DBOSlab](https://github.com/DBOSlab)
 ✅ Generate herbarium labels from field books with embedded maps and taxonomic authorities  
 ✅ Integrate with taxonomic reference tools like [LCVP](https://github.com/idiv-biodiversity/LCVP) and [lcvplants](https://idiv-biodiversity.github.io/lcvplants)
 
-##How to Contribute
+## How to Contribute
 
 We welcome community contributions:
 
-💬 Report bugs or feature requests via [GitHub Issues](https://github.com/DBOSlab/barroso/issues)
+💬 Report bugs or feature requests via [GitHub Issues](https://github.com/DBOSlab/barRoso/issues)
 🔧 Submit pull requests with improvements or new features
 🌱 Suggest new functionality or integration ideas
 
@@ -73,4 +73,4 @@ This package is released under the [MIT License](/LICENSE.md), supporting open s
 
 ## Acknowledgements
 
-Development of `barroso` is led by the [Rio de Janeiro Botanical Garden (JBRJ)](https://www.gov.br/jbrj). I also gratefully acknowledge the financial support provided by [CNPq - Conselho Nacional de Desenvolvimento Científico e Tecnológico](https://www.gov.br/cnpq/pt-br), Brazil's National Council for Scientific and Technological Development, and [FINEP - Financiadora de Estudos e Projetos](https://www.gov.br/finep/pt-br), Brazil's Funding Authority for Studies and Projects. I honor Graziela Maciel Barroso’s legacy in taxonomy and herbaria through this tool.
+Development of `barRoso` is led by the [Rio de Janeiro Botanical Garden (JBRJ)](https://www.gov.br/jbrj). I also gratefully acknowledge the financial support provided by [CNPq - Conselho Nacional de Desenvolvimento Científico e Tecnológico](https://www.gov.br/cnpq/pt-br), Brazil's National Council for Scientific and Technological Development, and [FINEP - Financiadora de Estudos e Projetos](https://www.gov.br/finep/pt-br), Brazil's Funding Authority for Studies and Projects. I honor Graziela Maciel Barroso’s legacy in taxonomy and herbaria through this tool.

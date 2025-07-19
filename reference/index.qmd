@@ -31,7 +31,7 @@ format:
   }
 </style>
 
-<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='jabot logo watermark'>
+<img src='/figures/barroso_background.png' class='watermark' alt='jabot logo watermark'>
 
 ## std_types
 - [std_types](/reference/std_types.qmd)

@@ -5,7 +5,7 @@ format: html
 
 ## Overview
 
-The `barroso_std()` function is the primary tool in the `barroso` package for performing full data cleaning and standardization of biodiversity specimen records. It is designed to process raw data from herbaria, virtual repositories, and field collections, ensuring harmonized fields across taxonomic, geographic, and collector-related information.
+The `barroso_std()` function is the primary tool in the `barRoso` package for performing full data cleaning and standardization of biodiversity specimen records. It is designed to process raw data from herbaria, virtual repositories, and field collections, ensuring harmonized fields across taxonomic, geographic, and collector-related information.
 
 ## Key Features
 
@@ -19,7 +19,7 @@ The `barroso_std()` function is the primary tool in the `barroso` package for pe
 ## Usage
 
 ```r
-library(barroso)
+library(barRoso)
 
 df <- read.csv("raw_herbarium_data.csv")
 
@@ -77,5 +77,3 @@ cleaned_data <- barroso_std(df,
 ```
 
 For a complete list of supported fields, refer to the function documentation with `?barroso_std`.
-
----

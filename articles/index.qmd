@@ -10,7 +10,7 @@ format: html
 
   .watermark {
     position: fixed;
-    bottom: 50px;
+    bottom: 100px;
     right: 50px;
     opacity: 0.15;
     z-index: -1;
@@ -18,32 +18,31 @@ format: html
   }
 </style>
 
-<img src="/figures/barroso_hex_sticker.png" class="watermark" alt="barroso logo watermark">
+<img src="/figures/barroso_background.png" class="watermark" alt="barroso logo watermark">
 
 ::: {layout-ncol="2"}
+
 ::: {style="display: block;"}
 ### Data Standardization
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)
 - [Flexible Column Names](/articles/custom_column_names.qmd)
-
-::: {style="display: block;"}
 :::
+
 ::: {style="display: block;"}
 ### Duplicate Detection
 - [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
 - [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
-
-::: {style="display: block;"}
 :::
+
 ::: {style="display: block;"}
 ### Case Studies & Workflows  
 - [Standardize GBIF Data](/articles/cleaning_gbif_data.qmd)
 - [REFLORA Cleaning Workflow](/articles/case_study_reflora.qmd)
-
-::: {style="display: block;"}
 :::
+
 ::: {style="display: block;"}
 ### Herbarium Label Generation  
 - [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)
-::: 
+:::
+
 :::

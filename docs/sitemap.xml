@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/index.html</loc>
-    <lastmod>2025-07-19T03:32:34.468Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/get-started/index.html</loc>
+    <lastmod>2025-07-19T14:38:15.365Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/get-started/index.html</loc>
-    <lastmod>2025-07-19T03:32:50.846Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/reference/barroso_labels.html</loc>
+    <lastmod>2025-07-19T13:12:16.226Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/barroso_labels.html</loc>
-    <lastmod>2025-07-19T03:39:16.832Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/reference/std_recordedBy.html</loc>
+    <lastmod>2025-07-19T13:12:16.219Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/std_recordedBy.html</loc>
-    <lastmod>2025-07-19T03:39:16.825Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/reference/std_collection.html</loc>
+    <lastmod>2025-07-19T13:12:16.185Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/std_collection.html</loc>
-    <lastmod>2025-07-19T03:39:16.766Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/reference/barroso_flag_duplicates.html</loc>
+    <lastmod>2025-07-19T13:12:16.191Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/barroso_flag_duplicates.html</loc>
-    <lastmod>2025-07-19T03:39:16.774Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/reference/std_types.html</loc>
+    <lastmod>2025-07-19T13:12:16.161Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/std_types.html</loc>
-    <lastmod>2025-07-19T03:39:16.748Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/news/index.html</loc>
+    <lastmod>2025-07-19T14:36:30.881Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/news/index.html</loc>
-    <lastmod>2025-07-18T23:27:36.113Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/index.html</loc>
+    <lastmod>2025-07-19T14:47:32.264Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/case_study_reflora.html</loc>
-    <lastmod>2025-07-18T22:41:03.862Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/compare_herbarium_sources.html</loc>
+    <lastmod>2025-07-19T15:17:29.634Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/cleaning_gbif_data.html</loc>
-    <lastmod>2025-07-18T22:45:28.063Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/standardize_specimens.html</loc>
-    <lastmod>2025-07-18T22:20:06.980Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/detect_duplicates.html</loc>
-    <lastmod>2025-07-18T22:27:32.671Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/authors/index.html</loc>
-    <lastmod>2025-07-19T03:38:19.663Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/LICENSE.html</loc>
-    <lastmod>2024-09-20T12:01:20.819Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/faq/index.html</loc>
-    <lastmod>2025-07-19T03:35:08.286Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/custom_column_names.html</loc>
-    <lastmod>2025-07-18T22:17:04.859Z</lastmod>
-  </url>
-  <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/generate_herbarium_labels.html</loc>
+    <loc>https://dboslab.github.io/barRoso-website/articles/generate_herbarium_labels.html</loc>
     <lastmod>2025-07-18T22:30:08.331Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/articles/compare_herbarium_sources.html</loc>
-    <lastmod>2025-07-18T22:26:51.206Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/index.html</loc>
+    <lastmod>2025-07-19T16:03:41.457Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/about.html</loc>
-    <lastmod>2025-07-19T03:32:27.184Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/detect_duplicates.html</loc>
+    <lastmod>2025-07-19T14:44:12.564Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/overview/index.html</loc>
-    <lastmod>2025-07-19T03:17:38.405Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/authors/index.html</loc>
+    <lastmod>2025-07-19T14:41:23.443Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/barroso_cat.html</loc>
-    <lastmod>2025-07-19T03:39:16.838Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/LICENSE.html</loc>
+    <lastmod>2025-07-19T14:36:47.459Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/index.html</loc>
-    <lastmod>2025-07-19T03:39:16.841Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/faq/index.html</loc>
+    <lastmod>2025-07-19T14:39:11.131Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/std_taxa.html</loc>
-    <lastmod>2025-07-19T03:39:16.758Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/custom_column_names.html</loc>
+    <lastmod>2025-07-19T15:58:34.057Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/barroso_std.html</loc>
-    <lastmod>2025-07-19T03:39:16.816Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/standardize_specimens.html</loc>
+    <lastmod>2025-07-19T15:57:25.042Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/reference/std_place.html</loc>
-    <lastmod>2025-07-19T03:39:16.785Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/cleaning_gbif_data.html</loc>
+    <lastmod>2025-07-19T14:42:41.581Z</lastmod>
   </url>
   <url>
-    <loc>https://dboslab.github.io/barroso-website/index.html</loc>
-    <lastmod>2025-07-18T23:45:01.212Z</lastmod>
+    <loc>https://dboslab.github.io/barRoso-website/articles/case_study_reflora.html</loc>
+    <lastmod>2025-07-19T14:42:18.611Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/about.html</loc>
+    <lastmod>2025-07-19T15:04:06.746Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/overview/index.html</loc>
+    <lastmod>2025-07-19T14:34:18.513Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/reference/barroso_cat.html</loc>
+    <lastmod>2025-07-19T13:12:16.231Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/reference/index.html</loc>
+    <lastmod>2025-07-19T13:12:16.235Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/reference/std_taxa.html</loc>
+    <lastmod>2025-07-19T13:12:16.177Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/reference/barroso_std.html</loc>
+    <lastmod>2025-07-19T13:12:16.211Z</lastmod>
+  </url>
+  <url>
+    <loc>https://dboslab.github.io/barRoso-website/reference/std_place.html</loc>
+    <lastmod>2025-07-19T13:12:16.199Z</lastmod>
   </url>
 </urlset>

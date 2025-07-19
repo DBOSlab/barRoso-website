@@ -18,19 +18,25 @@ format: html
   }
 </style>
 
-<img src="/figures/barroso_hex_sticker.png" class="watermark" alt="jabot logo watermark">
+<img src="/figures/barroso_background.png" class="watermark" alt="jabot logo watermark">
 
 
-## What is barroso?
+## What is barRoso?
 
-`barroso` is an R package designed to clean, standardize, and reconcile plant specimen records—especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for [GBIF](https://www.gbif.org), it is compatible with data from [JABOT](https://jabot.jbrj.gov.br/v3/consulta.php), [SEINet](https://swbiodiversity.org/seinet), [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), [speciesLink](https://specieslink.net), and others.
+`barRoso` is an R package designed to clean, standardize, and reconcile plant specimen records, especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for [GBIF](https://www.gbif.org), it is compatible with data from [JABOT](https://jabot.jbrj.gov.br/v3/consulta.php), [SEINet](https://swbiodiversity.org/seinet), [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), [speciesLink](https://specieslink.net), and others.
 
 The package is named after Brazilian botanist [Graziela Maciel Barroso](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso), and also serves as an acronym: **B**iodiversity **A**nalysis and **R**ecord **R**econciliation for **O**rganizing **S**pecimen **O**bservations.
 
+Graziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.
 
-## What does barroso do?
+She authored the landmark three-volume *Sistemática de Angiospermas do Brasil* (1978–1986), still a cornerstone of botanical education, as well as *Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas* (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.
 
-`barroso` helps users:
+Barroso remained professionally active until her passing at age 92. A month before her death, she was elected to the [Brazilian Academy of Sciences](https://www.abc.org.br/membro/graziela-maciel-barroso/) — a distinction awarded posthumously.
+
+
+## What does barRoso do?
+
+`barRoso` helps users:
 
 - Standardize collector names and collection numbers using regex-based parsing
 - Harmonize taxonomic, geographic, and temporal fields
@@ -40,7 +46,7 @@ The package is named after Brazilian botanist [Graziela Maciel Barroso](https://
 - Prepare large-scale biodiversity datasets for publication and analysis
 
 
-## Who should use barroso?
+## Who should use barRoso?
 
 - Taxonomists and herbarium curators
 - Biodiversity data scientists
@@ -48,20 +54,20 @@ The package is named after Brazilian botanist [Graziela Maciel Barroso](https://
 - Graduate students and researchers managing field collections
 
 
-## What makes barroso different?
+## What makes barRoso different?
 
-Unlike other packages that rely on static collector name dictionaries, `barroso` uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow.
+Unlike other packages that rely on static collector name dictionaries, `barRoso` uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow.
 
 
 ## Data Preservation Philosophy
 
-While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, `barroso` takes a different approach. Its philosophy centers on *standardization* rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, `barroso` focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, `barroso` allows users to flag rather than erase inconsistencies—enabling more transparent workflows and empowering users to trace potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.
-
+While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, `barRoso` takes a different approach. Its philosophy centers on *standardization* rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, `barRoso` focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, `barRoso` allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.
 
 ## Learn more
 
 Explore the full documentation:
 
-- [Install and Setup](/articles/install_barroso.qmd)
-- [Basic Workflow](/articles/basic_workflow.qmd)
+- [Install and Setup](/get-started/index.qmd)
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)
+- [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
+- [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)

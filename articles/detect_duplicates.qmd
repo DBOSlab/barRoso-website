@@ -31,7 +31,7 @@ You can run this function as a standalone or as part of `barroso_std()`.
 ## Example
 
 ```r
-library(barroso)
+library(barRoso)
 
 # Load sample specimen dataset
 df <- read.csv("raw_herbarium_data.csv")

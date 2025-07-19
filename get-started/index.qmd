@@ -20,11 +20,11 @@ format:
   }
 </style>
 
-<img src="/figures/barroso_hex_sticker.png" class="watermark" alt="barroso logo watermark">
+<img src="/figures/barroso_background.png" class="watermark" alt="barroso logo watermark">
 
-## Installing barroso
+## Installing barRoso
 
-The `barroso` package is available on GitHub and can be installed using `devtools`. Before installation, make sure you have the following packages installed:
+The `barRoso` package is available on GitHub and can be installed using `devtools`. Before installation, make sure you have the following packages installed:
 
 - [`devtools`](https://CRAN.R-project.org/package=devtools)
 - [`LCVP`](https://github.com/idiv-biodiversity/LCVP)
@@ -38,14 +38,14 @@ install.packages("devtools")
 devtools::install_github("idiv-biodiversity/LCVP")
 devtools::install_github("idiv-biodiversity/lcvplants")
 
-# Install barroso
-devtools::install_github("DBOSlab/barroso")
+# Install barRoso
+devtools::install_github("DBOSlab/barRoso")
 ```
 
 ## Load the package
 
 ```r
-library(barroso)
+library(barRoso)
 ```
 
 You are now ready to start cleaning, standardizing, and analyzing plant specimen records.
@@ -70,5 +70,5 @@ install.packages(c(
 
 For troubleshooting or support, visit:
 
-- [barroso GitHub repository](https://github.com/DBOSlab/barroso)
-- [GitHub Discussions](https://github.com/DBOSlab/barroso/discussions)
+- [`barRoso` GitHub repository](https://github.com/DBOSlab/barRoso)
+- [`barRoso` GitHub Discussions](https://github.com/DBOSlab/barRoso/discussions)

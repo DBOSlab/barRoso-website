@@ -4,12 +4,11 @@ format:
   html:
     toc: true
     toc-depth: 2
-    number-sections: true
 ---
 
 ## Overview
 
-When working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. `barroso` offers the `combine_herbaria()` function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.
+When working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. `barRoso` offers the `barroso_cat()` function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.
 
 This article demonstrates how to:
 
@@ -42,7 +41,7 @@ If no source is specified, the function merges all sources, retaining potential 
 ## Example
 
 ```r
-library(barroso)
+library(barRoso)
 
 # Load three herbarium datasets
 jabot <- read.csv("jabot.csv")
@@ -60,6 +59,7 @@ combined_df <- barroso_cat(
 )
 ```
 
+
 ## How It Works
 
 - `collectionCode` is used to detect overlapping herbaria
@@ -69,7 +69,6 @@ combined_df <- barroso_cat(
 
 This harmonization step is especially useful before running downstream standardization (`barroso_std()`) or duplicate detection (`barroso_flag_duplicates()`).
 
----
 
 ## Tips
 
@@ -77,11 +76,3 @@ This harmonization step is especially useful before running downstream standardi
 - Use `keep_source = NULL` if you want to preserve all records
 - Use `barroso_std()` after combining to clean remaining fields
 
----
-
-## Next Steps
-
-Continue to:
-- [Standardize Specimens](/articles/standardize_specimens.qmd)
-- [Detect Duplicates](/articles/detect_duplicates.qmd)
-- [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)

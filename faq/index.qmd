@@ -30,14 +30,14 @@ format:
   }
 </style>
 
-<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='barroso logo watermark'>
+<img src='/figures/barroso_background.png' class='watermark' alt='barroso logo watermark'>
 
 
-### What is the barroso?
+### What is the barRoso?
 
-`barroso` is an R package for cleaning, standardizing, and reconciling plant specimen records—especially from biodiversity repositories like [GBIF](https://www.gbif.org). It streamlines workflows for curators, researchers, and data scientists by automating the harmonization of taxonomic, geographic, and collector metadata. Optimized for reproducibility, `barroso` facilitates the detection of duplicate specimens and improves data quality across herbarium datasets.
+`barRoso` is an R package for cleaning, standardizing, and reconciling plant specimen records—especially from biodiversity repositories like [GBIF](https://www.gbif.org). It streamlines workflows for curators, researchers, and data scientists by automating the harmonization of taxonomic, geographic, and collector metadata. Optimized for reproducibility, `barRoso` facilitates the detection of duplicate specimens and improves data quality across herbarium datasets.
 
-### What can I use barroso for?
+### What can I use barRoso for?
 
 - Standardize collector names and associated collector numbers — a crucial step for detecting duplicate specimens across herbaria
 - Harmonize taxonomic and geographic fields (e.g., family, genus, locality, country)
@@ -45,48 +45,48 @@ format:
 - Generate herbarium labels from field notebooks, including taxon authority and geolocation maps
 - Prepare high-quality datasets for biodiversity, floristic, and taxonomic studies
 
-### How do I install barroso?
+### How do I install barRoso?
 
 Follow the [Get Started guide](/get-started/index.qmd) for full instructions on installing the package and its dependencies via GitHub.
 
-### Is barroso free to use?
+### Is barRoso free to use?
 
-Yes. `barroso` is open-source software licensed under the [MIT License](https://opensource.org/license/mit/), which permits unrestricted use, modification, and distribution.
+Yes. `barRoso` is open-source software licensed under the [MIT License](https://opensource.org/license/mit/), which permits unrestricted use, modification, and distribution.
 
-### What output can barroso generate?
+### What output can barRoso generate?
 
-While `barroso` does not directly produce formatted reports, it supports:
+While `barRoso` does not directly produce formatted reports, it supports:
 
 - Cleaned and standardized data frames for downstream biodiversity analysis
 - Visual maps in herbarium label generation
 - Easy integration with RMarkdown, Quarto, and Shiny for reporting and dashboards
 
-### How does barroso work?
+### How does barRoso work?
 
-Unlike many packages that rely on static dictionaries to clean collector names, `barroso` uses a robust set of regular expressions (regex) to dynamically identify and standardize collector patterns across datasets. This approach allows `barroso` to generalize better across sources and spelling variations — even when names are inconsistently formatted. Combined with harmonization of geographic and taxonomic fields, this makes the package especially powerful for detecting duplicates and preparing data for downstream analysis.
+Unlike many packages that rely on static dictionaries to clean collector names, `barRoso` uses a robust set of regular expressions (regex) to dynamically identify and standardize collector patterns across datasets. This approach allows `barRoso` to generalize better across sources and spelling variations — even when names are inconsistently formatted. Combined with harmonization of geographic and taxonomic fields, this makes the package especially powerful for detecting duplicates and preparing data for downstream analysis.
 
-### Why doesn’t `barroso` remove incomplete or inconsistent records?
+### Why doesn’t `barRoso` remove incomplete or inconsistent records?
 
-Because **standardization** is more powerful than deletion. Many biodiversity records contain valuable metadata even when some fields are missing or messy. `barroso` standardizes and flags potential problems but leaves the final decision to the user—preserving data integrity and maximizing research potential.
+Because **standardization** is more powerful than deletion. Many biodiversity records contain valuable metadata even when some fields are missing or messy. `barRoso` standardizes and flags potential problems but leaves the final decision to the user—preserving data integrity and maximizing research potential.
 
 
-### Who are the developers of barroso?
+### Who are the developers of barRoso?
 
 Development is sponsored by [JBRJ](https://www.gov.br/jbrj/pt-br), [FINEP](http://www.finep.gov.br), and [CNPq](https://www.gov.br/cnpq/pt-br). Main developer:
 
 - Domingos Cardoso ([\@DBOSlab](https://github.com/DBOSlab))
 
-View the code and contribute on GitHub: [https://github.com/DBOSlab/barroso](https://github.com/DBOSlab/barroso)
+View the code and contribute on GitHub: [https://github.com/DBOSlab/barRoso](https://github.com/DBOSlab/barRoso)
 
-### Why the name barroso?
+### Why the name barRoso?
 
 The name honors Graziela Maciel Barroso (1912–2003), a pioneering Brazilian botanist. It also serves as an acronym: **B**iodiversity **A**nalysis and **R**ecord **R**econciliation for **O**rganizing **S**pecimen **O**bservations, highlighting both its mission and its deep roots in the R programming ecosystem.
 
 ### Where can I report bugs or request features?
 
-Submit issues on GitHub: [barroso Issues](https://github.com/DBOSlab/barroso/issues).
+Submit issues on GitHub: [barRoso Issues](https://github.com/DBOSlab/barRoso/issues).
 
 ### Where can I ask questions or join the community?
 
-Visit [GitHub Discussions](https://github.com/DBOSlab/barroso/discussions) to ask questions, share ideas, or connect with other users.
+Visit [GitHub Discussions](https://github.com/DBOSlab/barRoso/discussions) to ask questions, share ideas, or connect with other users.
 

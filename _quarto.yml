@@ -5,8 +5,10 @@ project:
     - figures/**
 
 website:
-  title: "barroso"
-  site-url: https://dboslab.github.io/barroso-website/
+  title: "barRoso"
+  site-url: https://dboslab.github.io/barRoso-website/
+  repo-url: https://github.com/dboslab/barRoso-website
+  repo-actions: [edit, issue]
   page-navigation: true
   reader-mode: true  
   favicon: "figures/barroso_hex_sticker.png"
@@ -21,8 +23,8 @@ website:
         href: LICENSE.md
     right:
       - icon: github
-        href: https://github.com/DBOSlab/barroso
-        aria-label: barroso GitHub
+        href: https://github.com/DBOSlab/barRoso
+        aria-label: barRoso GitHub
   
   navbar:
     search: true
@@ -48,18 +50,18 @@ website:
         menu:
           - text: "Report a Bug"
             icon: "bug"
-            href: "https://github.com/DBOSlab/barroso/issues"
+            href: "https://github.com/DBOSlab/barRoso/issues"
           - text: "Ask a Question"
             icon: "chat-right-text"
-            href: "https://github.com/DBOSlab/barroso/discussions"
+            href: "https://github.com/DBOSlab/barRoso/discussions"
           - text: "FAQ"
             icon: "question-circle"
             href: faq/index.qmd
         
     tools:
       - icon: github
-        href: https://github.com/DBOSlab/barroso
-        text: barroso GitHub
+        href: https://github.com/DBOSlab/barRoso
+        text: barRoso GitHub
         
   sidebar:                
     - id: articles

@@ -3,26 +3,9 @@ title: "Flexible Column Names"
 format: html
 ---
 
-<style>
-  body {
-    position: relative;
-  }
-
-  .watermark {
-    position: fixed;
-    bottom: 50px;
-    right: 50px;
-    opacity: 0.15;
-    z-index: -1;
-    width: 400px;
-  }
-</style>
-
-<img src="/figures/barroso_background.png" class="watermark" alt="jabot logo watermark">
-
 ## Overview
 
-Herbarium datasets vary widely in how they name their columns. One dataset might label a column as `estado`, while another might use `stateProvince` or `province`. To make `barroso` work with any data source, all standardization functions support flexible column naming.
+Herbarium datasets vary widely in how they name their columns. One dataset might label a column as `estado`, while another might use `stateProvince` or `province`. To make `barRoso` work with any data source, all standardization functions support flexible column naming.
 
 The `barroso_std()` function accepts parameters such as `colname_country`, `colname_stateProvince`, `colname_recordedBy`, and more. These let you specify the actual column names in your input data.
 
@@ -33,7 +16,7 @@ This flexibility is essential when cleaning datasets from mixed sources like GBI
 Use named arguments in `barroso_std()` to point to your actual column names. For example:
 
 ```r
-library(barroso)
+library(barRoso)
 
 # Assume your dataset uses "pais" and "estado" instead of "country" and "stateProvince"
 df <- read.csv("raw_data.csv")
@@ -61,4 +44,4 @@ df_std <- barroso_std(df,
 - Always check the column headers of your CSV or data frame before calling `barroso_std()`
 - Rename fields only if necessary — using this feature gives you more flexibility
 
-This makes `barroso` highly generalizable for data standardization across any herbarium or biodiversity dataset.
+This makes `barRoso` highly generalizable for data standardization across any herbarium or biodiversity dataset.

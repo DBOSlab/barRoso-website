@@ -6,15 +6,15 @@ library(devtools)
 library(roxygen2)
 library(brio)
 library(purrr)
-library(barroso)
+library(barRoso)
 
 ref_dir <- path("reference")
 dir_create(ref_dir)
-exports <- getNamespaceExports("barroso")
+exports <- getNamespaceExports("barRoso")
 
 # Helper to convert Rd to markdown sections
 extract_rd_markdown <- function(fname) {
-  rd_db <- tools::Rd_db("barroso")
+  rd_db <- tools::Rd_db("barRoso")
   rd <- rd_db[[paste0(fname, ".Rd")]]
   if (is.null(rd)) return(NULL)
 
@@ -105,7 +105,7 @@ index_lines <- c(
   "  }",
   "</style>",
   "",
-  "<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='jabot logo watermark'>",
+  "<img src='/figures/barroso_background.png' class='watermark' alt='jabot logo watermark'>",
   ""
 )
 

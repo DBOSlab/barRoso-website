@@ -3,11 +3,11 @@ title: "Cleaning GBIF Data"
 format: html
 ---
 
-This article walks through a practical case study using the `barroso` package to standardize and harmonize plant specimen records downloaded from the [Global Biodiversity Information Facility (GBIF)](https://www.gbif.org/) portal.
+This article walks through a practical case study using the `barRoso` package to standardize and harmonize plant specimen records downloaded from the [Global Biodiversity Information Facility (GBIF)](https://www.gbif.org/) portal.
 
 ## Goal
 
-Perform a full cleaning workflow for GBIF records using `barroso`, including:
+Perform a full cleaning workflow for GBIF records using `barRoso`, including:
 
 - Standardizing collector names and record numbers
 - Harmonizing taxonomic and geographic fields
@@ -26,13 +26,13 @@ occ <- occ_search(scientificName = "Fabaceae", limit = 1000, hasCoordinate = TRU
 df <- occ$data
 ```
 
-## Step 2: Load barroso and Standardize Records
+## Step 2: Load barRoso and Standardize Records
 
 ```r
 # install.packages("devtools")
-devtools::install_github("DBOSlab/barroso")
+devtools::install_github("DBOSlab/barRoso")
 
-library(barroso)
+library(barRoso)
 
 cleaned <- barroso_std(df,
                        flag_duplicates = TRUE,
@@ -57,7 +57,7 @@ write.csv(cleaned, "gbif_cleaned.csv", row.names = FALSE)
 In this case study, we:
 
 - Programmatically downloaded GBIF data for a plant family
-- Used `barroso` to standardize and harmonize specimen metadata
+- Used `barRoso` to standardize and harmonize specimen metadata
 - Flagged duplicates and prepared a clean dataset for biodiversity research
 
 You can apply this pipeline to other sources such as [SEINet](https://swbiodiversity.org/seinet), [REFLORA Virtual Herbarium](https://floradobrasil.jbrj.gov.br/reflora/herbarioVirtual/), [JABOT](https://jabot.jbrj.gov.br/v3/consulta.php), or [speciesLink](https://specieslink.net/).
