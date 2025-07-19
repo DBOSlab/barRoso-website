@@ -8,7 +8,6 @@ website:
   title: "barRoso"
   site-url: https://dboslab.github.io/barRoso-website/
   repo-url: https://github.com/dboslab/barRoso-website
-  repo-actions: [edit, issue]
   page-navigation: true
   reader-mode: true  
   favicon: "figures/barroso_hex_sticker.png"
@@ -63,7 +62,7 @@ website:
         href: https://github.com/DBOSlab/barRoso
         text: barRoso GitHub
         
-  sidebar:                
+  sidebar:              
     - id: articles
       title: How-To Articles
       collapse-level: 3

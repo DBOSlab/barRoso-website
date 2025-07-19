@@ -4927,7 +4927,7 @@ height: 400px;
   <li><a href="#data-preservation-philosophy" id="toc-data-preservation-philosophy" class="nav-link" data-scroll-target="#data-preservation-philosophy">Data Preservation Philosophy</a></li>
   <li><a href="#learn-more" id="toc-learn-more" class="nav-link" data-scroll-target="#learn-more">Learn more</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/dboslab/barRoso-website/edit/main/overview/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/dboslab/barRoso-website/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -4972,9 +4972,6 @@ width: 300px;
 <h2 class="anchored" data-anchor-id="what-is-barroso">What is barRoso?</h2>
 <p><code>barRoso</code> is an R package designed to clean, standardize, and reconcile plant specimen records, especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for <a href="https://www.gbif.org">GBIF</a>, it is compatible with data from <a href="https://jabot.jbrj.gov.br/v3/consulta.php">JABOT</a>, <a href="https://swbiodiversity.org/seinet">SEINet</a>, <a href="https://floradobrasil.jbrj.gov.br/reflora">REFLORA</a>, <a href="https://specieslink.net">speciesLink</a>, and others.</p>
 <p>The package is named after Brazilian botanist <a href="https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso">Graziela Maciel Barroso</a>, and also serves as an acronym: <strong>B</strong>iodiversity <strong>A</strong>nalysis and <strong>R</strong>ecord <strong>R</strong>econciliation for <strong>O</strong>rganizing <strong>S</strong>pecimen <strong>O</strong>bservations.</p>
-<p>Graziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.</p>
-<p>She authored the landmark three-volume <em>Sistemática de Angiospermas do Brasil</em> (1978–1986), still a cornerstone of botanical education, as well as <em>Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas</em> (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.</p>
-<p>Barroso remained professionally active until her passing at age 92. A month before her death, she was elected to the <a href="https://www.abc.org.br/membro/graziela-maciel-barroso/">Brazilian Academy of Sciences</a> — a distinction awarded posthumously.</p>
 </section>
 <section id="what-does-barroso-do" class="level2">
 <h2 class="anchored" data-anchor-id="what-does-barroso-do">What does barRoso do?</h2>
@@ -5665,50 +5662,44 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>The package is named after Brazilian botanist <span class="co">[</span><span class="ot">Graziela Maciel Barroso</span><span class="co">](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso)</span>, and also serves as an acronym: **B**iodiversity **A**nalysis and **R**ecord **R**econciliation for **O**rganizing **S**pecimen **O**bservations.</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>Graziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>She authored the landmark three-volume *Sistemática de Angiospermas do Brasil* (1978–1986), still a cornerstone of botanical education, as well as *Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas* (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>Barroso remained professionally active until her passing at age 92. A month before her death, she was elected to the <span class="co">[</span><span class="ot">Brazilian Academy of Sciences</span><span class="co">](https://www.abc.org.br/membro/graziela-maciel-barroso/)</span> — a distinction awarded posthumously.</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## What does barRoso do?</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="in">`barRoso`</span> helps users:</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Standardize collector names and collection numbers using regex-based parsing</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Harmonize taxonomic, geographic, and temporal fields</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Flag and remove potential duplicates across herbarium records</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Generate herbarium labels from fieldbook data</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Integrate with external taxonomic databases (e.g., LCVP, WFO)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Prepare large-scale biodiversity datasets for publication and analysis</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Who should use barRoso?</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## What does barRoso do?</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="in">`barRoso`</span> helps users:</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Standardize collector names and collection numbers using regex-based parsing</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Harmonize taxonomic, geographic, and temporal fields</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Flag and remove potential duplicates across herbarium records</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Generate herbarium labels from fieldbook data</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Integrate with external taxonomic databases (e.g., LCVP, WFO)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Prepare large-scale biodiversity datasets for publication and analysis</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Who should use barRoso?</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Taxonomists and herbarium curators</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Biodiversity data scientists</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Floristic inventory teams</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Graduate students and researchers managing field collections</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Taxonomists and herbarium curators</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Biodiversity data scientists</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Floristic inventory teams</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Graduate students and researchers managing field collections</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## What makes barRoso different?</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>Unlike other packages that rely on static collector name dictionaries, <span class="in">`barRoso`</span> uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow.</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## What makes barRoso different?</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>Unlike other packages that rely on static collector name dictionaries, <span class="in">`barRoso`</span> uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow.</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Preservation Philosophy</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, <span class="in">`barRoso`</span> takes a different approach. Its philosophy centers on *standardization* rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, <span class="in">`barRoso`</span> focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, <span class="in">`barRoso`</span> allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learn more</span></span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Preservation Philosophy</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>Explore the full documentation:</span>
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, <span class="in">`barRoso`</span> takes a different approach. Its philosophy centers on *standardization* rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, <span class="in">`barRoso`</span> focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, <span class="in">`barRoso`</span> allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learn more</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>Explore the full documentation:</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Install and Setup</span><span class="co">](/get-started/index.qmd)</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Standardize Specimen Records</span><span class="co">](/articles/standardize_specimens.qmd)</span></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Detect and Flag Duplicates</span><span class="co">](/articles/detect_duplicates.qmd)</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Generate Herbarium Labels</span><span class="co">](/articles/generate_herbarium_labels.qmd)</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Install and Setup</span><span class="co">](/get-started/index.qmd)</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Standardize Specimen Records</span><span class="co">](/articles/standardize_specimens.qmd)</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Detect and Flag Duplicates</span><span class="co">](/articles/detect_duplicates.qmd)</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Generate Herbarium Labels</span><span class="co">](/articles/generate_herbarium_labels.qmd)</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
@@ -5734,7 +5725,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/dboslab/barRoso-website/edit/main/overview/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/dboslab/barRoso-website/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    </div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">

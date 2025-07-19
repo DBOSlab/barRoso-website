@@ -26,7 +26,7 @@ resources:
 </style>
 
 <div class="floating-logos">
-  <img src='/figures/barroso_hex_sticker.png' alt='jabotR hex sticker'>
+  <img src='/figures/barroso_hex_sticker.png' alt='barRoso hex sticker'>
   <img src='/figures/jbrj_marca.jpg' alt='JBRJ logo'>
 </div>
 
@@ -46,6 +46,15 @@ Unlike many packages that rely on static dictionaries to clean collector names, 
 \
 While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, `barRoso` takes a different approach. Its philosophy centers on standardization rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, `barRoso` focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, `barRoso` allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.\
 \
+\
+
+## Graziela Maciel Barroso
+
+Graziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.
+
+She authored the landmark three-volume *Sistemática de Angiospermas do Brasil* (1978–1986), still a cornerstone of botanical education, as well as *Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas* (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.
+
+Barroso remained professionally active until her passing at age 92. A month before her death, she was elected to the [Brazilian Academy of Sciences](https://www.abc.org.br/membro/graziela-maciel-barroso/), a distinction awarded posthumously.\
 \
 :::
 ::: {style="display: flex; gap: 16px; justify-content: center; align-items: center;"}
