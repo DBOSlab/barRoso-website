@@ -1,0 +1,149 @@
+---
+title: "std_place"
+description: "Documentation for `std_place()` from the refloraR package."
+toc: true
+toc-depth: 3
+---
+ 
+```{r}
+#| eval: false
+refloraR::std_place()
+```
+
+ **Description**
+ \description
+{
+
+
+Cleans and standardizes the geographic columns of a biodiversity collection
+
+dataset. This includes unifying column names and harmonizing values for
+
+\code
+{
+continent
+}
+, 
+\code
+{
+country
+}
+, 
+\code
+{
+stateProvince
+}
+, 
+\code
+{
+county
+}
+, 
+\code
+{
+municipality
+}
+, and 
+\code
+{
+locality
+}
+.
+
+The function handles translations, synonyms, upper-case anomalies, ISO country
+
+codes, and common geographic aliases.
+
+} 
+
+ **Details**
+ \details
+{
+
+
+This function is used internally by the 
+\code
+{
+barroso
+}
+ package to support record
+
+reconciliation, duplicate detection, and label generation across different
+
+biodiversity databases. It ensures consistency of location fields by correcting
+
+common mistakes and variations. Country names are translated to English and
+
+harmonized using 
+\code
+{
+countrycode
+}
+ Brazilian and U.S. state abbreviations are
+
+expanded to full names.
+
+} 
+
+ **Arguments**
+
+| Argument | Description |
+|----------|-------------|
+| \item  { df }  { A data frame containing biodiversity records. } | \item  { df }  { A data frame containing biodiversity records. } |
+| \item  { colname_continent }  { Column name for continent (default:  \code { "continent" } | \item  { colname_continent }  { Column name for continent (default:  \code { "continent" } |
+| \item  { colname_country }  { Column name for country (default:  \code { "country" } | \item  { colname_country }  { Column name for country (default:  \code { "country" } |
+| \item  { colname_stateProvince }  { Column name for state or province (default:  \code { "stateProvince" } | \item  { colname_stateProvince }  { Column name for state or province (default:  \code { "stateProvince" } |
+| \item  { colname_county }  { Column name for county (default:  \code { "county" } | \item  { colname_county }  { Column name for county (default:  \code { "county" } |
+| \item  { colname_municipality }  { Column name for municipality (default:  \code { "municipality" } | \item  { colname_municipality }  { Column name for municipality (default:  \code { "municipality" } |
+| \item  { colname_locality }  { Column name for locality (default:  \code { "locality" } | \item  { colname_locality }  { Column name for locality (default:  \code { "locality" } |
+| \item  { rm_original_column }  { Logical; if  \code { TRUE } | \item  { rm_original_column }  { Logical; if  \code { TRUE } | 
+
+ **Value**
+ \value
+{
+
+
+A data frame with standardized geographic information. If
+
+\code
+{
+rm_original_column = FALSE
+}
+, the original columns are retained with 
+\verb
+{
+*Original
+}
+
+
+suffixes.
+
+} 
+
+ **Examples**
+```r
+ \examples
+{
+
+
+\dontrun
+{
+
+
+df <- read.csv("herbarium_records.csv")
+
+df_clean <- std_place(df,
+
+                      colname_country = "pais",
+
+                      colname_stateProvince = "estado",
+
+                      rm_original_column = FALSE)
+
+}
+
+
+
+
+} 
+```

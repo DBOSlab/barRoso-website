@@ -1,0 +1,153 @@
+---
+title: "std_taxa"
+description: "Documentation for `std_taxa()` from the refloraR package."
+toc: true
+toc-depth: 3
+---
+ 
+```{r}
+#| eval: false
+refloraR::std_taxa()
+```
+
+ **Description**
+ \description
+{
+
+
+Cleans and standardizes taxonomic fields in a biodiversity collection dataset.
+
+Specifically targets and harmonizes the 
+\code
+{
+family
+}
+, 
+\code
+{
+genus
+}
+, and 
+\code
+{
+specificEpithet
+}
+ columns,
+
+correcting legacy naming (e.g. Leguminosae → Fabaceae), removing ambiguous entries,
+
+and formatting genus/species names for consistency.
+
+} 
+
+ **Details**
+ \details
+{
+
+
+This function is part of the 
+\code
+{
+barroso
+}
+ package and is designed to improve the
+
+quality of taxon names for reconciliation, querying, and label generation.
+
+It removes common taxonomic noise such as uncertain identifiers (e.g. “cf.”,
+
+“aff.”, “indet.”), numeric placeholders, and genus-only labels mistakenly
+
+stored in the species field. Genus names are capitalized, and legacy family
+
+names (like 
+\code
+{
+Leguminosae
+}
+) are standardized to their accepted equivalents
+
+(e.g. 
+\code
+{
+Fabaceae
+}
+).
+
+} 
+
+ **Arguments**
+
+| Argument | Description |
+|----------|-------------|
+| \item  { df }  { A data frame with biodiversity collection records. } | \item  { df }  { A data frame with biodiversity collection records. } |
+| \item  { colname_family }  { Name of the column containing plant family names (default:  \code { "family" } | \item  { colname_family }  { Name of the column containing plant family names (default:  \code { "family" } |
+| \item  { colname_genus }  { Name of the column containing genus names (default:  \code { "genus" } | \item  { colname_genus }  { Name of the column containing genus names (default:  \code { "genus" } |
+| \item  { colname_specificEpithet }  { Name of the column containing specific epithet of the species names (default:  \code { "specificEpithet" } | \item  { colname_specificEpithet }  { Name of the column containing specific epithet of the species names (default:  \code { "specificEpithet" } |
+| \item  { rm_original_column }  { Logical; if  \code { TRUE } | \item  { rm_original_column }  { Logical; if  \code { TRUE } | 
+
+ **Value**
+ \value
+{
+
+
+A data frame with cleaned and standardized 
+\code
+{
+family
+}
+, 
+\code
+{
+genus
+}
+, and 
+\code
+{
+specificEpithet
+}
+ columns.
+
+If 
+\code
+{
+rm_original_column = FALSE
+}
+, original values are retained with a 
+\verb
+{
+*Original
+}
+ suffix.
+
+} 
+
+ **Examples**
+```r
+ \examples
+{
+
+
+\dontrun
+{
+
+
+df <- read.csv("taxa.csv")
+
+df_clean <- std_taxa(df,
+
+                     colname_family = "familia",
+
+                     colname_genus = "genero",
+
+                     colname_specificEpithet = "especie",
+
+                     rm_original_column = FALSE)
+
+}
+
+
+
+
+} 
+```

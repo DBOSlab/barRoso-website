@@ -1,0 +1,123 @@
+---
+title: "barroso_std"
+description: "Documentation for `barroso_std()` from the refloraR package."
+toc: true
+toc-depth: 3
+---
+ 
+```{r}
+#| eval: false
+refloraR::barroso_std()
+```
+
+ **Description**
+ \description
+{
+
+
+A wrapper function that performs integrated cleaning and standardization of
+
+biodiversity collection records using the 
+\code
+{
+barroso
+}
+ package. This includes
+
+harmonizing taxonomic, geographic, collector, and type status information,
+
+as well as flagging or removing unvouchered and duplicate specimens.
+
+} 
+
+ **Details**
+ \details
+{
+
+
+This function orchestrates several 
+\verb
+{
+std_*
+}
+ functions from the 
+\code
+{
+barroso
+}
+
+
+package to clean records from virtual herbaria and biodiversity portals. It
+
+handles multilingual field names, missing data, inconsistent formatting,
+
+and dataset chunking for large inputs. The function also detects and optionally
+
+removes duplicate records and specimens lacking voucher information.
+
+} 
+
+ **Arguments**
+
+| Argument | Description |
+|----------|-------------|
+| \item  { ... }  { Input data frame containing raw biodiversity records. } | \item  { ... }  { Input data frame containing raw biodiversity records. } |
+| \item  { unvouchered }  { Logical; if  \code { TRUE } | \item  { unvouchered }  { Logical; if  \code { TRUE } |
+| \item  { delunkcoll }  { Logical; if  \code { TRUE } | \item  { delunkcoll }  { Logical; if  \code { TRUE } |
+| \item  { flag_missid }  { Reserved for future use. Currently not implemented. } | \item  { flag_missid }  { Reserved for future use. Currently not implemented. } |
+| \item  { flag_duplicates }  { Logical; if  \code { TRUE } | \item  { flag_duplicates }  { Logical; if  \code { TRUE } |
+| \item  { rm_duplicates }  { Logical; if  \code { TRUE } | \item  { rm_duplicates }  { Logical; if  \code { TRUE } |
+| \item  { colname_recordedBy }  { Column name for collector names. } | \item  { colname_recordedBy }  { Column name for collector names. } |
+| \item  { colname_recordNumber }  { Column name for collector number. } | \item  { colname_recordNumber }  { Column name for collector number. } |
+| \item  { colname_continent }  { Column name for continent. } | \item  { colname_continent }  { Column name for continent. } |
+| \item  { colname_country }  { Column name for country. } | \item  { colname_country }  { Column name for country. } |
+| \item  { colname_stateProvince }  { Column name for state/province. } | \item  { colname_stateProvince }  { Column name for state/province. } |
+| \item  { colname_county }  { Column name for county. } | \item  { colname_county }  { Column name for county. } |
+| \item  { colname_municipality }  { Column name for municipality. } | \item  { colname_municipality }  { Column name for municipality. } |
+| \item  { colname_locality }  { Column name for locality. } | \item  { colname_locality }  { Column name for locality. } |
+| \item  { colname_collectionCode }  { Column name for collection code. } | \item  { colname_collectionCode }  { Column name for collection code. } |
+| \item  { colname_institutionCode }  { Column name for institution code. } | \item  { colname_institutionCode }  { Column name for institution code. } |
+| \item  { colname_typeStatus }  { Column name for type status. } | \item  { colname_typeStatus }  { Column name for type status. } |
+| \item  { colname_family }  { Column name for family. } | \item  { colname_family }  { Column name for family. } |
+| \item  { colname_genus }  { Column name for genus. } | \item  { colname_genus }  { Column name for genus. } |
+| \item  { colname_specificEpithet }  { Column name for specific epithet. } | \item  { colname_specificEpithet }  { Column name for specific epithet. } |
+| \item  { rm_original_column }  { Logical; if  \code { TRUE } | \item  { rm_original_column }  { Logical; if  \code { TRUE } | 
+
+ **Value**
+ \value
+{
+
+
+A fully cleaned and standardized data frame ready for downstream reconciliation,
+
+duplicate handling, and label generation.
+
+} 
+
+ **Examples**
+```r
+ \examples
+{
+
+
+\dontrun
+{
+
+
+df <- read.csv("raw_herbarium_data.csv")
+
+df_std <- barroso_std(df,
+
+                      colname_country = "pais",
+
+                      colname_stateProvince = "estado",
+
+                      rm_duplicates = TRUE)
+
+}
+
+
+
+
+} 
+```

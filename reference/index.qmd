@@ -1,0 +1,62 @@
+---
+title: "Function Reference"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+<style>
+  body {
+    position: relative;
+  }
+
+  .watermark {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    opacity: 0.15;
+    z-index: -1;
+    width: 300px;
+  }
+
+  .background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: -1;
+  }
+</style>
+
+<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='jabot logo watermark'>
+
+## std_types
+- [std_types](/reference/std_types.qmd)
+
+## std_taxa
+- [std_taxa](/reference/std_taxa.qmd)
+
+## std_collection
+- [std_collection](/reference/std_collection.qmd)
+
+## barroso_flag_duplicates
+- [barroso_flag_duplicates](/reference/barroso_flag_duplicates.qmd)
+
+## std_place
+- [std_place](/reference/std_place.qmd)
+
+## barroso_std
+- [barroso_std](/reference/barroso_std.qmd)
+
+## std_recordedBy
+- [std_recordedBy](/reference/std_recordedBy.qmd)
+
+## barroso_labels
+- [barroso_labels](/reference/barroso_labels.qmd)
+
+## barroso_cat
+- [barroso_cat](/reference/barroso_cat.qmd)
+

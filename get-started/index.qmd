@@ -1,0 +1,74 @@
+---
+title: "Install"
+format:
+  html:
+    toc: true
+---
+
+<style>
+  body {
+    position: relative;
+  }
+
+  .watermark {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    opacity: 0.15;
+    z-index: -1;
+    width: 300px;
+  }
+</style>
+
+<img src="/figures/barroso_hex_sticker.png" class="watermark" alt="barroso logo watermark">
+
+## Installing barroso
+
+The `barroso` package is available on GitHub and can be installed using `devtools`. Before installation, make sure you have the following packages installed:
+
+- [`devtools`](https://CRAN.R-project.org/package=devtools)
+- [`LCVP`](https://github.com/idiv-biodiversity/LCVP)
+- [`lcvplants`](https://github.com/idiv-biodiversity/lcvplants)
+
+```r
+# Install devtools if needed
+install.packages("devtools")
+
+# Install dependencies
+devtools::install_github("idiv-biodiversity/LCVP")
+devtools::install_github("idiv-biodiversity/lcvplants")
+
+# Install barroso
+devtools::install_github("DBOSlab/barroso")
+```
+
+## Load the package
+
+```r
+library(barroso)
+```
+
+You are now ready to start cleaning, standardizing, and analyzing plant specimen records.
+
+## System Requirements
+
+- R version >= 4.1
+- Compatible with macOS, Windows, and Linux
+- Requires internet access to query taxonomic APIs and download specimen records
+
+## Optional: Install recommended packages
+
+For full functionality (label generation, mapping, regex, etc.), install the following suggested packages:
+
+```r
+install.packages(c(
+  "dplyr", "stringr", "sf", "ggplot2", "rmarkdown", "purrr", "tidyr"
+))
+```
+
+## Get Help
+
+For troubleshooting or support, visit:
+
+- [barroso GitHub repository](https://github.com/DBOSlab/barroso)
+- [GitHub Discussions](https://github.com/DBOSlab/barroso/discussions)

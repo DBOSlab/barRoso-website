@@ -1,0 +1,87 @@
+---
+title: "Compare Herbarium Sources"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+---
+
+## Overview
+
+When working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. `barroso` offers the `combine_herbaria()` function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.
+
+This article demonstrates how to:
+
+- Merge multiple data sources into a unified data frame
+- Identify and remove overlapping records
+- Prioritize a preferred source when conflicts occur
+
+
+## Function: `barroso_cat()`
+
+```r
+combined_df <- barroso_cat(
+  list_sources = list(
+    GBIF = gbif_data,
+    speciesLink = splink_data,
+    JABOT = jabot_data
+  ),
+  keep_source = "GBIF"
+)
+```
+
+## Arguments
+
+- `list_sources`: A named list of data frames. Each represents a biodiversity source.
+- `keep_source`: Optionally specify a preferred source (e.g., "GBIF"). When overlaps are detected via `collectionCode`, records from the preferred source are retained.
+
+If no source is specified, the function merges all sources, retaining potential duplicates for further reconciliation.
+
+
+## Example
+
+```r
+library(barroso)
+
+# Load three herbarium datasets
+jabot <- read.csv("jabot.csv")
+gbif <- read.csv("gbif.csv")
+splink <- read.csv("splink.csv")
+
+# Merge, giving preference to GBIF for overlapping herbaria
+combined_df <- barroso_cat(
+  list_sources = list(
+    GBIF = gbif,
+    speciesLink = splink,
+    JABOT = jabot
+  ),
+  keep_source = "GBIF"
+)
+```
+
+## How It Works
+
+- `collectionCode` is used to detect overlapping herbaria
+- Only one record is retained when `keep_source` is defined
+- All datasets are aligned to a common column structure
+- Missing fields are filled with `NA` for consistency
+
+This harmonization step is especially useful before running downstream standardization (`barroso_std()`) or duplicate detection (`barroso_flag_duplicates()`).
+
+---
+
+## Tips
+
+- Ensure each dataset includes a `collectionCode` column
+- Use `keep_source = NULL` if you want to preserve all records
+- Use `barroso_std()` after combining to clean remaining fields
+
+---
+
+## Next Steps
+
+Continue to:
+- [Standardize Specimens](/articles/standardize_specimens.qmd)
+- [Detect Duplicates](/articles/detect_duplicates.qmd)
+- [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)

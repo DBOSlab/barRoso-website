@@ -1,0 +1,76 @@
+---
+title: "About barroso"
+subtitle: "Open-source tools for managing and standardizing herbarium specimen records"
+format:
+  html:
+    toc: true
+---
+
+<style>
+  body {
+    position: relative;
+  }
+
+  .watermark {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    opacity: 0.15;
+    z-index: -1;
+    width: 300px;
+  }
+
+  .background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: -1;
+  }
+</style>
+
+<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='barroso logo watermark'>
+
+
+## Overview
+
+`barroso` (Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations) is an R package that streamlines biodiversity data cleaning, integration, and reconciliation, particularly for herbarium records. The toolkit supports workflows from data curation to label production, helping botanists, curators, and researchers analyze plant specimen collections more efficiently.
+
+Named in honor of [Graziela Maciel Barroso](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso), one of Brazil's most respected botanists, the acronym **BARROSO** also nods to its native programming environment—**R**.
+
+The package was originally developed for the [JABOT Virtual Herbarium](https://jabot.jbrj.gov.br), maintained by the [Rio de Janeiro Botanical Garden](https://www.gov.br/jbrj), but it is generalizable to other biodiversity repositories such as [GBIF](https://www.gbif.org), [SEINet](https://swbiodiversity.org/seinet), [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), and [speciesLink](https://specieslink.net).
+The package was originally developed to support the cleaning and reconciliation of plant specimen records retrieved from the [Global Biodiversity Information Facility (GBIF)](https://www.gbif.org), but its flexible design makes it broadly applicable to other biodiversity data sources. These include national and institutional repositories such as the [JABOT Virtual Herbarium](https://jabot.jbrj.gov.br), maintained by the [Rio de Janeiro Botanical Garden](https://www.gov.br/jbrj) and [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), as well as [SEINet](https://swbiodiversity.org/seinet) and [speciesLink](https://specieslink.net).
+
+## Package Description
+
+Package: `barroso`  
+Type: R Package  
+Version: 1.0.0  
+
+Author and Maintainer: Domingos Cardoso ([\@DBOSlab](https://github.com/DBOSlab) [ORCID](https://orcid.org/0000-0001-7072-2656) <domingoscardoso@jbrj.gov.br>)
+
+### Package Features
+
+✅ Clean and standardize collector names, record numbers, and geographic fields  
+✅ Reconcile records from multiple herbarium sources (e.g., GBIF, JABOT, speciesLink)  
+✅ Flag and optionally remove duplicated specimen records  
+✅ Generate herbarium labels from field books with embedded maps and taxonomic authorities  
+✅ Integrate with taxonomic reference tools like [LCVP](https://github.com/idiv-biodiversity/LCVP) and [lcvplants](https://idiv-biodiversity.github.io/lcvplants)
+
+##How to Contribute
+
+We welcome community contributions:
+
+💬 Report bugs or feature requests via [GitHub Issues](https://github.com/DBOSlab/barroso/issues)
+🔧 Submit pull requests with improvements or new features
+🌱 Suggest new functionality or integration ideas
+
+## License
+
+This package is released under the [MIT License](/LICENSE.md), supporting open science and data accessibility for biodiversity research.
+
+## Acknowledgements
+
+Development of `barroso` is led by the [Rio de Janeiro Botanical Garden (JBRJ)](https://www.gov.br/jbrj). I also gratefully acknowledge the financial support provided by [CNPq - Conselho Nacional de Desenvolvimento Científico e Tecnológico](https://www.gov.br/cnpq/pt-br), Brazil's National Council for Scientific and Technological Development, and [FINEP - Financiadora de Estudos e Projetos](https://www.gov.br/finep/pt-br), Brazil's Funding Authority for Studies and Projects. I honor Graziela Maciel Barroso’s legacy in taxonomy and herbaria through this tool.

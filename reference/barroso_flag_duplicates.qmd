@@ -1,0 +1,163 @@
+---
+title: "barroso_flag_duplicates"
+description: "Documentation for `barroso_flag_duplicates()` from the refloraR package."
+toc: true
+toc-depth: 3
+---
+ 
+```{r}
+#| eval: false
+refloraR::barroso_flag_duplicates()
+```
+
+ **Description**
+ \description
+{
+
+
+Identifies and optionally removes duplicate herbarium specimen records based on
+
+collector name and number, or—when these are missing—by species name and date.
+
+Adds a logical 
+\code
+{
+duplicate
+}
+ column to indicate flagged duplicates.
+
+} 
+
+ **Details**
+ \details
+{
+
+
+This function is part of the internal workflow of the 
+\code
+{
+barroso
+}
+ package, supporting
+
+record reconciliation and dataset cleaning. It uses combinations of collector names
+
+(
+\code
+{
+recordedBy
+}
+), collection numbers (
+\code
+{
+recordNumber
+}
+), and collection dates (
+\code
+{
+year
+}
+,
+
+\code
+{
+month
+}
+, 
+\code
+{
+day
+}
+) to identify duplicate entries. When 
+\code
+{
+rm_duplicates = TRUE
+}
+, one
+
+record from each duplicated group is retained, and all others are removed.
+
+Specimens missing collector numbers are handled in a separate logic pass using
+
+additional fields (
+\code
+{
+species
+}
+, 
+\code
+{
+recordedBy
+}
+, 
+\code
+{
+year
+}
+, 
+\code
+{
+month
+}
+, 
+\code
+{
+day
+}
+) to detect
+
+duplicates.
+
+} 
+
+ **Arguments**
+
+| Argument | Description |
+|----------|-------------|
+| \item  { df }  { A data frame with biodiversity specimen records. } | \item  { df }  { A data frame with biodiversity specimen records. } |
+| \item  { rm_duplicates }  { Logical; if  \code { TRUE } | \item  { rm_duplicates }  { Logical; if  \code { TRUE } | 
+
+ **Value**
+ \value
+{
+
+
+A data frame with an added 
+\code
+{
+duplicate
+}
+ column. If 
+\code
+{
+rm_duplicates = TRUE
+}
+,
+
+duplicated entries are removed based on standardized logic.
+
+} 
+
+ **Examples**
+```r
+ \examples
+{
+
+
+\dontrun
+{
+
+
+df <- read.csv("herbarium_data.csv")
+
+df_flagged <- barroso_flag_duplicates(df)
+
+df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE)
+
+}
+
+
+
+
+} 
+```

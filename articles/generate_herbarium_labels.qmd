@@ -1,0 +1,58 @@
+---
+title: "Generate Herbarium Labels"
+format: html
+---
+
+## Overview
+
+The `barroso_labels()` function generates printable herbarium labels directly from field book spreadsheets or CSV files. Labels include specimen information, taxonomic authority, formatted locality descriptions, and location maps (with greater resolution for USA-based collections). 
+
+Taxonomic updates and authority strings are automatically fetched via the [lcvplants](https://idiv-biodiversity.github.io/lcvplants/) package.
+
+## Main Capabilities
+
+- Formats collection records into standardized labels
+- Automatically retrieves and updates scientific names with taxonomic authorities
+- Produces mapped visual references (USA: county-level, Others: country-level)
+- Paginates and saves results as multi-page PDF files (6 labels/page)
+
+## Usage
+
+```r
+barroso_labels(fieldbook = "fieldbook_collections.csv",
+               dir_create = "results_herbarium_labels",
+               file_label = "herbarium_labels.pdf")
+```
+
+- `fieldbook`: Data frame or path to CSV containing specimen records
+- `dir_create`: Folder to output results (defaults to creating dated subfolder)
+- `file_label`: Base name for PDF output files
+
+## Required Fields
+The function expects the following minimal columns in your input:
+
+- `genus`, `species`, `family`, `recordedBy`, `recordNumber`
+- `stateProvince`, `country`, `locality`, `decimalLatitude`, `decimalLongitude`
+
+Optional enhancements:
+- `vernacularName`, `plantDescription`, `vegetation`, `catalogNumber`, `addCollector`, `altitude`, `day`, `month`, `year`
+
+## Output
+- A series of `.pdf` files are saved with six herbarium labels per page
+- Output directory is timestamped with current date
+
+## Example Fieldbook CSV (minimal):
+```csv
+genus,species,family,recordedBy,recordNumber,stateProvince,country,locality,decimalLatitude,decimalLongitude
+Quercus,robur,Fagaceae,John Doe,102,Texas,USA,Austin,30.2672,-97.7431
+```
+
+## Notes
+- For USA records, both state and county maps are shown.
+- For all other countries, only the country-level map is included.
+- Records without `stateProvince` will halt processing.
+- Labels are parsed into line breaks based on text length for improved readability.
+
+## See Also
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)

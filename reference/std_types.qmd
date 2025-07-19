@@ -1,0 +1,116 @@
+---
+title: "std_types"
+description: "Documentation for `std_types()` from the refloraR package."
+toc: true
+toc-depth: 3
+---
+ 
+```{r}
+#| eval: false
+refloraR::std_types()
+```
+
+ **Description**
+ \description
+{
+
+
+Cleans and standardizes the 
+\code
+{
+typeStatus
+}
+ column in biodiversity datasets,
+
+addressing inconsistencies in type designations. It removes irrelevant entries,
+
+harmonizes formatting, and optionally fills missing values if present in other
+
+duplicate records (assumed to be handled outside this function).
+
+} 
+
+ **Details**
+ \details
+{
+
+
+This function is used internally in the 
+\code
+{
+barroso
+}
+ package to prepare
+
+type status data for reconciliation and label generation. It corrects known
+
+placeholder or non-type entries (e.g. “Fotografia do Tipo”, “NOTATYPE”, “Epítipo”)
+
+and simplifies terms like 
+\code
+{
+"sim -"
+}
+ to ensure clean type labels.
+
+} 
+
+ **Arguments**
+
+| Argument | Description |
+|----------|-------------|
+| \item  { df }  { A data frame containing type designation records. } | \item  { df }  { A data frame containing type designation records. } |
+| \item  { colname_typeStatus }  { Name of the column holding type status information (default:  \code { "typeStatus" } | \item  { colname_typeStatus }  { Name of the column holding type status information (default:  \code { "typeStatus" } |
+| \item  { rm_original_column }  { Logical; if  \code { TRUE } | \item  { rm_original_column }  { Logical; if  \code { TRUE } | 
+
+ **Value**
+ \value
+{
+
+
+A data frame with a standardized 
+\code
+{
+typeStatus
+}
+ column.
+
+If 
+\code
+{
+rm_original_column = FALSE
+}
+, the original values are preserved in a column named 
+\code
+{
+typeStatusOriginal
+}
+.
+
+} 
+
+ **Examples**
+```r
+ \examples
+{
+
+
+\dontrun
+{
+
+
+df <- read.csv("specimens.csv")
+
+df_clean <- std_types(df,
+
+                      colname_typeStatus = "tipo",
+
+                      rm_original_column = FALSE)
+
+}
+
+
+
+
+} 
+```

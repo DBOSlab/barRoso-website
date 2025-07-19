@@ -1,0 +1,92 @@
+---
+title: "Frequently Asked Questions"
+format:
+  html:
+    toc: true
+---
+
+<style>
+  body {
+    position: relative;
+  }
+
+  .watermark {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    opacity: 0.15;
+    z-index: -1;
+    width: 300px;
+  }
+
+  .background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: -1;
+  }
+</style>
+
+<img src='/figures/barroso_hex_sticker.png' class='watermark' alt='barroso logo watermark'>
+
+
+### What is the barroso?
+
+`barroso` is an R package for cleaning, standardizing, and reconciling plant specimen records—especially from biodiversity repositories like [GBIF](https://www.gbif.org). It streamlines workflows for curators, researchers, and data scientists by automating the harmonization of taxonomic, geographic, and collector metadata. Optimized for reproducibility, `barroso` facilitates the detection of duplicate specimens and improves data quality across herbarium datasets.
+
+### What can I use barroso for?
+
+- Standardize collector names and associated collector numbers — a crucial step for detecting duplicate specimens across herbaria
+- Harmonize taxonomic and geographic fields (e.g., family, genus, locality, country)
+- Detect and flag potential duplicate records using cleaned metadata
+- Generate herbarium labels from field notebooks, including taxon authority and geolocation maps
+- Prepare high-quality datasets for biodiversity, floristic, and taxonomic studies
+
+### How do I install barroso?
+
+Follow the [Get Started guide](/get-started/index.qmd) for full instructions on installing the package and its dependencies via GitHub.
+
+### Is barroso free to use?
+
+Yes. `barroso` is open-source software licensed under the [MIT License](https://opensource.org/license/mit/), which permits unrestricted use, modification, and distribution.
+
+### What output can barroso generate?
+
+While `barroso` does not directly produce formatted reports, it supports:
+
+- Cleaned and standardized data frames for downstream biodiversity analysis
+- Visual maps in herbarium label generation
+- Easy integration with RMarkdown, Quarto, and Shiny for reporting and dashboards
+
+### How does barroso work?
+
+Unlike many packages that rely on static dictionaries to clean collector names, `barroso` uses a robust set of regular expressions (regex) to dynamically identify and standardize collector patterns across datasets. This approach allows `barroso` to generalize better across sources and spelling variations — even when names are inconsistently formatted. Combined with harmonization of geographic and taxonomic fields, this makes the package especially powerful for detecting duplicates and preparing data for downstream analysis.
+
+### Why doesn’t `barroso` remove incomplete or inconsistent records?
+
+Because **standardization** is more powerful than deletion. Many biodiversity records contain valuable metadata even when some fields are missing or messy. `barroso` standardizes and flags potential problems but leaves the final decision to the user—preserving data integrity and maximizing research potential.
+
+
+### Who are the developers of barroso?
+
+Development is sponsored by [JBRJ](https://www.gov.br/jbrj/pt-br), [FINEP](http://www.finep.gov.br), and [CNPq](https://www.gov.br/cnpq/pt-br). Main developer:
+
+- Domingos Cardoso ([\@DBOSlab](https://github.com/DBOSlab))
+
+View the code and contribute on GitHub: [https://github.com/DBOSlab/barroso](https://github.com/DBOSlab/barroso)
+
+### Why the name barroso?
+
+The name honors Graziela Maciel Barroso (1912–2003), a pioneering Brazilian botanist. It also serves as an acronym: **B**iodiversity **A**nalysis and **R**ecord **R**econciliation for **O**rganizing **S**pecimen **O**bservations, highlighting both its mission and its deep roots in the R programming ecosystem.
+
+### Where can I report bugs or request features?
+
+Submit issues on GitHub: [barroso Issues](https://github.com/DBOSlab/barroso/issues).
+
+### Where can I ask questions or join the community?
+
+Visit [GitHub Discussions](https://github.com/DBOSlab/barroso/discussions) to ask questions, share ideas, or connect with other users.
+

@@ -1,0 +1,108 @@
+project:
+  output-dir: docs
+  type: website
+  resources:
+    - figures/**
+
+website:
+  title: "barroso"
+  site-url: https://dboslab.github.io/barroso-website/
+  page-navigation: true
+  reader-mode: true  
+  favicon: "figures/barroso_hex_sticker.png"
+  
+  page-footer:
+    center:
+      - text: "About"
+        href: about.qmd
+      - text: "FAQ"
+        href: faq/index.qmd
+      - text: "License"
+        href: LICENSE.md
+    right:
+      - icon: github
+        href: https://github.com/DBOSlab/barroso
+        aria-label: barroso GitHub
+  
+  navbar:
+    search: true
+    background: light
+    collapse-below: lg
+    type: light
+    logo: "figures/barroso_hex_sticker.png"
+    href: index.qmd
+    left:
+      - text: "Overview"
+        href: overview/index.qmd
+      - text: "Get Started"
+        href: get-started/index.qmd
+      - text: "Articles"
+        href: articles/index.qmd
+      - text: "News"
+        href: news/index.qmd 
+      - text: "Reference"
+        href: reference/index.qmd
+      - text: "Authors"
+        href: authors/index.qmd
+      - text: "Help"
+        menu:
+          - text: "Report a Bug"
+            icon: "bug"
+            href: "https://github.com/DBOSlab/barroso/issues"
+          - text: "Ask a Question"
+            icon: "chat-right-text"
+            href: "https://github.com/DBOSlab/barroso/discussions"
+          - text: "FAQ"
+            icon: "question-circle"
+            href: faq/index.qmd
+        
+    tools:
+      - icon: github
+        href: https://github.com/DBOSlab/barroso
+        text: barroso GitHub
+        
+  sidebar:                
+    - id: articles
+      title: How-To Articles
+      collapse-level: 3
+      align: left
+      contents:
+        - text: Overview
+          href: articles/index.qmd
+        - section: Data Standardization
+          contents:
+          - text: Standardize Specimen Records 
+            href: articles/standardize_specimens.qmd
+          - text: Flexible Column Names 
+            href: articles/custom_column_names.qmd   
+        - section: Duplicate Detection
+          contents:
+          - text: Detect and Flag Duplicates 
+            href: articles/detect_duplicates.qmd
+          - text: Compare Herbarium Sources 
+            href: articles/compare_herbarium_sources.qmd
+        - section: Case Studies & Workflows
+          contents:
+          - text: Standardize GBIF Data 
+            href: articles/cleaning_gbif_data.qmd
+          - text: REFLORA Cleaning Workflow 
+            href: articles/case_study_reflora.qmd
+        - section: Herbarium Label Generation
+          contents:
+          - text: Generate Herbarium Labels 
+            href: articles/generate_herbarium_labels.qmd
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    code-copy: true
+    code-overflow: wrap
+    code-tools: true
+    css: styles.css
+    eval: false
+    theme:
+      light: [spacelab, theme.scss]
+      dark: [spacelab, theme-dark.scss]
+    include-in-header: gtm-head.html
+    include-before-body: gtm-body.html

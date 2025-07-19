@@ -1,0 +1,70 @@
+---
+title: "Detect and Flag Duplicates"
+format:
+  html:
+    toc: true
+    code-fold: true
+    page-layout: full
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Overview
+
+Duplicate specimens are common in herbarium collections due to specimen exchange among institutions. Identifying and flagging them is crucial for avoiding data inflation and ensuring analytical accuracy. The function `barroso_flag_duplicates()` provides a fast and flexible way to detect potential duplicates based on collector name, collection number, taxon, and collection date.
+
+## Function: `barroso_flag_duplicates()`
+
+### Purpose
+This function flags duplicate specimens by comparing fields that typically indicate specimen identity and collection event.
+
+### Fields used in comparison:
+- `recordedBy` (collector name)
+- `recordNumber` (collection number)
+- `year`, `month`, `day`
+- `family`, `genus`, `specificEpithet`
+
+You can run this function as a standalone or as part of `barroso_std()`.
+
+## Example
+
+```r
+library(barroso)
+
+# Load sample specimen dataset
+df <- read.csv("raw_herbarium_data.csv")
+
+# Detect duplicates and add flag column
+df_flagged <- barroso_flag_duplicates(df,
+                                      rm_duplicates = FALSE)
+
+# View flagged rows
+subset(df_flagged, duplicate == TRUE)
+```
+
+## Arguments
+
+- `df`: A data frame of herbarium records
+- `rm_duplicates`: Logical; if `TRUE`, duplicates will be removed (default: `FALSE`)
+
+## Output
+Returns the same data frame with an additional column:
+- `duplicate`: Logical column indicating whether a row is a suspected duplicate
+
+## Best Practices
+- Run this step **after** standardizing fields using `barroso_std()`
+- Check for misspellings in `recordedBy` and inconsistencies in dates before trusting flags
+
+## Integration Tip
+Use `barroso_flag_duplicates()` to visually inspect duplicates before removing them.
+
+```r
+# To keep only unique records:
+df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE)
+```
+
+## See Also
+- `barroso_std()` – integrates duplicate detection automatically
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)

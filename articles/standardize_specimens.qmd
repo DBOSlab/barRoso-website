@@ -1,0 +1,81 @@
+---
+title: "Standardize Specimen Records"
+format: html
+---
+
+## Overview
+
+The `barroso_std()` function is the primary tool in the `barroso` package for performing full data cleaning and standardization of biodiversity specimen records. It is designed to process raw data from herbaria, virtual repositories, and field collections, ensuring harmonized fields across taxonomic, geographic, and collector-related information.
+
+## Key Features
+
+- Normalize collector names and collection numbers
+- Standardize geographic fields like country, state, and locality
+- Harmonize taxonomic names including family, genus, and species
+- Clean and normalize type status
+- Optionally remove unvouchered or duplicate records
+- Support for multilingual column names (e.g., Portuguese, Spanish)
+
+## Usage
+
+```r
+library(barroso)
+
+df <- read.csv("raw_herbarium_data.csv")
+
+standardized_df <- barroso_std(df,
+                               unvouchered = TRUE,
+                               delunkcoll = FALSE,
+                               flag_missid = TRUE,
+                               flag_duplicates = TRUE,
+                               rm_duplicates = FALSE,
+                               colname_recordedBy = "recordedBy",
+                               colname_recordNumber = "recordNumber",
+                               colname_country = "country",
+                               colname_stateProvince = "stateProvince",
+                               colname_county = "county",
+                               colname_municipality = "municipality",
+                               colname_locality = "locality",
+                               colname_collectionCode = "collectionCode",
+                               colname_institutionCode = "institutionCode",
+                               colname_typeStatus = "typeStatus",
+                               colname_family = "family",
+                               colname_genus = "genus",
+                               colname_specificEpithet = "specificEpithet",
+                               rm_original_column = TRUE)
+```
+
+## Arguments
+
+- `...`: A data frame or list of data frames with raw biodiversity records
+- `unvouchered`: Remove unvouchered (non-herbarium) records
+- `delunkcoll`: Optionally delete records with unknown collectors
+- `flag_duplicates`, `rm_duplicates`: Detect and optionally remove duplicates
+- `rm_original_column`: Remove original (uncleaned) fields after standardization
+
+## Output
+
+Returns a cleaned and fully standardized data frame ready for:
+
+- Reconciliation and deduplication
+- Taxonomic and biogeographic analysis
+- Herbarium label generation workflows
+
+## Notes
+
+- Uses dynamic regular expressions for name harmonization rather than static dictionaries
+- Optimized for scalability and flexible input schema
+- Recommended to run before calling downstream functions like `barroso_flag_duplicates()` or `barroso_labels()`
+
+## Example
+
+```r
+cleaned_data <- barroso_std(df,
+                            colname_country = "pais",
+                            colname_stateProvince = "estado",
+                            rm_duplicates = TRUE)
+```
+
+For a complete list of supported fields, refer to the function documentation with `?barroso_std`.
+
+---

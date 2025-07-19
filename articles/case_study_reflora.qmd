@@ -1,0 +1,72 @@
+---
+title: "REFLORA Cleaning Workflow"
+format: html
+---
+
+This article walks through a practical case study using the `barroso` package to clean and harmonize plant specimen records downloaded from the [REFLORA Virtual Herbarium](https://floradobrasil.jbrj.gov.br/reflora/herbarioVirtual/) using the [`refloraR`](https://dboslab.github.io/refloraR-website/) package.
+
+## Goal
+
+Demonstrate a full cleaning pipeline for biodiversity records from REFLORA, covering:
+
+- Programmatic data download with `refloraR`
+- Collector and record number standardization
+- Duplicate detection
+- Output preparation for downstream analysis
+
+## Step 1: Install Required Packages
+
+```r
+# install.packages("devtools")
+devtools::install_github("DBOSlab/refloraR")
+devtools::install_github("DBOSlab/barroso")
+```
+
+## Step 2: Download Specimens from REFLORA
+
+Use the `refloraR` package to retrieve specimen records for a given taxon and herbarium:
+
+```r
+library(refloraR)
+
+records <- reflora_records(taxon = "Fabaceae", 
+                           herbarium = "RB",
+                           save = FALSE)
+```
+
+## Step 3: Run barroso Standardization
+
+```r
+library(barroso)
+
+cleaned <- barroso_std(records,
+                       colname_recordedBy = "recordedBy",
+                       colname_recordNumber = "recordNumber",
+                       colname_country = "country",
+                       colname_stateProvince = "stateProvince",
+                       flag_duplicates = TRUE,
+                       rm_duplicates = FALSE)
+```
+
+## Step 4: Explore Results
+
+```r
+table(cleaned$duplicate)
+head(cleaned[, c("recordedBy", "recordNumber", "duplicate")])
+```
+
+## Step 5: Save Cleaned Output
+
+```r
+write.csv(cleaned, "reflora_cleaned.csv", row.names = FALSE)
+```
+
+## Summary
+
+With this REFLORA case study, we demonstrated how to:
+
+- Download REFLORA data programmatically with `refloraR`
+- Clean and harmonize biodiversity records using `barroso`
+- Detect and flag duplicates across herbarium specimens
+
+This workflow is reusable for any REFLORA-supported taxa and institutions. Explore additional tools like `barroso_cat()` to merge datasets from GBIF, JABOT, and speciesLink next.

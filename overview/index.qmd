@@ -1,0 +1,67 @@
+---
+title: "Overview"
+format: html
+---
+
+<style>
+  body {
+    position: relative;
+  }
+
+  .watermark {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    opacity: 0.15;
+    z-index: -1;
+    width: 300px;
+  }
+</style>
+
+<img src="/figures/barroso_hex_sticker.png" class="watermark" alt="jabot logo watermark">
+
+
+## What is barroso?
+
+`barroso` is an R package designed to clean, standardize, and reconcile plant specimen records—especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for [GBIF](https://www.gbif.org), it is compatible with data from [JABOT](https://jabot.jbrj.gov.br/v3/consulta.php), [SEINet](https://swbiodiversity.org/seinet), [REFLORA](https://floradobrasil.jbrj.gov.br/reflora), [speciesLink](https://specieslink.net), and others.
+
+The package is named after Brazilian botanist [Graziela Maciel Barroso](https://www.gov.br/jbrj/pt-br/assuntos/colecoes/arquivistica/graziela-maciel-barroso), and also serves as an acronym: **B**iodiversity **A**nalysis and **R**ecord **R**econciliation for **O**rganizing **S**pecimen **O**bservations.
+
+
+## What does barroso do?
+
+`barroso` helps users:
+
+- Standardize collector names and collection numbers using regex-based parsing
+- Harmonize taxonomic, geographic, and temporal fields
+- Flag and remove potential duplicates across herbarium records
+- Generate herbarium labels from fieldbook data
+- Integrate with external taxonomic databases (e.g., LCVP, WFO)
+- Prepare large-scale biodiversity datasets for publication and analysis
+
+
+## Who should use barroso?
+
+- Taxonomists and herbarium curators
+- Biodiversity data scientists
+- Floristic inventory teams
+- Graduate students and researchers managing field collections
+
+
+## What makes barroso different?
+
+Unlike other packages that rely on static collector name dictionaries, `barroso` uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow.
+
+
+## Data Preservation Philosophy
+
+While many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, `barroso` takes a different approach. Its philosophy centers on *standardization* rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, `barroso` focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, `barroso` allows users to flag rather than erase inconsistencies—enabling more transparent workflows and empowering users to trace potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research.
+
+
+## Learn more
+
+Explore the full documentation:
+
+- [Install and Setup](/articles/install_barroso.qmd)
+- [Basic Workflow](/articles/basic_workflow.qmd)
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)
