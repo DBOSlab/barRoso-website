@@ -1,147 +1,54 @@
 ---
-title: "std_collection"
-description: "Documentation for `std_collection()` from the refloraR package."
+title: 'std_collection'
+description: 'Standardize Herbarium Acronyms in Collection Records'
 toc: true
 toc-depth: 3
 ---
- 
+
+
 ```{r}
 #| eval: false
-refloraR::std_collection()
+barRoso::std_collection()
 ```
 
- **Description**
- \description
-{
-
+### Description
 
 Cleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing
-
-values from the 
-\code
-{
-collectionCode
-}
- and 
-\code
-{
-institutionCode
-}
- fields. The function
-
+values from the `collectionCode` and `institutionCode` fields. The function
 corrects common issues in GBIF and other aggregated records, replacing ambiguous
-
 or placeholder codes with recognized herbarium acronyms. It also flags missing
-
 values with fallback rules and optional original column retention.
 
-} 
+### Details
 
- **Details**
- \details
-{
-
-
-This function is part of the 
-\code
-{
-barroso
-}
- package, and applies a large set of
-
+This function is part of the `barRoso` package, and applies a large set of
 conditional replacements based on known patterns and integrates fallback from
-
-\code
-{
-institutionCode
-}
- when 
-\code
-{
-collectionCode
-}
- is missing or ambiguous. Common aliases
-
-like 
-\code
-{
-"Herbarium"
-}
-, 
-\code
-{
-"Botany"
-}
-, or 
-\code
-{
-"Angiosperms"
-}
- are converted to valid acronyms
-
+`institutionCode` when `collectionCode` is missing or ambiguous. Common aliases
+like `"Herbarium"`, `"Botany"`, or `"Angiosperms"` are converted to valid acronyms
 when possible.
 
-} 
-
- **Arguments**
+### Arguments
 
 | Argument | Description |
-|----------|-------------|
-| \item  { df }  { A data frame with biodiversity specimen records. } | \item  { df }  { A data frame with biodiversity specimen records. } |
-| \item  { colname_collectionCode }  { Name of the column containing collection codes (default:  \code { "collectionCode" } | \item  { colname_collectionCode }  { Name of the column containing collection codes (default:  \code { "collectionCode" } |
-| \item  { colname_institutionCode }  { Name of the column containing institution codes (default:  \code { "institutionCode" } | \item  { colname_institutionCode }  { Name of the column containing institution codes (default:  \code { "institutionCode" } |
-| \item  { rm_original_column }  { Logical; if  \code { TRUE } | \item  { rm_original_column }  { Logical; if  \code { TRUE } | 
+|---|---|
+| df | A data frame with biodiversity specimen records. |
+| colname_collectionCode | Name of the column containing collection codes (default: `"collectionCode"`). |
+| colname_institutionCode | Name of the column containing institution codes (default: `"institutionCode"`). |
+| rm_original_column | Logical; if `TRUE`, original columns are removed after cleaning (default: `TRUE`). |
 
- **Value**
- \value
-{
+### Value
 
+A data frame with standardized collection codes in the `collectionCode` column.
+If `rm_original_column = FALSE`, the original values are saved with a *Original suffix.
 
-A data frame with standardized collection codes in the 
-\code
-{
-collectionCode
-}
- column.
+### Examples
 
-If 
-\code
-{
-rm_original_column = FALSE
-}
-, the original values are saved with a 
-\verb
-{
-*Original
-}
- suffix.
-
-} 
-
- **Examples**
 ```r
- \examples
-{
-
-
-\dontrun
-{
-
-
 df <- read.csv("gbif_download.csv")
-
 df_clean <- std_collection(df,
-
                            colname_collectionCode = "collection_code",
-
                            colname_institutionCode = "institution_code",
-
                            rm_original_column = FALSE)
-
-}
-
-
-
-
-} 
 ```
+
+

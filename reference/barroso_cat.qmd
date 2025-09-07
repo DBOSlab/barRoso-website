@@ -1,98 +1,50 @@
 ---
-title: "barroso_cat"
-description: "Documentation for `barroso_cat()` from the refloraR package."
+title: 'barroso_cat'
+description: 'Combine and Harmonize Multiple Herbarium Data Sources'
 toc: true
 toc-depth: 3
 ---
- 
+
+
 ```{r}
 #| eval: false
-refloraR::barroso_cat()
+barRoso::barroso_cat()
 ```
 
- **Description**
- \description
-{
-
+### Description
 
 Merges herbarium records from two or more biodiversity data sources into a single
-
 harmonized data frame. Optionally prioritizes specific sources when duplicates
-
 are detected across herbaria, retaining records based on a flexible exclusion
-
 strategy. The function keeps non-Brazilian herbaria records by default, assuming
-
 higher completeness from global repositories.
 
-} 
-
- **Details**
- \details
-{
-
+### Details
 
 This function aligns column structures, removes redundant records from overlapping
-
 herbaria, and merges all sources into a single output. Duplicate filtering is
+based on matching `collectionCode` across sources. Users can specify a preferred
+source (`keep_source`) when duplicates exist.
 
-based on matching 
-\code
-{
-collectionCode
-}
- across sources. Users can specify a preferred
-
-source (
-\code
-{
-keep_source
-}
-) when duplicates exist.
-
-} 
-
- **Arguments**
+### Arguments
 
 | Argument | Description |
-|----------|-------------|
-| \item  { list_sources }  { A named list of data frames. Each element represents a
- herbarium data source. The names of the list are used to track the source origin
- for internal filtering. } | \item  { list_sources }  { A named list of data frames. Each element represents a
- herbarium data source. The names of the list are used to track the source origin
- for internal filtering. } |
-| \item  { keep_source }  { Optional character string specifying the preferred data
- source (e.g., "GBIF") for resolving duplicate  \code { collectionCode } | \item  { keep_source }  { Optional character string specifying the preferred data
- source (e.g., "GBIF") for resolving duplicate  \code { collectionCode } | 
+|---|---|
+| list_sources | A named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering. |
+| keep_source | Optional character string specifying the preferred data source (e.g., "GBIF") for resolving duplicate `collectionCode` conflicts. If NULL, all records are retained. |
 
- **Value**
- \value
-{
-
+### Value
 
 A harmonized data frame combining all provided herbarium sources, with
-
 columns aligned and optionally filtered to resolve duplicate collections.
 
-} 
+### Examples
 
- **Examples**
 ```r
- \examples
-{
-
-
-
-
-combined_df <- combine_herbaria(list_sources = list(GBIF = gbif_data,
-
-                                                    speciesLink = splink_data,
-
-                                                    JABOT = jabot_data),
-
+combined_df <- barroso_cat(list_sources = list(GBIF = gbif_data,
+                                               speciesLink = splink_data,
+                                               JABOT = jabot_data),
                                 keep_source = "GBIF")
-
-
-
-} 
 ```
+
+
