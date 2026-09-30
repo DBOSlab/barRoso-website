@@ -1,0 +1,166 @@
+---
+title: 'barroso_write_taxon_descr'
+description: 'Build species morphological descriptions from an Excel spreadsheet and export to Word (.docx).'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::barroso_write_taxon_descr()
+```
+
+### Description
+
+This function reads morphological data from an Excel spreadsheet,
+generates standardized species descriptions in plain text and Word document formats,
+and exports them to a Word (.docx) file. It handles complex morphological data
+structures including measurements, subterms, and grouping of related characters.
+The function automatically detects measurement ranges and formats them with
+en dashes (e.g., "4.3–14.5 cm").
+
+### Details
+
+The function expects an Excel file with specific column naming conventions.
+Morphological characters should be grouped with consistent naming patterns:
+
+- 
+
+- 
+-  Simple characters: "Habit", "LEAF shape", "LEAF margin"
+
+- 
+-  Measurements: "LEAF length (cm)", "LEAF width (mm)"
+
+- 
+-  Hierarchical structures: "FLOWER SEPALS length (mm)", "FLOWER SEPALS width (mm)"
+
+The package includes an example dataset `morphological_dataset` containing
+morphological data for 15 species of *Ouratea* (Ochnaceae) that demonstrates
+these naming conventions. This dataset can be used to test the function
+and understand the required data structure.
+
+The function automatically:
+
+- 
+
+- 
+- Detects and groups related morphological characters
+- 
+
+- 
+- Handles measurement ranges (e.g., "4.3-14.5" becomes "4.3–14.5")
+- 
+
+- 
+- Merges duplicate species entries
+- 
+
+- 
+- Formats descriptions with customizable text formatting
+- 
+
+- 
+- Exports to Word with proper scientific typography
+- 
+
+Text formatting can be controlled via the `species_bold`, `group_bold`,
+and related parameters. Species names are italicized by default following
+botanical conventions.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| xlsx_path | Character string. Path to the .xlsx file containing morphological data. |
+| species_cols | Character vector or integer indices. Column names or indices used to build the species header (e.g., c("Genus", "Species", "Author") or 1:3). |
+| character_cols | Character vector or integer indices. Column names or indices of morphological character columns (e.g., c("Habit", "Leaf.length", "Leaf.width") or 4:20). |
+| sheet | Character string or integer. Sheet name or index passed to `readxl::read_excel()`. Default is 1. |
+| species_filter | Optional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the `species_cols` columns (without authorship). |
+| font_family | Character string. Font family for the Word document. Default is "Times New Roman". Common options include "Arial", "Calibri", "Cambria". |
+| font_size | Numeric. Font size in points. Default is 12. |
+| species_bold | Logical. Whether to make species names bold. Default is TRUE. |
+| species_italic | Logical. Whether to make species names italic. Default is TRUE (following botanical conventions). |
+| group_bold | Logical. Whether to make group names (e.g., "Habit", "Leaf") bold. Default is TRUE. |
+| group_italic | Logical. Whether to make group names italic. Default is FALSE. |
+| description_bold | Logical. Whether to make description text bold. Default is FALSE. |
+| description_italic | Logical. Whether to make description text italic. Default is FALSE. |
+| verbose | Logical. If `TRUE` (default), progress messages are printed to the console. Set to `FALSE` for silent operation. |
+| dir | Character string. Directory path where output will be saved. A date-stamped subfolder will be created inside this directory. If `NULL`, uses the Excel filename as directory name. |
+| filename | Character string. Basename for output files (without extension). If `NULL`, uses the Excel filename with "_descriptions" suffix. |
+
+### Value
+
+Invisibly returns a data.frame with two columns:
+
+- 
+
+- 
+- `species_name`: Full species name with authorship
+- 
+
+- 
+- `description_plain`: Plain text description
+- 
+
+The main output is a Word document (.docx) saved to the specified directory.
+
+### Examples
+
+```r
+# Basic usage - generate descriptions for all species
+barroso_write_taxon_descr(
+  xlsx_path = "morphological_data.xlsx",
+  species_cols = c("Genus", "Species", "Author"),
+  character_cols = 4:20
+)
+
+# Generate descriptions only for specific species
+barroso_write_taxon_descr(
+  xlsx_path = "morphological_data.xlsx",
+  species_cols = c("Genus", "Species"),
+  character_cols = 3:15,
+  species_filter = c("Ouratea concinna", "Ouratea coarctata")
+)
+
+# Customize formatting
+barroso_write_taxon_descr(
+  xlsx_path = "morphological_data.xlsx",
+  species_cols = 1:3,
+  character_cols = 4:25,
+  font_family = "Arial",
+  font_size = 11,
+  species_bold = TRUE,
+  species_italic = TRUE,
+  group_bold = FALSE,
+  group_italic = TRUE,
+  description_bold = FALSE,
+  description_italic = FALSE,
+  filename = "MySpeciesDescriptions",
+  dir = "Output"
+)
+
+# Using column indices instead of names
+barroso_write_taxon_descr(
+  xlsx_path = "data.xlsx",
+  species_cols = 1:2,          # First two columns: Genus and Species
+  character_cols = 3:18        # Columns 3-18: morphological characters
+)
+
+
+# Using the included morphological_dataset
+
+# First save the dataset to Excel format=
+library(openxlsx)
+openxlsx::write.xlsx(morphological_dataset, "morphological_dataset.xlsx")
+
+# Generate descriptions using the example dataset
+barroso_write_taxon_descr(
+  xlsx_path = "morphological_dataset.xlsx",
+  species_cols = c("Genus", "Species", "Author"),
+  character_cols = 19:131  # Morphological character columns
+)
+```
+
+

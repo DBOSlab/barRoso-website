@@ -29,34 +29,11 @@ columns can be preserved or overwritten.
 
 Specifically, this function performs extensive string cleaning including:
 
-- 
-
-- 
--  Converting unicode (e.g., Chinese) to Latin names
-
-- 
--  Parsing and normalizing collector names split by 
-- `&`
-- , 
-- `and`
-- , 
-- `e`
-- , 
-- `y`
-- , 
-- ;
-- , 
-- `|`
-- , etc.
-
-- 
--  Handling cases of one, two, or more collectors
-
-- 
--  Cleaning spacing, punctuation, and known collector aliases
-
-- 
--  Adding standardized initials or removing redundant suffixes (e.g., "et al.")
+- Converting Chinese names written as unicode escapes (e.g. `"<U+674E><U+5149><U+7167>"`) into abbreviated Latin names, as Chinese authors cite themselves (e.g. `"G. Z. Li"`)
+- Parsing and normalizing collector names split by `&`, `and`, `e`, `y`, ;, `|`, etc.
+- Handling cases of one, two, or more collectors
+- Cleaning spacing, punctuation, and known collector aliases
+- Adding standardized initials or removing redundant suffixes (e.g., "et al.")
 
 ### Arguments
 

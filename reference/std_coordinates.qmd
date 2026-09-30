@@ -1,0 +1,76 @@
+---
+title: 'std_coordinates'
+description: 'Fix and Flag Geographic Coordinates in Biodiversity Records'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::std_coordinates()
+```
+
+### Description
+
+Checks the geographic coordinates of biodiversity records following the
+workflow of the [bdc](https://brunobrr.github.io/bdc/) package. Coordinates
+with latitude and longitude transposed or with inverted signs are fixed, while
+all other problems are flagged, so the user knows what was fixed and which
+records need attention.
+
+### Details
+
+The function applies, in this order:
+
+1. Parsing of coordinates stored as text, e.g. with decimal commas (`"-12,5"`). Values that cannot be read as numbers (e.g. `"Bloqueada"` in speciesLink) are set to `NA` and flagged.
+2. `bdc::bdc_coordinates_empty()` and `bdc::bdc_coordinates_outOfRange()`.
+3. `bdc::bdc_country_standardized()`, used internally to get the country codes (the original country column is not changed).
+4. `bdc::bdc_coordinates_transposed()`, which FIXES coordinates with latitude and longitude swapped and/or with inverted signs, based on the country of each record.
+5. `bdc::bdc_coordinates_country_inconsistent()`, for coordinates falling outside the country informed in the record.
+6. `bdc::bdc_coordinates_precision()`, for coordinates with few decimals.
+7. `CoordinateCleaner::clean_coordinates()`, with the tests used in the space module of bdc that do not need downloads: country capitals, country and province centroids, biodiversity institutions, zero and equal coordinates, and the GBIF headquarters.
+
+The flag columns follow the bdc convention, where `TRUE` means the record passed
+the test and `FALSE` means it was flagged: `.coordinates_empty`,
+`.coordinates_outOfRange`, `.coordinates_country_inconsistent`, `.rou`, `.equ`,
+`.zer`, `.cap`, `.cen`, `.gbf`, `.inst`. As in bdc, the column
+`coordinates_transposed` has no leading dot because the problem was fixed
+(`FALSE` means the coordinates were corrected). So, the output can be used
+directly with `bdc::bdc_summary_col()` and `bdc::bdc_filter_out_flags()`.
+
+A column `coordinateIssues` describes in words what was fixed or flagged in
+each record, e.g. `"transposed, fixed (latitude and longitude swapped); low precision"`.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame containing biodiversity records. |
+| colname_decimalLatitude | Column name for latitude in decimal degrees (default: `"decimalLatitude"`). |
+| colname_decimalLongitude | Column name for longitude in decimal degrees (default: `"decimalLongitude"`). |
+| colname_country | Column name for country (default: `"country"`). If the column is not found, the country-based tests are skipped. |
+| colname_scientificName | Column name for the taxon name, used to report the transposed coordinates (default: `"scientificName"`). |
+| fix_transposed | Logical; if `TRUE`, fix transposed coordinates (default: `TRUE`). |
+| check_country | Logical; if `TRUE`, flag coordinates outside the informed country (default: `TRUE`). |
+| check_space | Logical; if `TRUE`, flag coordinates at capitals, centroids, institutions, zero or equal coordinates and GBIF headquarters (default: `TRUE`). |
+| min_decimals | Minimum number of decimals of both latitude and longitude, below which coordinates are flagged as low precision (default: `2`). |
+| rm_original_column | Logical; if `TRUE`, the original coordinate columns are removed. If `FALSE`, they are retained with the *Original suffix (default: `FALSE`). |
+
+### Value
+
+The input data frame with numeric coordinates, with transposed coordinates
+fixed, plus the bdc-like flag columns and the column `coordinateIssues`.
+
+### Examples
+
+```r
+df <- read.csv("gbif_download.csv")
+df_coords <- std_coordinates(df)
+
+# Summarize the flags and remove flagged records with bdc
+df_coords <- bdc::bdc_summary_col(df_coords)
+df_clean <- bdc::bdc_filter_out_flags(df_coords, col_to_remove = "all")
+```
+
+

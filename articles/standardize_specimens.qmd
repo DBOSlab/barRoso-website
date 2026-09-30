@@ -10,6 +10,7 @@ The `barroso_std()` function is the primary tool in the `barRoso` package for pe
 ## Key Features
 
 - Normalize collector names and collection numbers
+- Normalize determiner names (`identifiedBy`)
 - Standardize geographic fields like country, state, and locality
 - Harmonize taxonomic names including family, genus, and species
 - Clean and normalize type status
@@ -31,6 +32,7 @@ standardized_df <- barroso_std(df,
                                rm_duplicates = FALSE,
                                colname_recordedBy = "recordedBy",
                                colname_recordNumber = "recordNumber",
+                               colname_identifiedBy = "identifiedBy",
                                colname_country = "country",
                                colname_stateProvince = "stateProvince",
                                colname_county = "county",
@@ -52,6 +54,25 @@ standardized_df <- barroso_std(df,
 - `delunkcoll`: Optionally delete records with unknown collectors
 - `flag_duplicates`, `rm_duplicates`: Detect and optionally remove duplicates
 - `rm_original_column`: Remove original (uncleaned) fields after standardization
+
+## Collector and determiner names
+
+Collector names (`recordedBy`) are standardized with `std_recordedBy()` into initials followed by the surname, and additional collectors are moved to a new column `addCollector` (or stored as `"et al."` when there are more than two collectors). Determiner names (`identifiedBy`) are standardized with `std_identifiedBy()`, using the same rules, but all determiners are kept in the same cell. The original columns are kept with the suffix `Original`.
+
+| Original | Standardized |
+|---|---|
+| `Cardoso, D.B.O.S.` | `D. B. O. S. Cardoso` |
+| `Padgurschi, MCG` | `M. C. G. Padgurschi` |
+| `Martius, CFP von` | `C. F. P. von Martius` |
+| `Uribe Uribe AL` | `A. L. Uribe-Uribe` |
+| `Dusén` | `Dusén` |
+| `A. Gómez Pompa, A. J. Sharp & P. Hernández` | `A. Gómez Pompa` (`addCollector`: `et al.`) |
+| `Lobato, LC; Soares, CRA; Silva, CA` (determiners) | `L. C. Lobato, C. R. A. Soares & C. A. Silva` |
+| `R.Barneby (NY) 1994-06` (determiner) | `R. Barneby` |
+
+Chinese names written as unicode escapes, as in some GBIF downloads (e.g. `<U+674E><U+5149><U+7167>`, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. `G. Z. Li`, `T. S. Yi` (易婷双) and `R. Zhang` (张荣). Family names of two characters (e.g. `Ouyang`) and family names with a special reading (e.g. 曾, `Zeng`) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full.
+
+The function `barroso_std()` does not check geographic coordinates. Use [`std_coordinates()`](/articles/fix_flag_coordinates.qmd) for that.
 
 ## Output
 

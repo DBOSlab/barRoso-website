@@ -1,0 +1,55 @@
+---
+title: 'std_identifiedBy'
+description: 'Standardize Determiner Names in Biodiversity Records'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::std_identifiedBy()
+```
+
+### Description
+
+Cleans and standardizes the `identifiedBy` field in biodiversity collection
+data, using the same name-cleaning rules of `std_recordedBy()`. Each
+determiner name is formatted with abbreviated initials before the surname
+(e.g. `"Cardoso, D.B.O.S."` into `"D. B. O. S. Cardoso"`).
+
+### Details
+
+Unlike `std_recordedBy()`, no additional column is created when there are
+several determiners. All names are kept in the same cell, each one
+standardized and joined as `"D. Cardoso & L. P. Queiroz"` or
+`"A. Pott, V. J. Pott & D. Cardoso"`.
+
+Before standardizing the names, the function removes information that often
+comes along with the determiner in the `identifiedBy` field, such as the
+prefix `"det."`, herbarium acronyms in parentheses (e.g. `"(MO)"`), and
+determination dates (e.g. `"/VI-2011"`, `", 2006"`, `"18 Jun 1996"`).
+Missing or anonymous determiners are returned as `NA`.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame containing biodiversity records. |
+| colname_identifiedBy | Column name for the determiner (default: `"identifiedBy"`). |
+| rm_original_column | Logical; if `TRUE`, the original column is removed after cleaning. If `FALSE`, it is retained with the *Original suffix (default: `FALSE`). |
+
+### Value
+
+A data frame with the standardized determiner names.
+
+### Examples
+
+```r
+df <- read.csv("herbarium_records.csv")
+df_clean <- std_identifiedBy(df,
+                             colname_identifiedBy = "identifiedBy",
+                             rm_original_column = FALSE)
+```
+
+

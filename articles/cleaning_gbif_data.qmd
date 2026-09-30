@@ -12,6 +12,7 @@ Perform a full cleaning workflow for GBIF records using `barRoso`, including:
 - Standardizing collector names and record numbers
 - Harmonizing taxonomic and geographic fields
 - Flagging and filtering duplicate specimens
+- Fixing and flagging geographic coordinates
 - Generating a cleaned dataset ready for downstream use
 
 ## Step 1: Download GBIF Records
@@ -46,7 +47,23 @@ table(cleaned$duplicate)
 head(cleaned[, c("recordedBy", "recordNumber", "duplicate")])
 ```
 
-## Step 4: Save Results
+Blocks of duplicates with conflicting identifications can be inspected with:
+
+```r
+subset(cleaned, identificationConflict %in% TRUE,
+       select = c(recordedBy, recordNumber, duplicateIdentifications, duplicateCatalogNumbers))
+```
+
+## Step 4: Fix and Flag Coordinates
+
+```r
+cleaned <- std_coordinates(cleaned)
+table(unlist(strsplit(cleaned$coordinateIssues, "; ")))
+```
+
+See [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd) for details.
+
+## Step 5: Save Results
 
 ```r
 write.csv(cleaned, "gbif_cleaned.csv", row.names = FALSE)
@@ -58,6 +75,7 @@ In this case study, we:
 
 - Programmatically downloaded GBIF data for a plant family
 - Used `barRoso` to standardize and harmonize specimen metadata
-- Flagged duplicates and prepared a clean dataset for biodiversity research
+- Flagged duplicates and conflicting identifications
+- Fixed and flagged geographic coordinates, preparing a clean dataset for biodiversity research
 
 You can apply this pipeline to other sources such as [SEINet](https://swbiodiversity.org/seinet), [REFLORA Virtual Herbarium](https://floradobrasil.jbrj.gov.br/reflora/herbarioVirtual/), [JABOT](https://jabot.jbrj.gov.br/v3/consulta.php), or [speciesLink](https://specieslink.net/).

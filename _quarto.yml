@@ -82,6 +82,10 @@ website:
             href: articles/detect_duplicates.qmd
           - text: Compare Herbarium Sources 
             href: articles/compare_herbarium_sources.qmd
+        - section: Geographic Coordinates
+          contents:
+          - text: Fix and Flag Coordinates 
+            href: articles/fix_flag_coordinates.qmd
         - section: Case Studies & Workflows
           contents:
           - text: Standardize GBIF Data 
@@ -92,6 +96,10 @@ website:
           contents:
           - text: Generate Herbarium Labels 
             href: articles/generate_herbarium_labels.qmd
+        - section: Write Taxonomic Descriptions
+          contents:
+          - text: Automatically generated taxonomic descriptions 
+            href: articles/write_taxonomic_descriptions.qmd
 
 format:
   html:

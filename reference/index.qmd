@@ -32,7 +32,17 @@ format:
 
 - [`barroso_std()`](/reference/barroso_std.qmd)
 
+- [`barroso_write_taxon_descr()`](/reference/barroso_write_taxon_descr.qmd)
+
+- [`dms_to_decimal()`](/reference/dms_to_decimal.qmd)
+
+- [`remove_authorship()`](/reference/remove_authorship.qmd)
+
 - [`std_collection()`](/reference/std_collection.qmd)
+
+- [`std_coordinates()`](/reference/std_coordinates.qmd)
+
+- [`std_identifiedBy()`](/reference/std_identifiedBy.qmd)
 
 - [`std_place()`](/reference/std_place.qmd)
 

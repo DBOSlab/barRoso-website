@@ -1,0 +1,43 @@
+---
+title: 'remove_authorship'
+description: 'Remove author names from scientific names'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::remove_authorship()
+```
+
+### Description
+
+This function removes author citations from scientific names, leaving only
+the genus and species epithet (and optionally infraspecific ranks).
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| scientific_names | Character vector of scientific names with authors. |
+| keep_infraspecific | Logical, if TRUE, keeps infraspecific epithets (subspecies, varieties, forms). Default is TRUE. |
+
+### Value
+
+Character vector of scientific names without authors.
+
+### Examples
+
+```r
+remove_authorship("Quercus alba L.")
+# Returns: "Quercus alba"
+
+remove_authorship("Quercus rubra var. borealis (F.Michx.) Farw.")
+# Returns: "Quercus rubra var. borealis" (if keep_infraspecific = TRUE)
+
+remove_authorship(c("Acer saccharum Marshall", "Pinus strobus L."))
+# Returns: c("Acer saccharum", "Pinus strobus")
+```
+
+

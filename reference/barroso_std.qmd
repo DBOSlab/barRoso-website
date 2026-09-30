@@ -16,7 +16,8 @@ barRoso::barroso_std()
 A wrapper function that performs integrated cleaning and standardization of
 biodiversity collection records using the `barRoso` package. This includes
 harmonizing taxonomic, geographic, collector, and type status information,
-as well as flagging or removing unvouchered and duplicate specimens.
+as well as flagging or removing unvouchered and duplicate specimens. Determiner
+names in `identifiedBy` are standardized with the same rules of collector names.
 
 ### Details
 
@@ -38,6 +39,7 @@ removes duplicate records and specimens lacking voucher information.
 | rm_duplicates | Logical; if `TRUE`, removes duplicate specimens (default: `FALSE`). |
 | colname_recordedBy | Column name for collector names. |
 | colname_recordNumber | Column name for collector number. |
+| colname_identifiedBy | Column name for determiner names. The column is standardized with `std_identifiedBy()` only when present in the data. |
 | colname_continent | Column name for continent. |
 | colname_country | Column name for country. |
 | colname_stateProvince | Column name for state/province. |

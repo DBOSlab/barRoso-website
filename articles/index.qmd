@@ -20,6 +20,10 @@ format: html
 
 <img src="/figures/barroso_background.png" class="watermark" alt="barroso logo watermark">
 
+These "how-to" articles walk through `barRoso`'s functions in the order you would typically reach for them: combining sources, standardizing the records, reconciling duplicates and checking coordinates, and finally generating labels and taxonomic descriptions. The diagram below gives the overall shape of that workflow before you dive into the individual guides.
+
+<img src="/figures/barRoso_workflow.svg" alt="barRoso workflow diagram" width="100%" />
+
 ::: {layout-ncol="2"}
 
 ::: {style="display: block;"}
@@ -35,6 +39,11 @@ format: html
 :::
 
 ::: {style="display: block;"}
+### Geographic Coordinates
+- [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd)
+:::
+
+::: {style="display: block;"}
 ### Case Studies & Workflows  
 - [Standardize GBIF Data](/articles/cleaning_gbif_data.qmd)
 - [REFLORA Cleaning Workflow](/articles/case_study_reflora.qmd)
@@ -43,6 +52,11 @@ format: html
 ::: {style="display: block;"}
 ### Herbarium Label Generation  
 - [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)
+:::
+
+::: {style="display: block;"}
+### Write Taxonomic Descriptions  
+- [Automatically generated taxonomic descriptions](/articles/write_taxonomic_descriptions.qmd)
 :::
 
 :::

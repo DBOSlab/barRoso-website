@@ -52,16 +52,30 @@ rd_render <- function(x) {
          },
          "\\link" = rend_children(),
          "\\itemize" = {
-           vals <- vapply(children, rd_render, character(1))
-           paste0("\n", paste(paste0("- ", vals), collapse = "\n"))
+           vals <- rd_list_items(children)
+           paste0("\n", paste(paste0("- ", vals), collapse = "\n"), "\n")
          },
          "\\enumerate" = {
-           vals <- vapply(children, rd_render, character(1))
-           paste0("\n", paste(paste0(seq_along(vals), ". ", vals), collapse = "\n"))
+           vals <- rd_list_items(children)
+           paste0("\n", paste(paste0(seq_along(vals), ". ", vals), collapse = "\n"), "\n")
          },
          "\\item" = rend_children(),
          rend_children()
   )
+}
+
+# Group the content of \\itemize and \\enumerate by \\item, as each \\item
+# is followed by several pieces of text and code
+rd_list_items <- function(children) {
+  items <- character(0)
+  for (ch in children) {
+    if (identical(rd_tag(ch), "\\item")) {
+      items <- c(items, "")
+    } else if (length(items) > 0) {
+      items[length(items)] <- paste0(items[length(items)], rd_render(ch))
+    }
+  }
+  gsub("\\s+", " ", trimws(items))
 }
 
 rd_get_section <- function(rd, tag) {

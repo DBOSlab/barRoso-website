@@ -32,9 +32,11 @@ The package is named after Brazilian botanist [Graziela Maciel Barroso](https://
 
 `barRoso` helps users:
 
-- Standardize collector names and collection numbers using regex-based parsing
+- Standardize collector and determiner names and collection numbers using regex-based parsing
 - Harmonize taxonomic, geographic, and temporal fields
-- Flag and remove potential duplicates across herbarium records
+- Combine records from GBIF, speciesLink and other sources
+- Flag and remove potential duplicates across herbarium records, highlighting conflicting identifications
+- Fix and flag geographic coordinates, following the workflow of the bdc package
 - Generate herbarium labels from fieldbook data
 - Integrate with external taxonomic databases (e.g., LCVP, WFO)
 - Prepare large-scale biodiversity datasets for publication and analysis
@@ -64,4 +66,5 @@ Explore the full documentation:
 - [Install and Setup](/get-started/index.qmd)
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)
 - [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
+- [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd)
 - [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)

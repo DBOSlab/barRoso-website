@@ -23,6 +23,26 @@ format:
 
 <img src="/figures/barroso_background.png" class="watermark" alt="barroso watermark">
 
+# barRoso (development version)
+
+### New functions
+
+- `std_identifiedBy()`: standardizes determiner names in `identifiedBy` with the same rules of `std_recordedBy()`, keeping all determiners in the same cell (e.g. `D. Cardoso & L. P. Queiroz`) and removing herbarium acronyms and determination dates. It is now part of `barroso_std()` (new argument `colname_identifiedBy`).
+- `dms_to_decimal()`: converts coordinates in degrees, minutes and seconds (e.g. `22º22´55´´S`, `43º40'49''O`) into decimal degrees. See [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd).
+- `std_coordinates()`: fixes transposed coordinates and flags empty, out of range, country-inconsistent and low precision coordinates, as well as coordinates at capitals, centroids and institutions, following the workflow of the [bdc](https://brunobrr.github.io/bdc/) package. See [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd).
+
+### Improvements
+
+- `barroso_flag_duplicates()`: groups duplicates into blocks, flags blocks with conflicting identifications, and stores all herbaria and catalog numbers of each block (e.g. `MO 2839102 | JBB 13548`). With `rm_duplicates = TRUE`, the record kept is identified to species, has the most frequent identification of the block, and then has coordinates and more filled columns. Records with unknown collector are no longer grouped as duplicates. See [Detect and Flag Duplicates](/articles/detect_duplicates.qmd).
+- `barroso_cat()`: standardizes records of REFLORA and JABOT (from refloraR and jabotR): the determiner `Administrador`, dates in ISO 8601, and type status in Latin.
+- `barroso_cat()`: renames raw speciesLink columns into Darwin Core terms, combines columns with different types, adds a `datasource` column, and with `keep_source` removes only the herbaria also present in the preferred source.
+- `std_recordedBy()`: rewritten with small internal helpers (about half of the code, and twice as fast). Chinese names in unicode escapes are converted into Latin names as Chinese authors cite themselves (e.g. `G. Z. Li`), without the `tmcn` package. Fixed accented names (e.g. `DuséN`), initials followed by particles (`Martius, CFP von`), three collectors like `A. Gómez Pompa, A. J. Sharp & P. Hernández`, remains of `et al.` and HTML entities.
+
+### Bug fixes
+
+- `std_collection()`: with custom column names, the herbarium column was renamed wrongly, so no cleaning was done, and the `genus` column was renamed.
+- `std_place()`: the original municipality and locality columns were saved as `countyOriginal.1` and `countyOriginal.2`; they are now `municipalityOriginal` and `localityOriginal`.
+
 
 # barRoso 1.0.0
 

@@ -1,0 +1,184 @@
+---
+title: "Fix and Flag Coordinates"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+Geographic coordinates of herbarium specimens often have errors: latitude and longitude swapped, a missing minus sign, coordinates pointing to the herbarium that houses the specimen or to the center of a country, or just too few decimals. The function `std_coordinates()` checks the coordinates following the workflow of the [bdc](https://brunobrr.github.io/bdc/) package and, in line with the `barRoso` philosophy, it **fixes** what can be safely fixed and **flags** everything else, so you know what was changed and which records need attention.
+
+## Installation of the suggested packages
+
+`std_coordinates()` uses packages that are not installed with `barRoso` by default:
+
+```r
+install.packages(c("bdc", "CoordinateCleaner", "rnaturalearth", "rnaturalearthdata"))
+install.packages("rnaturalearthhires", repos = "https://ropensci.r-universe.dev")
+```
+
+## Usage
+
+```r
+library(barRoso)
+
+df <- read.csv("gbif.csv")
+
+df_coords <- std_coordinates(df)
+
+# What was fixed or flagged
+table(unlist(strsplit(df_coords$coordinateIssues, "; ")))
+```
+
+Custom column names can be given, e.g. for raw speciesLink downloads:
+
+```r
+df_coords <- std_coordinates(splink,
+                             colname_decimalLatitude = "latitude",
+                             colname_decimalLongitude = "longitude",
+                             colname_scientificName = "scientificname")
+```
+
+## What is checked
+
+The checks are applied in this order:
+
+| Step | Check | Based on | Result |
+|---|---|---|---|
+| 1 | Coordinates stored as text, e.g. `"-12,5"` with decimal comma, or `"Bloqueada"` in speciesLink | — | converted into numbers; values that are not numbers are set to `NA` and flagged |
+| 2 | Empty coordinates | `bdc::bdc_coordinates_empty()` | flagged |
+| 3 | Out of range coordinates (latitude beyond ±90 or longitude beyond ±180) | `bdc::bdc_coordinates_outOfRange()` | flagged |
+| 4 | Latitude and longitude transposed, or with inverted signs | `bdc::bdc_coordinates_transposed()` | **fixed** |
+| 5 | Coordinates outside the country informed in the record | `bdc::bdc_coordinates_country_inconsistent()` | flagged |
+| 6 | Low precision, i.e. fewer decimals than `min_decimals` (default: 2) | `bdc::bdc_coordinates_precision()` | flagged |
+| 7 | Country capitals, country and province centroids, biodiversity institutions, zero or equal coordinates, and the GBIF headquarters | `CoordinateCleaner::clean_coordinates()`, as in the space module of bdc | flagged |
+
+Country names are standardized with `bdc::bdc_country_standardized()` just for these checks; the country column of your data is not changed.
+
+### Transposed coordinates
+
+A record is tested when its coordinates fall outside its country (considering a buffer of 0.2 degrees). As in bdc, seven combinations are tried, in this order, and the first one falling inside the country is kept:
+
+1. sign of latitude inverted
+2. sign of longitude inverted
+3. signs of latitude and longitude inverted
+4. latitude and longitude swapped
+5. latitude and longitude swapped, and sign of latitude inverted
+6. latitude and longitude swapped, and sign of longitude inverted
+7. latitude and longitude swapped, and signs inverted
+
+For example, a record from Brazil at latitude `10.2` and longitude `-59.35` falls in the Atlantic Ocean; with the sign of the latitude inverted (`-10.2`), it falls in Brazil, so it is fixed.
+
+::: {.callout-note}
+The steps 4 and 5 follow the same logic of the corresponding bdc functions (same Natural Earth map, buffers and combinations), but are run by `barRoso` itself. In bdc 1.1.6, `bdc_coordinates_transposed()` writes the fixed coordinates back into the wrong records when several countries are corrected at once, and `bdc_coordinates_country_inconsistent()` fails or flags correct coordinates with recent versions of dplyr.
+:::
+
+### Coordinates outside the informed country
+
+Coordinates are flagged when they fall outside the country informed in the record, considering a buffer of 0.1 degrees to avoid flagging records close to the borders or on the coast.
+
+## Output
+
+The coordinates are replaced by the checked coordinates (as numbers, with transposed coordinates fixed), and the original values are kept in `decimalLatitudeOriginal` and `decimalLongitudeOriginal`. The following columns are added:
+
+| Column | Test | `FALSE` means |
+|---|---|---|
+| `.coordinates_empty` | empty coordinates | coordinates missing |
+| `.coordinates_outOfRange` | out of range | impossible coordinates |
+| `coordinates_transposed` | transposed coordinates | coordinates were **fixed** |
+| `.coordinates_country_inconsistent` | country | outside the informed country |
+| `.rou` | precision | low precision |
+| `.equ` | equal coordinates | latitude equal to longitude |
+| `.zer` | zeros | coordinates at 0, 0 |
+| `.cap` | capitals | at a country capital |
+| `.cen` | centroids | at a country or province centroid |
+| `.gbf` | GBIF | at the GBIF headquarters |
+| `.inst` | institutions | at a biodiversity institution |
+| `coordinateIssues` | all | — (text describing what was fixed or flagged) |
+
+As in bdc, `TRUE` means the record passed the test. The column `coordinates_transposed` has no leading dot because the problem was fixed, not just flagged.
+
+The column `coordinateIssues` describes each record in words, e.g.:
+
+```
+transposed, fixed (sign of latitude inverted); low precision (< 2 decimals)
+```
+
+## Using the flags with bdc
+
+Since the flag columns follow the bdc convention, you can summarize and filter them with bdc:
+
+```r
+# Column .summary is FALSE when any test failed
+df_coords <- bdc::bdc_summary_col(df_coords)
+
+# Keep only records that passed all tests
+df_clean <- bdc::bdc_filter_out_flags(df_coords, col_to_remove = "all")
+```
+
+However, in line with the `barRoso` philosophy, consider reviewing the flagged records before removing them: a record with low precision or at a province centroid may still be useful, e.g. for mapping at the country or state level.
+
+## Example with Ormosia records
+
+Checking the coordinates of 12,979 *Ormosia* records from GBIF and speciesLink combined with `barroso_cat()`:
+
+```r
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = "GBIF")
+combined <- std_coordinates(combined)
+```
+
+| Issue | Records |
+|---|---|
+| empty | 6,830 |
+| low precision (< 2 decimals) | 919 |
+| country or province centroid | 62 |
+| country capital | 29 |
+| outside the informed country | 11 |
+| biodiversity institution | 3 |
+| transposed, fixed | 3 |
+| zero coordinates | 1 |
+
+## Coordinates in degrees, minutes and seconds
+
+Herbarium labels and the verbatim coordinates of databases like REFLORA and JABOT are often written in degrees, minutes and seconds. The function `dms_to_decimal()` converts them into decimal degrees, recognizing the many symbols and hemisphere letters found in herbarium data, also in Portuguese (`O` for oeste, `L` for leste):
+
+```r
+dms_to_decimal(c("22º22´55´´S", "53°45'W", "12 30 15.5 S", "S 8°30.5'", "43º40'49''O", "-55.602222"))
+#> [1] -22.381944 -53.750000 -12.504306  -8.508333 -43.680278 -55.602222
+```
+
+When the hemisphere is not written, as in many REFLORA latitudes (e.g. `"22º22´55´´"`), it can be given:
+
+```r
+dms_to_decimal(reflora$verbatimLatitude, type = "latitude", hemisphere = "S")
+```
+
+Invalid values, like `"60º6´61´´W"` (61 seconds) or latitudes beyond 90°, become `NA` with a warning. Checked against 423 REFLORA and JABOT records that have both verbatim and decimal coordinates, all valid values match the decimal coordinates of the databases.
+
+Unlike `std_coordinates()`, `dms_to_decimal()` works on a single vector of coordinates, so it can be used before checking the coordinates:
+
+```r
+df$decimalLatitude <- dms_to_decimal(df$verbatimLatitude, type = "latitude")
+df$decimalLongitude <- dms_to_decimal(df$verbatimLongitude, type = "longitude")
+df <- std_coordinates(df)
+```
+
+## Arguments
+
+- `df`: A data frame with biodiversity records
+- `colname_decimalLatitude`, `colname_decimalLongitude`: Columns of the coordinates in decimal degrees
+- `colname_country`: Column of the country; without it, the country-based checks are skipped
+- `colname_scientificName`: Column of the taxon name
+- `fix_transposed`: Fix transposed coordinates (default: `TRUE`)
+- `check_country`: Flag coordinates outside the informed country (default: `TRUE`)
+- `check_space`: Flag capitals, centroids, institutions, zero and equal coordinates, and the GBIF headquarters (default: `TRUE`)
+- `min_decimals`: Minimum number of decimals of both coordinates (default: `2`)
+- `rm_original_column`: Remove the original coordinate columns (default: `FALSE`)
+
+## See Also
+
+- [`std_coordinates()` reference](/reference/std_coordinates.qmd)
+- [bdc: Biodiversity Data Cleaning](https://brunobrr.github.io/bdc/)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)

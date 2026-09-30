@@ -26,11 +26,30 @@ df_std <- barroso_std(df,
                       colname_stateProvince = "estado",
                       colname_recordedBy = "coletor",
                       colname_recordNumber = "numero",
+                      colname_identifiedBy = "determinador",
+                      colname_collectionCode = "herbario",
+                      colname_institutionCode = "instituicao",
                       colname_locality = "localidade",
                       colname_family = "familia",
                       colname_genus = "genero",
                       colname_specificEpithet = "epiteto",
                       rm_duplicates = TRUE)
+```
+
+The standardized columns keep your names, and the original values are kept with the suffix `Original`, e.g. `herbario` and `herbarioOriginal`.
+
+The individual functions accept the same arguments, e.g.:
+
+```r
+df_std <- std_collection(df,
+                         colname_collectionCode = "herbario",
+                         colname_institutionCode = "instituicao",
+                         rm_original_column = FALSE)
+
+df_coords <- std_coordinates(df,
+                             colname_decimalLatitude = "latitude",
+                             colname_decimalLongitude = "longitude",
+                             colname_country = "pais")
 ```
 
 ## Why This Matters

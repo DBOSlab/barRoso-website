@@ -13,58 +13,167 @@ execute:
 
 ## Overview
 
-Duplicate specimens are common in herbarium collections due to specimen exchange among institutions. Identifying and flagging them is crucial for avoiding data inflation and ensuring analytical accuracy. The function `barroso_flag_duplicates()` provides a fast and flexible way to detect potential duplicates based on collector name, collection number, taxon, and collection date.
+Duplicate specimens are common in herbarium collections due to specimen exchange among institutions. Identifying them is crucial for avoiding data inflation, but duplicates are also a valuable source of information: the same collection may have been identified differently in each herbarium, and each duplicate may carry different details, such as coordinates.
 
-## Function: `barroso_flag_duplicates()`
+The function `barroso_flag_duplicates()`:
 
-### Purpose
-This function flags duplicate specimens by comparing fields that typically indicate specimen identity and collection event.
+- groups duplicates into **blocks**;
+- highlights blocks with **conflicting identifications**;
+- stores the **herbaria and catalog numbers** of all duplicates of each block;
+- optionally keeps just **one record per block**, chosen by explicit rules.
 
-### Fields used in comparison:
-- `recordedBy` (collector name)
-- `recordNumber` (collection number)
-- `year`, `month`, `day`
-- `family`, `genus`, `specificEpithet`
+You can run it as a standalone function or as part of `barroso_std()`. Run it **after** standardizing collector names with `barroso_std()` or `std_recordedBy()`, so that the same collector is always written in the same way (e.g. `"Cardoso, D."` and `"D.B.O.S. Cardoso"` both become `"D. Cardoso"`).
 
-You can run this function as a standalone or as part of `barroso_std()`.
+## How duplicates are found
 
-## Example
+| Case | Records are duplicates when they share |
+|---|---|
+| With collector number | the collector (`recordedBy`) and the collector number (`recordNumber`) |
+| Without collector number | the species name, the collector and the full collection date (`year`, `month` and `day`) |
+
+- Records with unknown collector (`NA` or `"Unknown"`) are **never** treated as duplicates, as `"Unknown 1"` in two herbaria are most likely different collections.
+- Without collector number, the full date is required, because the same collector may have collected the same species in different days.
+- The specific epithet is taken from `specificEpithet` or, when missing, from a binomial in the column `species`, as in GBIF downloads, which have no `specificEpithet` column.
+
+## Example dataset
+
+The examples below use two blocks of duplicates. Collection *D. Cardoso 1350* was distributed to five herbaria and identified with three different names; collection *L. P. Queiroz 4021* has two duplicates, one identified just to genus.
 
 ```r
 library(barRoso)
 
-# Load sample specimen dataset
-df <- read.csv("raw_herbarium_data.csv")
+df <- data.frame(
+  recordedBy = c(rep("D. Cardoso", 5), rep("L. P. Queiroz", 2)),
+  recordNumber = c(rep("1350", 5), rep("4021", 2)),
+  genus = c("Ormosia", "Ormosia", "Ormosia", "Swartzia", "Ormosia", "Ormosia", "Ormosia"),
+  specificEpithet = c("arborea", "arborea", NA, "apetala", "arborea", NA, "nitida"),
+  collectionCode = c("MO", "JBB", "RB", "K", "HUEFS", "ALCB", "HUEFS"),
+  catalogNumber = c("2839102", "13548", "RB00123", "K000555", "187321", "90210", "201544"),
+  decimalLatitude = c(NA, -12.97, -12.97, -12.97, -12.97, -11.2, NA),
+  decimalLongitude = c(NA, -38.51, -38.51, -38.51, -38.51, -40.1, NA),
+  locality = c("Salvador", NA, "Salvador", "Salvador", "Salvador, Parque da Cidade", NA, NA))
+```
 
-# Detect duplicates and add flag column
-df_flagged <- barroso_flag_duplicates(df,
-                                      rm_duplicates = FALSE)
+| recordedBy | recordNumber | Identification | collectionCode | catalogNumber | Coordinates | locality |
+|---|---|---|---|---|---|---|
+| D. Cardoso | 1350 | *Ormosia arborea* | MO | 2839102 | — | Salvador |
+| D. Cardoso | 1350 | *Ormosia arborea* | JBB | 13548 | -12.97, -38.51 | — |
+| D. Cardoso | 1350 | *Ormosia* | RB | RB00123 | -12.97, -38.51 | Salvador |
+| D. Cardoso | 1350 | *Swartzia apetala* | K | K000555 | -12.97, -38.51 | Salvador |
+| D. Cardoso | 1350 | *Ormosia arborea* | HUEFS | 187321 | -12.97, -38.51 | Salvador, Parque da Cidade |
+| L. P. Queiroz | 4021 | *Ormosia* | ALCB | 90210 | -11.2, -40.1 | — |
+| L. P. Queiroz | 4021 | *Ormosia nitida* | HUEFS | 201544 | — | — |
+
+## Flagging duplicates
+
+```r
+df_flagged <- barroso_flag_duplicates(df)
 
 # View flagged rows
 subset(df_flagged, duplicate == TRUE)
+
+# View blocks of duplicates with conflicting identifications
+subset(df_flagged, identificationConflict %in% TRUE)
 ```
 
-## Arguments
+The following columns are added after `recordNumber`:
 
-- `df`: A data frame of herbarium records
-- `rm_duplicates`: Logical; if `TRUE`, duplicates will be removed (default: `FALSE`)
+| Column | Description |
+|---|---|
+| `duplicate` | `TRUE` for records belonging to a block of duplicates |
+| `duplicateGroup` | Identifier of each block of duplicates |
+| `identificationConflict` | `TRUE` when the block has different species or genera (see below) |
+| `duplicateIdentifications` | All names found in the block |
+| `duplicateCollectionCodes` | All herbaria of the block, separated by `" | "` |
+| `duplicateCatalogNumbers` | All catalog numbers of the block with their herbarium acronym, separated by `" | "` |
 
-## Output
-Returns the same data frame with an additional column:
-- `duplicate`: Logical column indicating whether a row is a suspected duplicate
+For the example dataset:
 
-## Best Practices
-- Run this step **after** standardizing fields using `barroso_std()`
-- Check for misspellings in `recordedBy` and inconsistencies in dates before trusting flags
+| recordedBy | recordNumber | duplicateGroup | identificationConflict | duplicateIdentifications |
+|---|---|---|---|---|
+| D. Cardoso | 1350 | 1 | `TRUE` | Ormosia arborea \| Ormosia \| Swartzia apetala |
+| L. P. Queiroz | 4021 | 2 | `FALSE` | Ormosia \| Ormosia nitida |
 
-## Integration Tip
-Use `barroso_flag_duplicates()` to visually inspect duplicates before removing them.
+| duplicateGroup | duplicateCollectionCodes | duplicateCatalogNumbers |
+|---|---|---|
+| 1 | MO \| JBB \| RB \| K \| HUEFS | MO 2839102 \| JBB 13548 \| RB00123 \| K000555 \| HUEFS 187321 |
+| 2 | ALCB \| HUEFS | ALCB 90210 \| HUEFS 201544 |
+
+The herbarium acronym is pasted before each catalog number, except when the catalog number already starts with it (e.g. `RB00123`, `K000555`). Records that are not duplicates also receive their own herbarium and catalog number in these two columns, so the columns are complete for the whole dataset.
+
+### Conflicting identifications
+
+A block has `identificationConflict = TRUE` when its duplicates are identified as:
+
+- **different species**, e.g. *Ormosia arborea* and *Ormosia nitida*; or
+- **different genera**, e.g. *Ormosia arborea* and *Swartzia apetala* in block 1.
+
+A duplicate identified **just to genus** does not conflict with a complete name of the same genus. That is why block 2, with *Ormosia* and *Ormosia nitida*, has no conflict: the genus-only record is just less complete.
+
+Names are compared exactly, so spelling variants (e.g. *Ormosia trifoliata* and *Ormosia trifoliolata*) are also flagged. This helps finding misspelled names, besides misidentifications.
+
+## Removing duplicates
+
+With `rm_duplicates = TRUE`, only one record per block is kept. The record is chosen by three rules, applied in this order. Each rule only chooses among the records that passed the previous one.
 
 ```r
-# To keep only unique records:
 df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE)
 ```
 
+### Rule 1: identified to species
+
+Records with a complete species name (genus and specific epithet) are preferred over records identified just to genus.
+
+- Block 1: the RB duplicate (*Ormosia*) is discarded; MO, JBB, K and HUEFS go to rule 2.
+- Block 2: the ALCB duplicate (*Ormosia*) is discarded, even though it is the only one with coordinates; HUEFS (*Ormosia nitida*) is kept.
+
+If all duplicates of a block are identified just to genus, all of them go to rule 2.
+
+### Rule 2: most frequent identification
+
+Among the remaining records, those with the name given by most duplicates are preferred.
+
+- Block 1: *Ormosia arborea* is given by three duplicates (MO, JBB, HUEFS) and *Swartzia apetala* by one (K), so K is discarded; MO, JBB and HUEFS go to rule 3.
+
+When two or more names are equally frequent (e.g. one duplicate as *Ormosia arborea* and one as *Ormosia nitida*), all of them go to rule 3.
+
+### Rule 3: most complete record
+
+Among the remaining records, the one with the most complete information is kept:
+
+1. records **with latitude and longitude** are preferred;
+2. then, records with **more filled columns**;
+3. if records are still tied, the first one in the data is kept.
+
+- Block 1: MO has no coordinates and is discarded. JBB and HUEFS both have coordinates, but HUEFS also has the locality, so **HUEFS 187321** is kept.
+
+### Result
+
+| recordedBy | recordNumber | Identification | collectionCode | catalogNumber | identificationConflict |
+|---|---|---|---|---|---|
+| D. Cardoso | 1350 | *Ormosia arborea* | HUEFS | 187321 | `TRUE` |
+| L. P. Queiroz | 4021 | *Ormosia nitida* | HUEFS | 201544 | `FALSE` |
+
+The kept record still has `identificationConflict`, `duplicateIdentifications`, `duplicateCollectionCodes` and `duplicateCatalogNumbers` of its whole block. So, after removing duplicates, you still know that *D. Cardoso 1350* was also identified as *Swartzia apetala* and that it is housed in MO, JBB, RB, K and HUEFS.
+
+## Summary of the rules
+
+| Step | Rule |
+|---|---|
+| Grouping | Same collector and collector number; or same species, collector and full date when the number is missing. Unknown collectors are never grouped. |
+| Conflict | Different species or genera in the same block. Genus-only records do not conflict with species of the same genus. |
+| Rule 1 | Keep records identified to species rather than just to genus. |
+| Rule 2 | Keep records with the most frequent identification of the block (ties go to rule 3). |
+| Rule 3 | Keep the record with coordinates, then with more filled columns, then the first one. |
+
+## Best Practices
+
+- Run this step **after** standardizing fields with `barroso_std()`.
+- Inspect the blocks with `identificationConflict == TRUE` before removing duplicates, as they may reveal misidentified or misspelled names.
+- Keep `rm_duplicates = FALSE` when you want to review the blocks first; the columns `duplicateGroup` and `duplicateIdentifications` make it easy to sort and filter them.
+
 ## See Also
-- `barroso_std()` – integrates duplicate detection automatically
+
+- [`barroso_flag_duplicates()` reference](/reference/barroso_flag_duplicates.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)

@@ -1,0 +1,63 @@
+---
+title: 'dms_to_decimal'
+description: 'Convert Coordinates in Degrees, Minutes and Seconds into Decimal Degrees'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::dms_to_decimal()
+```
+
+### Description
+
+Converts geographic coordinates written in degrees, minutes and seconds
+(e.g. `"22º22´55´´S"`, `"53°45'W"`, `"12 30 15.5 S"`) into decimal degrees
+(e.g. `-22.381944`), as they are often recorded in herbarium labels and in the
+verbatim coordinates of databases like REFLORA, JABOT and speciesLink.
+
+### Details
+
+The function recognizes:
+
+- degree symbols `º`, °, ˚ or `d`; minute symbols ', ´, ′, ’ or `m`; second symbols ", `''`, ´´, ″, ” or `s`, or just spaces between the numbers;
+- decimal minutes or seconds, with dot or comma (e.g. `"12°30,5'S"`);
+- the hemisphere as `N`, `S`, `E`, `W`, or `O` (oeste) and `L` (leste) as in Portuguese and Spanish, before or after the numbers, or a minus sign;
+- coordinates already in decimal degrees (e.g. `"-12.5"`), which are kept.
+
+Values that cannot be converted, or with minutes or seconds of 60 or more, or
+out of the range of latitude (±90) or longitude (±180), are returned as `NA`,
+with a warning.
+
+When the hemisphere is not written (e.g. `"22º22´55´´"`), the result is positive,
+unless it is given in `hemisphere`, e.g. `hemisphere = "S"` for latitudes of
+Brazilian specimens.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| x | Character vector of coordinates. |
+| type | Either `"latitude"`, `"longitude"` or `"auto"` (default). It is used to check the range of the coordinates; with `"auto"`, the range depends on the hemisphere (±90 for N and S, ±180 otherwise). |
+| hemisphere | Optional hemisphere (`"N"`, `"S"`, `"E"` or `"W"`) for the coordinates written without hemisphere or sign. |
+| digits | Number of decimal places of the result (default: `6`, about 10 cm). |
+
+### Value
+
+A numeric vector of coordinates in decimal degrees.
+
+### Examples
+
+```r
+dms_to_decimal(c("22º22´55´´S", "53°45'W", "12 30 15.5 S", "S 8°30.5'", "-55.602222"))
+
+# Latitudes without hemisphere
+dms_to_decimal(c("22º22´55´´", "1º42´12´´"), type = "latitude", hemisphere = "S")
+
+# Longitude in Portuguese (O = oeste = west)
+dms_to_decimal("43º40'49''O")
+```
+
+
