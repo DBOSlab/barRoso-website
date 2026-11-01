@@ -1,0 +1,69 @@
+---
+title: 'barroso_dwc'
+description: 'Format Biodiversity Datasets into Darwin Core'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::barroso_dwc()
+```
+
+### Description
+
+Formats a dataset of herbarium records into [Darwin Core](https://dwc.tdwg.org/terms/)
+column names and value formats, so that records downloaded from different
+sources, such as GBIF, speciesLink, REFLORA and JABOT, can be combined and
+standardized together.
+
+### Details
+
+The source of the dataset is recognized from its columns and values, or can be
+given in `source`. Then:
+
+- Columns named as Darwin Core terms in other cases, e.g. `recordedby` or `decimallatitude`, are renamed into the terms, e.g. `recordedBy` and `decimalLatitude`, for any source.
+- speciesLink: the columns of the older speciesLink format are renamed into Darwin Core terms, e.g. `collector` into `recordedBy`, `collectornumber` into `recordNumber`, `latitude` into `decimalLatitude`, and `species` (just the epithet) into `specificEpithet`; `spp` (the binomial) becomes `species`, as in GBIF. The year, month and day of identification become `dateIdentified`; the author is added to `scientificName`; dates like `"23/11/2011"` become `"2011-11-23"`; and a missing `recordNumber` is taken from `fieldNumber`.
+- REFLORA (as returned by refloraR): the determiner `"Administrador"` (the system user, given to most records) becomes `NA`; dates like `"11/10/2006"` become `"2006-10-11"`; type status in Latin like `"ISOTYPUS"` becomes `"isotype"`; and the institution of RB becomes `"JBRJ"`, as in GBIF and JABOT.
+- JABOT (as returned by jabotR): dates like `"2008-9-26"` or `"22/4/2020"` become `"2008-09-26"` and `"2020-04-22"`.
+- GBIF: downloads are already in Darwin Core, so only the column names are checked.
+
+In all sources, a binomial `species` column is created from `genus` and
+`specificEpithet` when missing, as in GBIF downloads. Columns that are not
+Darwin Core terms are kept unchanged.
+
+By default, all columns are returned as character. Downloads of the same source
+may otherwise have different column types, e.g. `coordinatePrecision` as integer
+in a species with values and as character in a species without them, as in
+the speciesLink API used by `plantR::rspeciesLink()`, and then they cannot be
+combined with `dplyr::bind_rows()`.
+
+`barroso_cat()` runs this function on each source before combining them.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame of biodiversity records. |
+| source | The source of the records: `"auto"` (default) to recognize it from the data, or one of `"speciesLink"`, `"REFLORA"`, `"JABOT"` or `"GBIF"`. |
+| as_character | Logical; if `TRUE` (default), all columns are returned as character, so the outputs of different downloads can always be combined. |
+| verbose | Logical; if `TRUE`, reports the source and what was changed. |
+
+### Value
+
+The data frame with Darwin Core column names and value formats.
+
+### Examples
+
+```r
+splink <- data.frame(collector = "Queiroz, L. P.", collectornumber = "1350",
+                     collectioncode = "HUEFS", genus = "Ormosia", species = "arborea",
+                     scientificname = "Ormosia arborea",
+                     scientificnameauthor = "(Vell.) Harms",
+                     yearidentified = "2005", monthidentified = "3",
+                     dayidentified = NA, latitude = "-12.97", longitude = "-38.5")
+barroso_dwc(splink)
+```
+
+

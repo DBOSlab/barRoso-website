@@ -1,0 +1,304 @@
+---
+title: "Write Lists of Examined Specimens"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+Taxonomic revisions and descriptions of new species cite the specimens examined for each species, in a format that differs from journal to journal: the header, the case and format (bold, italics, small capitals) of countries, states and collectors, how dates and coordinates are written, and how herbaria are listed.
+
+The function `barroso_write_specimens()` writes these lists for one, several or all species of a database of herbarium records into a Word (.docx) file, in the format of a chosen journal. This article goes through the whole workflow with two R scripts, using the herbarium records of *Luetzelburgia* (Leguminosae), a genus of 15 species of South American trees:
+
+1. `01_get_standardized_records_script.R` downloads the records from GBIF, REFLORA and JABOT, combines and standardizes them, and saves a spreadsheet;
+2. `02_write_examined_specimens_script.R` writes the lists of examined specimens from this spreadsheet, in the format of several journals.
+
+Both scripts are run from an RStudio project, e.g. `build_herbarium_records_database`, with the scripts in a folder `scripts` and the results saved in a folder `results`.
+
+## Script 1: get standardized records
+
+The records are downloaded with [plantR](https://github.com/LimaRAF/plantR) (GBIF), [refloraR](https://dboslab.github.io/refloraR-website/) (REFLORA Virtual Herbarium) and [jabotR](https://dboslab.github.io/jabotR-website/) (JABOT, Rio de Janeiro Botanical Garden). The list of accepted species comes from Kew's [WCVP](https://powo.science.kew.org/), with the package `rWCVPdata`.
+
+```r
+# 01_get_standardized_records_script.R
+
+library(barRoso)
+library(refloraR)
+library(jabotR)
+library(plantR)
+library(dplyr)
+library(openxlsx)
+library(rWCVPdata)
+
+# Create a folder for the results of today
+dir <- "results"
+folder_name <- paste0(dir, "/", format(Sys.time(), "%d%b%Y"))
+if (!dir.exists(folder_name)) dir.create(folder_name, recursive = TRUE)
+
+# All accepted species of Luetzelburgia in WCVP
+wcvp_names <- rWCVPdata::wcvp_names
+luetz_wcvp <- subset(wcvp_names,
+                     genus == "Luetzelburgia" &
+                       taxon_rank == "Species" &
+                       taxon_status == "Accepted")
+luetz_list <- sort(luetz_wcvp$taxon_name)
+
+# GBIF: one search for each species, skipping species without records
+data_gbif <- lapply(luetz_list, function(x) {
+  gbif <- tryCatch(plantR::rgbif2(species = x, n.records = 5000, force = TRUE,
+                                  remove_na = FALSE, save = FALSE, compress = FALSE),
+                   error = function(e) NULL)
+  if (!is.data.frame(gbif) || nrow(gbif) == 0) return(NULL)
+  gbif
+})
+names(data_gbif) <- luetz_list
+data_gbif <- dplyr::bind_rows(data_gbif, .id = "original_search")
+
+# REFLORA Virtual Herbarium
+data_reflora <- refloraR::reflora_records(repatriated = TRUE, taxon = "Luetzelburgia",
+                                          indets = TRUE, updates = TRUE,
+                                          verbose = TRUE, save = FALSE)
+unlink("reflora_download/", recursive = TRUE, force = TRUE)
+
+# JABOT
+data_jabot <- jabotR::jabot_records(taxon = "Luetzelburgia", indets = TRUE,
+                                    updates = TRUE, verbose = TRUE, save = FALSE)
+unlink("jabot_download/", recursive = TRUE, force = TRUE)
+
+# Combine the sources, keeping GBIF for the herbaria present in more than one
+records_list <- list(GBIF = data_gbif,
+                     REFLORA = data_reflora,
+                     JABOT = data_jabot)
+data_all <- barRoso::barroso_cat(list_sources = records_list,
+                                 keep_source = "GBIF")
+
+# Standardize collectors, herbaria, places and taxa, and remove duplicates
+data_all_clean <- barRoso::barroso_std(data_all,
+                                       unvouchered = TRUE,
+                                       delunkcoll = TRUE,
+                                       flag_duplicates = TRUE,
+                                       rm_duplicates = TRUE)
+
+# Fix and flag coordinates
+data_all_clean <- barRoso::std_coordinates(data_all_clean)
+
+# Save the database
+openxlsx::write.xlsx(data_all_clean,
+                     paste0(folder_name, "/Luetzelburgia_herbarium_records.xlsx"))
+```
+
+In November 2026, this script found 3,215 records in GBIF, 1,093 in REFLORA and 351 in JABOT:
+
+```
+#> barroso_cat: removing 1089 records of 39 herbaria from REFLORA also present in GBIF
+#> barroso_cat: removing 337 records of 10 herbaria from JABOT also present in GBIF
+```
+
+After the standardization, without duplicates, unvouchered records and records of unknown collectors, the database has 1,202 records of 15 species, from Brazil (1,155), Bolivia (35), Colombia (3) and Guyana (3).
+
+## Script 2: write the examined specimens
+
+The second script reads the spreadsheet saved by the first one, and writes one .docx file for each journal, in the same folder:
+
+```r
+# 02_write_examined_specimens_script.R
+
+library(barRoso)
+library(openxlsx)
+
+# The most recent spreadsheet within the results folder
+dir <- "results"
+records_files <- list.files(dir,
+                            pattern = "^Luetzelburgia_herbarium_records[.]xlsx$",
+                            recursive = TRUE,
+                            full.names = TRUE)
+records_file <- records_files[which.max(file.mtime(records_files))]
+folder_name <- dirname(records_file)
+
+# Read the records once, so the spreadsheet is not read again for each journal
+data_records <- openxlsx::read.xlsx(records_file)
+
+# One Word (.docx) file for each journal. To write just some species, use the
+# argument species, e.g. species = c("Luetzelburgia andina", "Luetzelburgia harleyi")
+journals <- c("Annals of the Missouri Botanical Garden",
+              "Systematic Botany",
+              "Kew Bulletin",
+              "Rodriguesia")
+
+for (journal in journals) {
+  barRoso::barroso_write_specimens(
+    df = data_records,
+    species = NULL,
+    journal = journal,
+    dir = folder_name,
+    filename = paste0("Luetzelburgia_examined_specimens_", gsub("\\s+", "_", journal))
+  )
+}
+#> Skipping 5 records not identified to species
+#> Examined specimens of 15 species (1131 specimens) written in the format of
+#> Annals of the Missouri Botanical Garden to:
+#> results/01Nov2026/Luetzelburgia_examined_specimens_Annals_of_the_Missouri_Botanical_Garden.docx
+#> ...
+```
+
+For each species, the file has the species name and its author, followed by a paragraph with its specimens, e.g. in the format of Systematic Botany:
+
+> ***Luetzelburgia auriculata*** **(Allemão) Ducke**
+>
+> ***Representative Specimens Examined***—**Brazil.** —<span style="font-variant: small-caps;">Bahia</span>: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS). —<span style="font-variant: small-caps;">Ceará</span>: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+## Arguments
+
+| Argument | Description |
+|---|---|
+| `df` or `path` | The records, as a data frame or an .xlsx/.csv file, in Darwin Core format (e.g. the output of `barroso_std()` or `barroso_dwc()`) |
+| `species` | Species to write, with or without authors (e.g. `"Luetzelburgia andina"`); `NULL` for all species |
+| `journal` | The journal whose format is followed, one of the 17 journals below |
+| `header` | Text of the header, e.g. `"Paratypes"` or `"Additional specimens examined"`; `NULL` for the header of the journal, `""` for no header |
+| `language` | `"en"` or `"pt"`, for the default header, months and countries |
+| `catalog_numbers` | If `TRUE`, the catalog number is written after each herbarium, e.g. `"IAC no. 14754"` in Brittonia |
+| `dir`, `filename` | Folder and name of the .docx file |
+| `font_family`, `font_size` | Font of the document |
+
+## Journal formats
+
+The `journal` argument lists all available formats, each checked against recent papers of the journal, including the bold, italics and small capitals used. The journal can be written in any case, with or without accents, and abbreviated, e.g. `"systematic botany"`, `"Kew"`, `"Edinburgh"` or `"Rodriguesia"`. The examples below show the same records of *Luetzelburgia auriculata* in each format, as written in the .docx file. The records of *D. Cardoso et al. 2379* and *D. Machado Cardoso 2379* are duplicates of the same collection, and are cited once, with all their herbaria.
+
+### Systematic Botany
+
+With header in bold italics, countries in bold, states in small capitals after an em dash, and collectors with numbers in italics:
+
+> ***Representative Specimens Examined***—**Brazil.** —<span style="font-variant: small-caps;">Bahia</span>: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS). —<span style="font-variant: small-caps;">Ceará</span>: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Acta Botanica Brasilica
+
+With header, countries and states in bold, collectors in italics, herbaria marked as seen, and municipalities separated by periods:
+
+> **Additional specimens examined: BRAZIL. Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08’48” S, 45°00’55” W, 1 May 2009, *D. Cardoso 2628* (HUEFS!). **Ceará:** Caucaia, Lagoa dos Caetanos, 3° S, 38° W, 21 January 2009, *D. Cardoso et al. 2379* (ASE!, BOTU!, CNMT!, HDJF!, HEPH!, HUCS!, HUEFS!, HUESB!, SORO!, UB!, UESC!, VIC!). Crateús, RPPN Serra das Almas, 5°09’44” S, 40°53’18” W, 15 June 2014, *F.H.F. Nascimento 1402* (HUEFS!).
+
+### Annals of the Missouri Botanical Garden
+
+With states in bold, and collectors with spaced initials in italics:
+
+> *Additional specimens examined.* BRAZIL. **Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS). **Ceará:** Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, *F. H. F. Nascimento 1402* (HUEFS).
+
+### Botanical Journal of the Linnean Society
+
+With header in italics, states in bold, dates like "16.vi.2007", and each municipality cited once:
+
+> *Representative specimens examined:* BRAZIL. **Bahia**: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1.v.2009, *D. Cardoso 2628* (HUEFS). **Ceará**: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21.i.2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15.vi.2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Brazilian Journal of Botany
+
+With collectors cited by surname, and days with two digits:
+
+> *Selected additional specimens*—BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 01 May 2009, *Cardoso 2628* (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *Nascimento 1402* (HUEFS).
+
+### Brittonia
+
+With countries and states in bold, phenology between square brackets, and "et al." not in italics:
+
+> ***Additional specimens examined***.—**BRAZIL. Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS). **Ceará:** Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso* et al. *2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F. H. F. Nascimento 1402* (HUEFS).
+
+### Candollea
+
+With countries in bold small capitals, states in bold, and dates with Roman numerals:
+
+> *Additional specimens examined.* – **<span style="font-variant: small-caps;">Brazil.</span>** **Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S 45°00'55"W, 1.V.2009, *Cardoso 2628* (HUEFS). **Ceará:** Caucaia, Lagoa dos Caetanos, 3°S 38°W, 21.I.2009, *Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09'44"S 40°53'18"W, 15.VI.2014, *Nascimento 1402* (HUEFS).
+
+### Edinburgh Journal of Botany
+
+With states in bold, just the surname of collectors in italics, and municipalities separated by periods:
+
+> *Additional specimens examined.* **BRAZIL. Bahia**: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 v 2009, *Cardoso* 2628 (HUEFS). **Ceará**: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 i 2009, *Cardoso* et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 vi 2014, *Nascimento* 1402 (HUEFS).
+
+### Kew Bulletin
+
+With header and countries in bold uppercase Arial, and numbers not in italics:
+
+> <span style="font-family: Arial, sans-serif;">**SPECIMENS EXAMINED. BRAZIL.**</span> Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S, 45°00'55"W, 1 May 2009, *D. Cardoso* 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, *D. Cardoso et al.* 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09'44"S, 40°53'18"W, 15 June 2014, *F. H. F. Nascimento* 1402 (HUEFS).
+
+### Nordic Journal of Botany
+
+With the species cited in the paragraph of its specimens, under a single header:
+
+> **Additional specimen examined**
+>
+> *Luetzelburgia auriculata* – Brazil, Bahia, Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, Cardoso 2628 (HUEFS). Ceará, Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, Nascimento 1402 (HUEFS).
+
+### Phytotaxa
+
+With municipalities followed by a colon:
+
+> **Additional specimens examined:―**BRAZIL. Bahia: Barreiras: Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, *D. Cardoso 2628* (HUEFS). Ceará: Caucaia: Lagoa dos Caetanos, 3°S, 38°W, 21 January 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús: RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 June 2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### PhytoKeys
+
+With countries in bold small capitals, states in bold, and municipalities after "Mun.":
+
+> **Additional specimens examined.** **<span style="font-variant: small-caps;">Brazil.</span>** **Bahia:** Mun. Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S, 45°00'55"W, 1 May 2009, *D. Cardoso 2628* (HUEFS). **Ceará:** Mun. Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Mun. Crateús, RPPN Serra das Almas, 5°09'44"S, 40°53'18"W, 15 June 2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Plant Ecology and Evolution
+
+With specimens separated by bullets, fields by semicolons, and herbaria without parentheses:
+
+> **Additional material examined.** BRAZIL • Bahia, Barreiras, Prainha, margem do Rio das Ondas; 12°08’48”S, 45°00’55”W; 1 May 2009; *Cardoso 2628*; HUEFS • Ceará, Caucaia, Lagoa dos Caetanos; 3°S, 38°W; 21 Jan. 2009; *Cardoso et al. 2379*; ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC • Crateús, RPPN Serra das Almas; 5°09’44”S, 40°53’18”W; 15 June 2014; *Nascimento 1402*; HUEFS.
+
+### Rodriguésia
+
+With specimens separated by periods, and collections without number cited with the catalog number instead of "s.n.":
+
+> **Additional material examined:** BRAZIL. BAHIA: Barreiras, Prainha, margem do Rio das Ondas, 12º08’48”S, 45º00’55”W, 1.V.2009, *D. Cardoso 2628* (HUEFS). CEARÁ: Caucaia, Lagoa dos Caetanos, 3ºS, 38ºW, 21.I.2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5º09’44”S, 40º53’18”W, 15.VI.2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Systematics and Biodiversity
+
+With header in bold:
+
+> **Additional specimens analysed.** BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S, 45°00'55"W, 1 May 2009, *D. Cardoso 2628* (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 January 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09'44"S, 40°53'18"W, 15 June 2014, *F. H. F. Nascimento 1402* (HUEFS).
+
+### Taxon
+
+With states in uppercase, "& al.", and elevation in "m a.s.l.":
+
+> *Additional specimens examined.* – BRAZIL. BAHIA: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS); CEARÁ: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso & al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Willdenowia
+
+With a single header before all species, countries and states in small capitals, and each municipality cited once, after "Municipality":
+
+> **Additional specimens examined.** 
+>
+> <span style="font-variant: small-caps;">Brazil: Bahia</span>: Municipality Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S, 45°00'55"W, 1 May 2009, *D. Cardoso 2628* (HUEFS). — <span style="font-variant: small-caps;">Ceará</span>: Municipality Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso & al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Municipality Crateús, RPPN Serra das Almas, 5°09'44"S, 40°53'18"W, 15 Jun 2014, *F. H. F. Nascimento 1402* (HUEFS).
+
+## How the specimens are written
+
+- **Columns.** The function uses the Darwin Core columns `species`, `country`, `stateProvince`, `municipality` (or `county`, where GBIF keeps the municipalities of Brazil), `locality`, `decimalLatitude`, `decimalLongitude`, `minimumElevationInMeters`, `maximumElevationInMeters`, `day`, `month`, `year`, `reproductiveCondition` (phenology), `recordedBy`, `addCollector`, `recordNumber`, `collectionCode`, `catalogNumber`. Missing columns are just skipped.
+- **Collectors.** The names standardized by `barroso_std()` (e.g. `D. B. O. S. Cardoso`) are written as each journal cites them. The additional collector (`addCollector`) is written as `et al.` (`& al.` in Taxon) or as the name of the second collector, e.g. `R.M. Harley & A.M. Giulietti`.
+- **Duplicates.** Duplicates of the same collection (same species, collector surname and number, or same collector, date and locality when there is no number) are written once, with all their herbaria in alphabetical order, including those found by [`barroso_flag_duplicates()`](/articles/detect_duplicates.qmd) (`duplicateCollectionCodes`).
+- **Types.** The type status is not written, as types are cited apart from the examined specimens.
+- **Collections without number.** The catalog number of the first herbarium is written, e.g. `R. Spruce s.n. (K000892474, LD)`, so that the specimen can be found. Use `catalog_numbers = TRUE` to write the catalog numbers of all herbaria.
+- **Order.** Specimens are ordered by country, state, municipality and date. Records not identified to species are skipped.
+- **Species.** For each species, a heading with the species name in italics and its author (from `scientificNameAuthorship`, `acceptedScientificName` or `scientificName`) is followed by the paragraph of its specimens.
+
+The function returns, invisibly, a data frame with the species and their specimens, one per line, which can be checked in R:
+
+```r
+res <- barroso_write_specimens(path = "results/01Nov2026/Luetzelburgia_herbarium_records.xlsx",
+                               species = "Luetzelburgia andina", verbose = FALSE)
+cat(res$specimens_text)
+```
+
+## Tips
+
+- Standardize the database first with [`barroso_std()`](/articles/standardize_specimens.qmd), so that collectors, herbarium acronyms and places are written consistently, and duplicates are removed.
+- Check the countries and states of the database before writing: the specimens are cited as they are in the data.
+- For the paratypes of a new species, use `species` and `header = "Paratypes"`.
+
+## See Also
+
+- [`barroso_write_specimens()` reference](/reference/barroso_write_specimens.qmd)
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
+- [Write Taxonomic Descriptions](/articles/write_taxonomic_descriptions.qmd)

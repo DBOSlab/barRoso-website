@@ -38,6 +38,7 @@ The package is named after Brazilian botanist [Graziela Maciel Barroso](https://
 - Flag and remove potential duplicates across herbarium records, highlighting conflicting identifications
 - Fix and flag geographic coordinates, following the workflow of the bdc package
 - Generate herbarium labels from fieldbook data
+- Write lists of examined specimens in the format of 17 botanical journals
 - Integrate with external taxonomic databases (e.g., LCVP, WFO)
 - Prepare large-scale biodiversity datasets for publication and analysis
 
@@ -68,3 +69,4 @@ Explore the full documentation:
 - [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
 - [Fix and Flag Coordinates](/articles/fix_flag_coordinates.qmd)
 - [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)
+- [Write Lists of Examined Specimens](/articles/write_examined_specimens.qmd)

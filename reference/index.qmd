@@ -24,13 +24,19 @@ format:
 
 ## barRoso
 
+- [`barroso_add_char_template()`](/reference/barroso_add_char_template.qmd)
+
 - [`barroso_cat()`](/reference/barroso_cat.qmd)
+
+- [`barroso_dwc()`](/reference/barroso_dwc.qmd)
 
 - [`barroso_flag_duplicates()`](/reference/barroso_flag_duplicates.qmd)
 
 - [`barroso_labels()`](/reference/barroso_labels.qmd)
 
 - [`barroso_std()`](/reference/barroso_std.qmd)
+
+- [`barroso_write_specimens()`](/reference/barroso_write_specimens.qmd)
 
 - [`barroso_write_taxon_descr()`](/reference/barroso_write_taxon_descr.qmd)
 

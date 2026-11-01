@@ -1,0 +1,141 @@
+---
+title: "Format Datasets into Darwin Core"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+Herbarium records downloaded from different portals rarely share the same column names and formats. GBIF uses [Darwin Core](https://dwc.tdwg.org/terms/) terms such as `recordedBy` and `decimalLatitude`, while a speciesLink download may call them `collector` and `latitude`, write dates as `23/11/2011`, or keep the year, month and day of identification in separate columns.
+
+The function `barroso_dwc()` formats a dataset into Darwin Core column names and value formats, so records from GBIF, speciesLink, REFLORA and JABOT can be combined and standardized together. It recognizes the source of the data by itself.
+
+## Usage
+
+```r
+library(barRoso)
+
+splink <- readxl::read_excel("speciesLink-20260409091223-0027073.xlsx", col_types = "text")
+
+splink <- barroso_dwc(splink)
+#> barroso_dwc: speciesLink format; renamed 20 columns (collector -> recordedBy,
+#> collectornumber -> recordNumber, yearcollected -> year, monthcollected -> month, ...);
+#> renamed 13 columns (basisofrecord -> basisOfRecord, stateprovince -> stateProvince, ...);
+#> cleaned 3097 specificEpithet (e.g. "cf. platychila", "sp. 2"); created dateIdentified
+#> from year, month and day of identification; added the author to 133418 scientificName;
+#> took 1585 missing recordNumber from fieldNumber; created species from genus and
+#> specificEpithet
+```
+
+The report tells what was changed. The source can also be given explicitly:
+
+```r
+splink <- barroso_dwc(splink, source = "speciesLink")   # also "REFLORA", "JABOT", "GBIF"
+```
+
+You don't need to call `barroso_dwc()` before [`barroso_cat()`](/articles/compare_herbarium_sources.qmd): it formats each source by itself before combining them.
+
+```r
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = "GBIF")
+```
+
+All columns are returned as character, so the outputs of different downloads can always be combined. For example, when querying several species with `plantR::rspeciesLink()`, a column like `coordinatePrecision` may come as integer for one species and as character for another, and `dplyr::bind_rows()` would fail:
+
+```r
+data_speciesLink <- lapply(targeted_taxa, function(x) {
+  splink <- plantR::rspeciesLink(key = personal_key, species = x, save = FALSE)
+  barroso_dwc(splink)
+})
+names(data_speciesLink) <- targeted_taxa
+data_speciesLink <- dplyr::bind_rows(data_speciesLink, .id = "original_search")
+```
+
+Use `as_character = FALSE` to keep the original column types.
+
+## Recognized sources
+
+| Source | Recognized by | Example of columns |
+|---|---|---|
+| speciesLink, older format | lowercase names of the speciesLink | `collector`, `collectornumber`, `latitude`, `yearidentified` |
+| speciesLink, lowercase Darwin Core | lowercase Darwin Core terms | `recordedby`, `decimallatitude`, `yearidentified` |
+| speciesLink, current format | the column `spp` | `recordedBy`, `decimalLatitude`, `spp` |
+| REFLORA ([refloraR](https://dboslab.github.io/refloraR-website/)) | citation of the REFLORA Virtual Herbarium | Darwin Core |
+| JABOT ([jabotR](https://dboslab.github.io/jabotR-website/)) | `occurrenceID` like `urn:catalog:RB:123` | Darwin Core |
+| GBIF | `gbifID` | Darwin Core |
+
+## What is changed
+
+### Column names
+
+- Darwin Core terms written in other cases, e.g. `recordedby` or `decimallatitude`, become `recordedBy` and `decimalLatitude`, whatever the source.
+- Columns of the older speciesLink format are renamed:
+
+| speciesLink | Darwin Core |
+|---|---|
+| `collector` | `recordedBy` |
+| `collectornumber` | `recordNumber` |
+| `yearcollected`, `monthcollected`, `daycollected` | `year`, `month`, `day` |
+| `latitude`, `longitude` | `decimalLatitude`, `decimalLongitude` |
+| `scientificnameauthor` | `scientificNameAuthorship` |
+| `species` (just the epithet) | `specificEpithet` |
+| `subspecies` | `infraspecificEpithet` |
+| `ordem`, `taxonclass` | `order`, `class` |
+| `continentocean` | `continent` |
+| `minimumelevation`, `maximumelevation` | `minimumElevationInMeters`, `maximumElevationInMeters` |
+| `notes` | `occurrenceRemarks` |
+| `spp` (the binomial) | `species`, as in GBIF |
+
+- A column is never renamed into a name already in the data, and columns that are not Darwin Core terms (e.g. `barcode`, `julianday`) are kept unchanged.
+
+### Values of speciesLink records
+
+| What | Before | After |
+|---|---|---|
+| Date of identification | `yearidentified` 2005, `monthidentified` 3, `dayidentified` 7 | `dateIdentified` `2005-03-07` |
+| Dates | `23/11/2011` | `2011-11-23` |
+| Author in the scientific name | `Ormosia arborea` + `(Vell.) Harms` | `Ormosia arborea (Vell.) Harms` |
+| Qualifier in the epithet | `cf. platychila`, `cf.andarahiensis`, `af. acuminata` | `platychila` + `identificationQualifier` `cf.` |
+| Infraspecific name in the epithet | `stygium var. annulatum` | `stygium` + `infraspecificEpithet` `annulatum` |
+| Morphospecies | `sp.`, `sp. 2`, `sp. nov.`, `fabaceae sp1` | `NA` |
+| Epithet with quotes or a final dot | `"sincorense"`, `brasiliana.` | `sincorense`, `brasiliana` |
+| Missing collector number | `recordNumber` empty, `fieldNumber` 88 | `recordNumber` 88 |
+
+### Values of REFLORA and JABOT records
+
+| Source | What | Before | After |
+|---|---|---|---|
+| REFLORA | Determiner | `Administrador` (the system user) | `NA` |
+| REFLORA | Dates | `2/12/1940`, `--/5/1880` | `1940-12-02`, `1880-05` |
+| REFLORA | Type status in Latin | `ISOTYPUS` | `isotype` |
+| REFLORA | Institution of RB | `RB` | `JBRJ`, as in GBIF and JABOT |
+| JABOT | Dates | `2008-9-26`, `22/4/2020` | `2008-09-26`, `2020-04-22` |
+
+### In all sources
+
+A binomial `species` column is created from `genus` and `specificEpithet` when missing, as in GBIF downloads.
+
+## Example with speciesLink records of the Chapada Diamantina region
+
+The eleven speciesLink downloads of the municipalities around the Chapada Diamantina National Park (194,560 records) share the older speciesLink format, with 71 columns. After `barroso_dwc()`, 44 of them are Darwin Core terms, and:
+
+- 3,097 epithets were cleaned, e.g. 274 qualifiers like `cf.` moved to `identificationQualifier`;
+- 88,192 records got a `dateIdentified` in ISO 8601;
+- 133,418 scientific names got their author;
+- 1,585 missing collector numbers were taken from `fieldNumber`.
+
+## Next steps
+
+After formatting, the records can be combined and standardized:
+
+```r
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink))
+cleaned <- barroso_std(combined)
+```
+
+## See Also
+
+- [`barroso_dwc()` reference](/reference/barroso_dwc.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)

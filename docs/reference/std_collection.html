@@ -4420,11 +4420,19 @@ height: 400px;
 </div>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Cleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing values from the <code>collectionCode</code> and <code>institutionCode</code> fields. The function corrects common issues in GBIF and other aggregated records, replacing ambiguous or placeholder codes with recognized herbarium acronyms. It also flags missing values with fallback rules and optional original column retention.</p>
+<p>Cleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing values from the <code>collectionCode</code> and <code>institutionCode</code> fields. The function corrects common issues in GBIF and other aggregated records, replacing ambiguous or placeholder codes with the herbarium acronyms of <a href="https://sweetgum.nybg.org/science/ih/">Index Herbariorum</a>.</p>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>This function is part of the <code>barRoso</code> package, and applies a large set of conditional replacements based on known patterns and integrates fallback from <code>institutionCode</code> when <code>collectionCode</code> is missing or ambiguous. Common aliases like <code>&quot;Herbarium&quot;</code>, <code>&quot;Botany&quot;</code>, or <code>&quot;Angiosperms&quot;</code> are converted to valid acronyms when possible.</p>
+<p>This function is part of the <code>barRoso</code> package. Instead of a dictionary of every code, it uses regular expressions that generalize across datasets, in the following order:</p>
+<ul>
+<li>Aggregated collections like <code>&quot;Tropicos&quot;</code> or <code>&quot;MO-Duplicates&quot;</code> are replaced with the herbarium of the specimen given in <code>institutionCode</code> (e.g. <code>&quot;NY&quot;</code>), or with <code>&quot;MO&quot;</code> when it is missing.</li>
+<li>Generic words like <code>&quot;Botany&quot;</code>, <code>&quot;Herbarium&quot;</code>, <code>&quot;Vascular Plants&quot;</code> or <code>&quot;PNGplants&quot;</code> are replaced with the acronym in <code>institutionCode</code> or, when missing, with the acronym at the beginning of <code>catalogNumber</code> (e.g. <code>&quot;U.1317533&quot;</code> into <code>&quot;U&quot;</code>) or in <code>occurrenceID</code> (e.g. <code>&quot;urn:catalog:INB:...&quot;</code>).</li>
+<li>Names of collections, like <code>&quot;F-Seedplants&quot;</code>, <code>&quot;BHCB-Fanerogamas&quot;</code>, <code>&quot;INPA-Carpoteca&quot;</code>, <code>&quot;R-Tipos&quot;</code>, <code>&quot;UIS-H&quot;</code> or <code>&quot;BSMvplantscoll&quot;</code>, are reduced to the herbarium acronym. Codes of wood collections, like <code>&quot;INPAw&quot;</code>, are kept, as they are Index Herbariorum codes.</li>
+<li>Names of herbaria and institutions, like <code>&quot;Herbario INPA&quot;</code>, <code>&quot;Herbario Nacional de Costa Rica (CR)&quot;</code> or <code>&quot;Instituto de Botanica de Sao Paulo&quot;</code>, are replaced with the acronym given in the name or with the known acronym.</li>
+<li>Codes that are not acronyms, like observation projects (<code>&quot;Observations&quot;</code>, <code>&quot;Dados de Pesquisa SISBio&quot;</code>), companies (<code>&quot;Ecopetrol S.A&quot;</code>) or numbers, are replaced with the acronym in <code>institutionCode</code> or <code>catalogNumber</code>, or with <code>NA</code>.</li>
+</ul>
+<p>The columns <code>catalogNumber</code> and <code>occurrenceID</code> are used when present.</p>
 </section>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
@@ -4465,11 +4473,12 @@ height: 400px;
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;gbif_download.csv&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_collection</span>(df,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">colname_collectionCode =</span> <span class="st">&quot;collection_code&quot;</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">colname_institutionCode =</span> <span class="st">&quot;institution_code&quot;</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">collectionCode =</span> <span class="fu">c</span>(<span class="st">&quot;Tropicos&quot;</span>, <span class="st">&quot;Botany&quot;</span>, <span class="st">&quot;F-Seedplants&quot;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;Herbario INPA&quot;</span>, <span class="st">&quot;Observations&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">institutionCode =</span> <span class="fu">c</span>(<span class="st">&quot;NY&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;INPA&quot;</span>, <span class="st">&quot;iNaturalist&quot;</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">catalogNumber =</span> <span class="fu">c</span>(<span class="st">&quot;100595392&quot;</span>, <span class="st">&quot;U.1317533&quot;</span>, <span class="st">&quot;V0059731F&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;123&quot;</span>, <span class="st">&quot;340214363&quot;</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">std_collection</span>(df)<span class="sc">$</span>collectionCode</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 <!-- -->
@@ -4959,41 +4968,48 @@ height: 400px;
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>Cleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>values from the <span class="in">`collectionCode`</span> and <span class="in">`institutionCode`</span> fields. The function</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>corrects common issues in GBIF and other aggregated records, replacing ambiguous</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>or placeholder codes with recognized herbarium acronyms. It also flags missing</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>values with fallback rules and optional original column retention.</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>or placeholder codes with the herbarium acronyms of</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Index Herbariorum</span><span class="co">](https://sweetgum.nybg.org/science/ih/)</span>.</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="fu">### Details</span></span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>This function is part of the <span class="in">`barRoso`</span> package, and applies a large set of</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>conditional replacements based on known patterns and integrates fallback from</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="in">`institutionCode`</span> when <span class="in">`collectionCode`</span> is missing or ambiguous. Common aliases</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>like <span class="in">`&quot;Herbarium&quot;`</span>, <span class="in">`&quot;Botany&quot;`</span>, or <span class="in">`&quot;Angiosperms&quot;`</span> are converted to valid acronyms</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>when possible.</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame with biodiversity specimen records. <span class="pp">|</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Name of the column containing collection codes (default: <span class="in">`&quot;collectionCode&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Name of the column containing institution codes (default: <span class="in">`&quot;institutionCode&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, original columns are removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>A data frame with standardized collection codes in the <span class="in">`collectionCode`</span> column.</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>If <span class="in">`rm_original_column = FALSE`</span>, the original values are saved with a *Original suffix.</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;gbif_download.csv&quot;</span>)</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_collection</span>(df,</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>                           <span class="at">colname_collectionCode =</span> <span class="st">&quot;collection_code&quot;</span>,</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>                           <span class="at">colname_institutionCode =</span> <span class="st">&quot;institution_code&quot;</span>,</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>                           <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>This function is part of the <span class="in">`barRoso`</span> package. Instead of a dictionary of</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>every code, it uses regular expressions that generalize across datasets, in</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>the following order:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Aggregated collections like <span class="in">`&quot;Tropicos&quot;`</span> or <span class="in">`&quot;MO-Duplicates&quot;`</span> are replaced with the herbarium of the specimen given in <span class="in">`institutionCode`</span> (e.g. <span class="in">`&quot;NY&quot;`</span>), or with <span class="in">`&quot;MO&quot;`</span> when it is missing.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Generic words like <span class="in">`&quot;Botany&quot;`</span>, <span class="in">`&quot;Herbarium&quot;`</span>, <span class="in">`&quot;Vascular Plants&quot;`</span> or <span class="in">`&quot;PNGplants&quot;`</span> are replaced with the acronym in <span class="in">`institutionCode`</span> or, when missing, with the acronym at the beginning of <span class="in">`catalogNumber`</span> (e.g. <span class="in">`&quot;U.1317533&quot;`</span> into <span class="in">`&quot;U&quot;`</span>) or in <span class="in">`occurrenceID`</span> (e.g. <span class="in">`&quot;urn:catalog:INB:...&quot;`</span>).</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Names of collections, like <span class="in">`&quot;F-Seedplants&quot;`</span>, <span class="in">`&quot;BHCB-Fanerogamas&quot;`</span>, <span class="in">`&quot;INPA-Carpoteca&quot;`</span>, <span class="in">`&quot;R-Tipos&quot;`</span>, <span class="in">`&quot;UIS-H&quot;`</span> or <span class="in">`&quot;BSMvplantscoll&quot;`</span>, are reduced to the herbarium acronym. Codes of wood collections, like <span class="in">`&quot;INPAw&quot;`</span>, are kept, as they are Index Herbariorum codes.</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Names of herbaria and institutions, like <span class="in">`&quot;Herbario INPA&quot;`</span>, <span class="in">`&quot;Herbario Nacional de Costa Rica (CR)&quot;`</span> or <span class="in">`&quot;Instituto de Botanica de Sao Paulo&quot;`</span>, are replaced with the acronym given in the name or with the known acronym.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Codes that are not acronyms, like observation projects (<span class="in">`&quot;Observations&quot;`</span>, <span class="in">`&quot;Dados de Pesquisa SISBio&quot;`</span>), companies (<span class="in">`&quot;Ecopetrol S.A&quot;`</span>) or numbers, are replaced with the acronym in <span class="in">`institutionCode`</span> or <span class="in">`catalogNumber`</span>, or with <span class="in">`NA`</span>.</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>The columns <span class="in">`catalogNumber`</span> and <span class="in">`occurrenceID`</span> are used when present.</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame with biodiversity specimen records. <span class="pp">|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Name of the column containing collection codes (default: <span class="in">`&quot;collectionCode&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Name of the column containing institution codes (default: <span class="in">`&quot;institutionCode&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, original columns are removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>A data frame with standardized collection codes in the <span class="in">`collectionCode`</span> column.</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>If <span class="in">`rm_original_column = FALSE`</span>, the original values are saved with a *Original suffix.</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">collectionCode =</span> <span class="fu">c</span>(<span class="st">&quot;Tropicos&quot;</span>, <span class="st">&quot;Botany&quot;</span>, <span class="st">&quot;F-Seedplants&quot;</span>,</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;Herbario INPA&quot;</span>, <span class="st">&quot;Observations&quot;</span>),</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                 <span class="at">institutionCode =</span> <span class="fu">c</span>(<span class="st">&quot;NY&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;INPA&quot;</span>, <span class="st">&quot;iNaturalist&quot;</span>),</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>                 <span class="at">catalogNumber =</span> <span class="fu">c</span>(<span class="st">&quot;100595392&quot;</span>, <span class="st">&quot;U.1317533&quot;</span>, <span class="st">&quot;V0059731F&quot;</span>,</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;123&quot;</span>, <span class="st">&quot;340214363&quot;</span>))</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="fu">std_collection</span>(df)<span class="sc">$</span>collectionCode</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -20,7 +20,7 @@ format: html
 
 <img src="/figures/barroso_background.png" class="watermark" alt="barroso logo watermark">
 
-These "how-to" articles walk through `barRoso`'s functions in the order you would typically reach for them: combining sources, standardizing the records, reconciling duplicates and checking coordinates, and finally generating labels and taxonomic descriptions. The diagram below gives the overall shape of that workflow before you dive into the individual guides.
+These "how-to" articles walk through `barRoso`'s functions in the order you would typically reach for them: combining sources, standardizing the records, reconciling duplicates and checking coordinates, and finally generating labels, lists of examined specimens and taxonomic descriptions. The diagram below gives the overall shape of that workflow before you dive into the individual guides.
 
 <img src="/figures/barRoso_workflow.svg" alt="barRoso workflow diagram" width="100%" />
 
@@ -28,6 +28,7 @@ These "how-to" articles walk through `barRoso`'s functions in the order you woul
 
 ::: {style="display: block;"}
 ### Data Standardization
+- [Format Datasets into Darwin Core](/articles/format_darwin_core.qmd)
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)
 - [Flexible Column Names](/articles/custom_column_names.qmd)
 :::
@@ -52,6 +53,11 @@ These "how-to" articles walk through `barRoso`'s functions in the order you woul
 ::: {style="display: block;"}
 ### Herbarium Label Generation  
 - [Generate Herbarium Labels](/articles/generate_herbarium_labels.qmd)
+:::
+
+::: {style="display: block;"}
+### Write Examined Specimens
+- [Write Lists of Examined Specimens](/articles/write_examined_specimens.qmd)
 :::
 
 ::: {style="display: block;"}

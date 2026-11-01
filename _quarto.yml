@@ -72,6 +72,8 @@ website:
           href: articles/index.qmd
         - section: Data Standardization
           contents:
+          - text: Format Datasets into Darwin Core 
+            href: articles/format_darwin_core.qmd
           - text: Standardize Specimen Records 
             href: articles/standardize_specimens.qmd
           - text: Flexible Column Names 
@@ -96,6 +98,10 @@ website:
           contents:
           - text: Generate Herbarium Labels 
             href: articles/generate_herbarium_labels.qmd
+        - section: Write Examined Specimens
+          contents:
+          - text: Write Lists of Examined Specimens
+            href: articles/write_examined_specimens.qmd
         - section: Write Taxonomic Descriptions
           contents:
           - text: Automatically generated taxonomic descriptions 

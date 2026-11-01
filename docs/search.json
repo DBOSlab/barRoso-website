@@ -39,14 +39,14 @@
     "href": "reference/std_place.html",
     "title": "std_place",
     "section": "",
-    "text": "barRoso::std_place()\n\n\nDescription\nCleans and standardizes the geographic columns of a biodiversity collection dataset. This includes unifying column names and harmonizing values for continent, country, stateProvince, county, municipality, and locality. The function handles translations, synonyms, upper-case anomalies, ISO country codes, and common geographic aliases.\n\n\nDetails\nThis function is used internally by the barRoso package to support record reconciliation, duplicate detection, and label generation across different biodiversity databases. It ensures consistency of location fields by correcting common mistakes and variations. Country names are translated to English and harmonized using countrycode Brazilian and U.S. state abbreviations are expanded to full names.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing biodiversity records.\n\n\ncolname_continent\nColumn name for continent (default: \"continent\").\n\n\ncolname_country\nColumn name for country (default: \"country\").\n\n\ncolname_stateProvince\nColumn name for state or province (default: \"stateProvince\").\n\n\ncolname_county\nColumn name for county (default: \"county\").\n\n\ncolname_municipality\nColumn name for municipality (default: \"municipality\").\n\n\ncolname_locality\nColumn name for locality (default: \"locality\").\n\n\nrm_original_column\nLogical; if TRUE, original columns are removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with standardized geographic information. If rm_original_column = FALSE, the original columns are retained with *Original suffixes.\n\n\nExamples\ndf &lt;- read.csv(\"herbarium_records.csv\")\ndf_clean &lt;- std_place(df,\n                      colname_country = \"pais\",\n                      colname_stateProvince = \"estado\",\n                      rm_original_column = FALSE)"
+    "text": "barRoso::std_place()\n\n\nDescription\nCleans and standardizes the geographic columns of a biodiversity collection dataset. This includes unifying column names and harmonizing values for continent, country, stateProvince, county, municipality, and locality. The function handles translations, synonyms, upper-case anomalies, ISO country codes, and common geographic aliases.\n\n\nDetails\nThis function is used internally by the barRoso package to support record reconciliation, duplicate detection, and label generation across different biodiversity databases. It ensures consistency of location fields by correcting common mistakes and variations. Country names are translated to English and harmonized using countrycode Brazilian and U.S. state abbreviations are expanded to full names. Words for municipality in county and municipality, e.g. \"Manaus Mun.\", \"Mun. de Castelo\", \"Município de Mucugê\" or \"Arriaga Municipio\", are removed, leaving just the name.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing biodiversity records.\n\n\ncolname_continent\nColumn name for continent (default: \"continent\").\n\n\ncolname_country\nColumn name for country (default: \"country\").\n\n\ncolname_stateProvince\nColumn name for state or province (default: \"stateProvince\").\n\n\ncolname_county\nColumn name for county (default: \"county\").\n\n\ncolname_municipality\nColumn name for municipality (default: \"municipality\").\n\n\ncolname_locality\nColumn name for locality (default: \"locality\").\n\n\nrm_original_column\nLogical; if TRUE, original columns are removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with standardized geographic information. If rm_original_column = FALSE, the original columns are retained with *Original suffixes.\n\n\nExamples\ndf &lt;- read.csv(\"herbarium_records.csv\")\ndf_clean &lt;- std_place(df,\n                      colname_country = \"pais\",\n                      colname_stateProvince = \"estado\",\n                      rm_original_column = FALSE)"
   },
   {
     "objectID": "reference/barroso_std.html",
     "href": "reference/barroso_std.html",
     "title": "barroso_std",
     "section": "",
-    "text": "barRoso::barroso_std()\n\n\nDescription\nA wrapper function that performs integrated cleaning and standardization of biodiversity collection records using the barRoso package. This includes harmonizing taxonomic, geographic, collector, and type status information, as well as flagging or removing unvouchered and duplicate specimens. Determiner names in identifiedBy are standardized with the same rules of collector names.\n\n\nDetails\nThis function orchestrates several std_* functions from the barRoso package to clean records from virtual herbaria and biodiversity portals. It handles multilingual field names, missing data, inconsistent formatting, and dataset chunking for large inputs. The function also detects and optionally removes duplicate records and specimens lacking voucher information.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\n…\nInput data frame containing raw biodiversity records.\n\n\nunvouchered\nLogical; if TRUE, remove unvouchered wood/seed/spirit specimens (default: TRUE).\n\n\ndelunkcoll\nLogical; if TRUE, removes records with unknown collectors (default: FALSE).\n\n\nflag_missid\nReserved for future use. Currently not implemented.\n\n\nflag_duplicates\nLogical; if TRUE, flags duplicates with a logical column (default: TRUE).\n\n\nrm_duplicates\nLogical; if TRUE, removes duplicate specimens (default: FALSE).\n\n\ncolname_recordedBy\nColumn name for collector names.\n\n\ncolname_recordNumber\nColumn name for collector number.\n\n\ncolname_identifiedBy\nColumn name for determiner names. The column is standardized with std_identifiedBy() only when present in the data.\n\n\ncolname_continent\nColumn name for continent.\n\n\ncolname_country\nColumn name for country.\n\n\ncolname_stateProvince\nColumn name for state/province.\n\n\ncolname_county\nColumn name for county.\n\n\ncolname_municipality\nColumn name for municipality.\n\n\ncolname_locality\nColumn name for locality.\n\n\ncolname_collectionCode\nColumn name for collection code.\n\n\ncolname_institutionCode\nColumn name for institution code.\n\n\ncolname_typeStatus\nColumn name for type status.\n\n\ncolname_family\nColumn name for family.\n\n\ncolname_genus\nColumn name for genus.\n\n\ncolname_specificEpithet\nColumn name for specific epithet.\n\n\nrm_original_column\nLogical; if TRUE, remove original columns after standardization.\n\n\n\n\n\nValue\nA fully cleaned and standardized data frame ready for downstream reconciliation, duplicate handling, and label generation.\n\n\nExamples\ndf &lt;- read.csv(\"raw_herbarium_data.csv\")\ndf_std &lt;- barroso_std(df,\n                      colname_country = \"pais\",\n                      colname_stateProvince = \"estado\",\n                      rm_duplicates = TRUE)"
+    "text": "barRoso::barroso_std()\n\n\nDescription\nA wrapper function that performs integrated cleaning and standardization of biodiversity collection records using the barRoso package. This includes harmonizing taxonomic, geographic, collector, and type status information, as well as flagging or removing unvouchered and duplicate specimens. Determiner names in identifiedBy are standardized with the same rules of collector names.\n\n\nDetails\nThis function orchestrates several std_* functions from the barRoso package to clean records from virtual herbaria and biodiversity portals. It handles multilingual field names, missing data, inconsistent formatting, and dataset chunking for large inputs. The function also detects and optionally removes duplicate records and specimens lacking voucher information.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\n…\nInput data frame containing raw biodiversity records.\n\n\nunvouchered\nLogical; if TRUE, remove records of wood, seed, fruit, pollen and spirit collections (e.g. \"INPAw\", \"INPA-Carpoteca\"), and observations without a specimen (basisOfRecord like \"HUMAN_OBSERVATION\") (default: TRUE).\n\n\ndelunkcoll\nLogical; if TRUE, removes records with unknown collectors (default: FALSE).\n\n\nflag_missid\nReserved for future use. Currently not implemented.\n\n\nflag_duplicates\nLogical; if TRUE, flags duplicates with a logical column (default: TRUE).\n\n\nrm_duplicates\nLogical; if TRUE, removes duplicate specimens (default: FALSE).\n\n\ncolname_recordedBy\nColumn name for collector names.\n\n\ncolname_recordNumber\nColumn name for collector number.\n\n\ncolname_identifiedBy\nColumn name for determiner names. The column is standardized with std_identifiedBy() only when present in the data.\n\n\ncolname_continent\nColumn name for continent.\n\n\ncolname_country\nColumn name for country.\n\n\ncolname_stateProvince\nColumn name for state/province.\n\n\ncolname_county\nColumn name for county.\n\n\ncolname_municipality\nColumn name for municipality.\n\n\ncolname_locality\nColumn name for locality.\n\n\ncolname_collectionCode\nColumn name for collection code.\n\n\ncolname_institutionCode\nColumn name for institution code.\n\n\ncolname_typeStatus\nColumn name for type status.\n\n\ncolname_family\nColumn name for family.\n\n\ncolname_genus\nColumn name for genus.\n\n\ncolname_specificEpithet\nColumn name for specific epithet.\n\n\nrm_original_column\nLogical; if TRUE, remove original columns after standardization.\n\n\n\n\n\nValue\nA fully cleaned and standardized data frame ready for downstream reconciliation, duplicate handling, and label generation.\n\n\nExamples\ndf &lt;- read.csv(\"raw_herbarium_data.csv\")\ndf_std &lt;- barroso_std(df,\n                      colname_country = \"pais\",\n                      colname_stateProvince = \"estado\",\n                      rm_duplicates = TRUE)"
   },
   {
     "objectID": "reference/std_recordedBy.html",
@@ -56,18 +56,25 @@
     "text": "barRoso::std_recordedBy()\n\n\nDescription\nCleans and standardizes the recordedBy and recordNumber fields in biodiversity collection data, consolidating collector names and removing inconsistencies across herbarium records. The function identifies and formats collector initials, extracts main collector names, and handles multilingual and complex name structures including multiple collectors, Asian unicode names, and Brazilian surname conventions.\n\n\nDetails\nThis function is part of the barRoso package. It supports reconciliation of biodiversity records, especially for resolving collector name discrepancies across duplicate specimens. A new column addCollector is created when multiple collectors are detected, storing secondary collectors as \"et al.\". Original columns can be preserved or overwritten.\nSpecifically, this function performs extensive string cleaning including:\n\nConverting Chinese names written as unicode escapes (e.g. \"&lt;U+674E&gt;&lt;U+5149&gt;&lt;U+7167&gt;\") into abbreviated Latin names, as Chinese authors cite themselves (e.g. \"G. Z. Li\")\nParsing and normalizing collector names split by &, and, e, y, ;, |, etc.\nHandling cases of one, two, or more collectors\nCleaning spacing, punctuation, and known collector aliases\nAdding standardized initials or removing redundant suffixes (e.g., “et al.”)\n\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing biodiversity records.\n\n\ncolname_recordedBy\nColumn name for the main collector (default: “recordedBy”).\n\n\ncolname_recordNumber\nColumn name for the collector number (default: “recordNumber”).\n\n\nrm_original_column\nLogical; if TRUE, original columns are removed after cleaning. If FALSE, they are retained with *Original suffixes (default: FALSE).\n\n\n\n\n\nValue\nA data frame with cleaned and harmonized collector name fields. A new column addCollector is added where additional collectors are identified.\n\n\nExamples\ndf &lt;- read.csv(\"herbarium_records.csv\")\ndf_clean &lt;- std_recordedBy(df,\n                           colname_recordedBy = \"coletor\",\n                           colname_recordNumber = \"num_coleta\",\n                           rm_original_column = FALSE)"
   },
   {
+    "objectID": "reference/barroso_dwc.html",
+    "href": "reference/barroso_dwc.html",
+    "title": "barroso_dwc",
+    "section": "",
+    "text": "barRoso::barroso_dwc()\n\n\nDescription\nFormats a dataset of herbarium records into Darwin Core column names and value formats, so that records downloaded from different sources, such as GBIF, speciesLink, REFLORA and JABOT, can be combined and standardized together.\n\n\nDetails\nThe source of the dataset is recognized from its columns and values, or can be given in source. Then:\n\nColumns named as Darwin Core terms in other cases, e.g. recordedby or decimallatitude, are renamed into the terms, e.g. recordedBy and decimalLatitude, for any source.\nspeciesLink: the columns of the older speciesLink format are renamed into Darwin Core terms, e.g. collector into recordedBy, collectornumber into recordNumber, latitude into decimalLatitude, and species (just the epithet) into specificEpithet; spp (the binomial) becomes species, as in GBIF. The year, month and day of identification become dateIdentified; the author is added to scientificName; dates like \"23/11/2011\" become \"2011-11-23\"; and a missing recordNumber is taken from fieldNumber.\nREFLORA (as returned by refloraR): the determiner \"Administrador\" (the system user, given to most records) becomes NA; dates like \"11/10/2006\" become \"2006-10-11\"; type status in Latin like \"ISOTYPUS\" becomes \"isotype\"; and the institution of RB becomes \"JBRJ\", as in GBIF and JABOT.\nJABOT (as returned by jabotR): dates like \"2008-9-26\" or \"22/4/2020\" become \"2008-09-26\" and \"2020-04-22\".\nGBIF: downloads are already in Darwin Core, so only the column names are checked.\n\nIn all sources, a binomial species column is created from genus and specificEpithet when missing, as in GBIF downloads. Columns that are not Darwin Core terms are kept unchanged.\nBy default, all columns are returned as character. Downloads of the same source may otherwise have different column types, e.g. coordinatePrecision as integer in a species with values and as character in a species without them, as in the speciesLink API used by plantR::rspeciesLink(), and then they cannot be combined with dplyr::bind_rows().\nbarroso_cat() runs this function on each source before combining them.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame of biodiversity records.\n\n\nsource\nThe source of the records: \"auto\" (default) to recognize it from the data, or one of \"speciesLink\", \"REFLORA\", \"JABOT\" or \"GBIF\".\n\n\nas_character\nLogical; if TRUE (default), all columns are returned as character, so the outputs of different downloads can always be combined.\n\n\nverbose\nLogical; if TRUE, reports the source and what was changed.\n\n\n\n\n\nValue\nThe data frame with Darwin Core column names and value formats.\n\n\nExamples\nsplink &lt;- data.frame(collector = \"Queiroz, L. P.\", collectornumber = \"1350\",\n                     collectioncode = \"HUEFS\", genus = \"Ormosia\", species = \"arborea\",\n                     scientificname = \"Ormosia arborea\",\n                     scientificnameauthor = \"(Vell.) Harms\",\n                     yearidentified = \"2005\", monthidentified = \"3\",\n                     dayidentified = NA, latitude = \"-12.97\", longitude = \"-38.5\")\nbarroso_dwc(splink)"
+  },
+  {
     "objectID": "reference/std_collection.html",
     "href": "reference/std_collection.html",
     "title": "std_collection",
     "section": "",
-    "text": "barRoso::std_collection()\n\n\nDescription\nCleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing values from the collectionCode and institutionCode fields. The function corrects common issues in GBIF and other aggregated records, replacing ambiguous or placeholder codes with recognized herbarium acronyms. It also flags missing values with fallback rules and optional original column retention.\n\n\nDetails\nThis function is part of the barRoso package, and applies a large set of conditional replacements based on known patterns and integrates fallback from institutionCode when collectionCode is missing or ambiguous. Common aliases like \"Herbarium\", \"Botany\", or \"Angiosperms\" are converted to valid acronyms when possible.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame with biodiversity specimen records.\n\n\ncolname_collectionCode\nName of the column containing collection codes (default: \"collectionCode\").\n\n\ncolname_institutionCode\nName of the column containing institution codes (default: \"institutionCode\").\n\n\nrm_original_column\nLogical; if TRUE, original columns are removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with standardized collection codes in the collectionCode column. If rm_original_column = FALSE, the original values are saved with a *Original suffix.\n\n\nExamples\ndf &lt;- read.csv(\"gbif_download.csv\")\ndf_clean &lt;- std_collection(df,\n                           colname_collectionCode = \"collection_code\",\n                           colname_institutionCode = \"institution_code\",\n                           rm_original_column = FALSE)"
+    "text": "barRoso::std_collection()\n\n\nDescription\nCleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing values from the collectionCode and institutionCode fields. The function corrects common issues in GBIF and other aggregated records, replacing ambiguous or placeholder codes with the herbarium acronyms of Index Herbariorum.\n\n\nDetails\nThis function is part of the barRoso package. Instead of a dictionary of every code, it uses regular expressions that generalize across datasets, in the following order:\n\nAggregated collections like \"Tropicos\" or \"MO-Duplicates\" are replaced with the herbarium of the specimen given in institutionCode (e.g. \"NY\"), or with \"MO\" when it is missing.\nGeneric words like \"Botany\", \"Herbarium\", \"Vascular Plants\" or \"PNGplants\" are replaced with the acronym in institutionCode or, when missing, with the acronym at the beginning of catalogNumber (e.g. \"U.1317533\" into \"U\") or in occurrenceID (e.g. \"urn:catalog:INB:...\").\nNames of collections, like \"F-Seedplants\", \"BHCB-Fanerogamas\", \"INPA-Carpoteca\", \"R-Tipos\", \"UIS-H\" or \"BSMvplantscoll\", are reduced to the herbarium acronym. Codes of wood collections, like \"INPAw\", are kept, as they are Index Herbariorum codes.\nNames of herbaria and institutions, like \"Herbario INPA\", \"Herbario Nacional de Costa Rica (CR)\" or \"Instituto de Botanica de Sao Paulo\", are replaced with the acronym given in the name or with the known acronym.\nCodes that are not acronyms, like observation projects (\"Observations\", \"Dados de Pesquisa SISBio\"), companies (\"Ecopetrol S.A\") or numbers, are replaced with the acronym in institutionCode or catalogNumber, or with NA.\n\nThe columns catalogNumber and occurrenceID are used when present.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame with biodiversity specimen records.\n\n\ncolname_collectionCode\nName of the column containing collection codes (default: \"collectionCode\").\n\n\ncolname_institutionCode\nName of the column containing institution codes (default: \"institutionCode\").\n\n\nrm_original_column\nLogical; if TRUE, original columns are removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with standardized collection codes in the collectionCode column. If rm_original_column = FALSE, the original values are saved with a *Original suffix.\n\n\nExamples\ndf &lt;- data.frame(collectionCode = c(\"Tropicos\", \"Botany\", \"F-Seedplants\",\n                                    \"Herbario INPA\", \"Observations\"),\n                 institutionCode = c(\"NY\", NA, \"F\", \"INPA\", \"iNaturalist\"),\n                 catalogNumber = c(\"100595392\", \"U.1317533\", \"V0059731F\",\n                                   \"123\", \"340214363\"))\nstd_collection(df)$collectionCode"
   },
   {
     "objectID": "reference/index.html#barroso",
     "href": "reference/index.html#barroso",
     "title": "Function Reference",
     "section": "barRoso",
-    "text": "barRoso\n\nbarroso_cat()\nbarroso_flag_duplicates()\nbarroso_labels()\nbarroso_std()\nbarroso_write_taxon_descr()\ndms_to_decimal()\nremove_authorship()\nstd_collection()\nstd_coordinates()\nstd_identifiedBy()\nstd_place()\nstd_recordedBy()\nstd_taxa()\nstd_types()"
+    "text": "barRoso\n\nbarroso_add_char_template()\nbarroso_cat()\nbarroso_dwc()\nbarroso_flag_duplicates()\nbarroso_labels()\nbarroso_std()\nbarroso_write_specimens()\nbarroso_write_taxon_descr()\ndms_to_decimal()\nremove_authorship()\nstd_collection()\nstd_coordinates()\nstd_identifiedBy()\nstd_place()\nstd_recordedBy()\nstd_taxa()\nstd_types()"
   },
   {
     "objectID": "reference/std_identifiedBy.html",
@@ -77,375 +84,307 @@
     "text": "barRoso::std_identifiedBy()\n\n\nDescription\nCleans and standardizes the identifiedBy field in biodiversity collection data, using the same name-cleaning rules of std_recordedBy(). Each determiner name is formatted with abbreviated initials before the surname (e.g. \"Cardoso, D.B.O.S.\" into \"D. B. O. S. Cardoso\").\n\n\nDetails\nUnlike std_recordedBy(), no additional column is created when there are several determiners. All names are kept in the same cell, each one standardized and joined as \"D. Cardoso & L. P. Queiroz\" or \"A. Pott, V. J. Pott & D. Cardoso\".\nBefore standardizing the names, the function removes information that often comes along with the determiner in the identifiedBy field, such as the prefix \"det.\", herbarium acronyms in parentheses (e.g. \"(MO)\"), and determination dates (e.g. \"/VI-2011\", \", 2006\", \"18 Jun 1996\"). Missing or anonymous determiners are returned as NA.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing biodiversity records.\n\n\ncolname_identifiedBy\nColumn name for the determiner (default: \"identifiedBy\").\n\n\nrm_original_column\nLogical; if TRUE, the original column is removed after cleaning. If FALSE, it is retained with the *Original suffix (default: FALSE).\n\n\n\n\n\nValue\nA data frame with the standardized determiner names.\n\n\nExamples\ndf &lt;- read.csv(\"herbarium_records.csv\")\ndf_clean &lt;- std_identifiedBy(df,\n                             colname_identifiedBy = \"identifiedBy\",\n                             rm_original_column = FALSE)"
   },
   {
-    "objectID": "reference/barroso_cat.html",
-    "href": "reference/barroso_cat.html",
-    "title": "barroso_cat",
+    "objectID": "reference/barroso_write_specimens.html",
+    "href": "reference/barroso_write_specimens.html",
+    "title": "barroso_write_specimens",
     "section": "",
-    "text": "barRoso::barroso_cat()\n\n\nDescription\nMerges herbarium records from two or more biodiversity data sources into a single harmonized data frame. Optionally prioritizes specific sources when duplicates are detected across herbaria, retaining records based on a flexible exclusion strategy.\n\n\nDetails\nThis function aligns column structures, removes redundant records from overlapping herbaria, and merges all sources into a single output. Duplicate filtering is based on matching collectionCode across sources: when keep_source is given, the records of any herbarium that is also present in keep_source are removed from the other sources. Herbaria shared only among the other sources are kept.\nRaw speciesLink downloads, which use lowercase column names such as collector, collectornumber and collectioncode, are automatically renamed into Darwin Core terms (recordedBy, recordNumber, collectionCode, etc.). Records of the REFLORA Virtual Herbarium and of the JABOT collections, as returned by the packages refloraR and jabotR, already have Darwin Core column names, but some of their values are standardized to match the other sources:\n\nREFLORA: the determiner \"Administrador\" (the name of the system user, given to most records) is set to NA; dates like \"11/10/2006\" or \"--/5/1880\" become \"2006-10-11\" and \"1880-05\"; type status in Latin like \"ISOTYPUS\" becomes \"isotype\"; and the institution of RB becomes \"JBRJ\", as in GBIF and JABOT.\nJABOT: dates like \"2008-9-26\" or \"22/4/2020\" become \"2008-09-26\" and \"2020-04-22\".\n\nThe sources are recognized by their content, so their names in list_sources can be any name.\nColumns with different types across sources (e.g. numeric year in one source and character in another) are combined as character. A column datasource records the source of each record.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nlist_sources\nA named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering.\n\n\nkeep_source\nOptional character string specifying the preferred data source (e.g., “GBIF”) for resolving duplicate collectionCode conflicts. If NULL, all records are retained.\n\n\n\n\n\nValue\nA harmonized data frame combining all provided herbarium sources, with columns aligned, a datasource column, and optionally filtered to resolve duplicate collections.\n\n\nExamples\nreflora &lt;- refloraR::reflora_records(herbarium = \"RB\", taxon = \"Ormosia\", save = FALSE)\njabot &lt;- jabotR::jabot_records(herbarium = \"MBM\", taxon = \"Ormosia\", save = FALSE)\n\ncombined_df &lt;- barroso_cat(list_sources = list(GBIF = gbif_data,\n                                               speciesLink = splink_data,\n                                               REFLORA = reflora,\n                                               JABOT = jabot),\n                           keep_source = \"GBIF\")"
+    "text": "barRoso::barroso_write_specimens()\n\n\nDescription\nWrites the lists of examined specimens of one, several or all species of a database of herbarium records in Darwin Core format, as standardized by barroso_std(), into a Word (.docx) file, in the format of a botanical journal, e.g. Systematic Botany, Taxon, Kew Bulletin or Phytotaxa.\n\n\nDetails\nThe records are formatted with barroso_dwc(), so the columns may also come from other sources, e.g. speciesLink. The columns used are species, country, stateProvince, municipality, locality, decimalLatitude, decimalLongitude, minimumElevationInMeters, maximumElevationInMeters, day, month, year, reproductiveCondition, recordedBy, addCollector, recordNumber, collectionCode and catalogNumber; and, when present, the columns of barroso_flag_duplicates() with all herbaria of each specimen (duplicateCollectionCodes, duplicateCatalogNumbers). The author of each species comes from scientificNameAuthorship, acceptedScientificName or scientificName.\nDuplicates of the same collection (same collector and number, or same collector, date and locality when there is no number) are written once, with all their herbaria. The specimens are ordered by country, state, municipality and date.\nExamples of the format of each journal:\nSystematic Botany: Representative Specimens Examined—Brazil. —Bahia: Abaíra, Catolés, 13°23′S, 41°48′W, 1200 m, 8 May 1994 (fl), D.B.O.S. Cardoso et al. 2066 (HUEFS, RB). (header and states in small capitals, countries in bold, collectors and numbers in italics, as also in Taxon and Acta Botanica Brasilica) Taxon: Additional specimens examined. – BRAZIL. BAHIA: Abaíra, Catolés, 13°23′S, 41°48′W, 1200 m a.s.l., 8 May 1994 (fl), D.B.O.S. Cardoso & al. 2066 (HUEFS, RB). Kew Bulletin: SPECIMENS EXAMINED. BRAZIL. Bahia: Abaíra, Catolés, 13°23’S, 41°48’W, 1200 m, 8 May 1994 (fl), D. B. O. S. Cardoso et al. 2066 (HUEFS, RB). Phytotaxa: Additional specimens examined:―BRAZIL. Bahia: Abaíra: Catolés, …, 8 May 1994 (fl), D.B.O.S. Cardoso et al. 2066 (HUEFS, RB). Brittonia: Additional specimens examined.—BRAZIL. Bahia: …, 8 May 1994 [fl], D. B. O. S. Cardoso et al. 2066 (HUEFS, RB). Candollea: Additional specimens examined. – Brazil. Bahia: …, 13°23’S 41°48’W, 1200 m, 8.V.1994, Cardoso et al. 2066 (HUEFS, RB). Edinburgh Journal of Botany: Additional specimens examined. BRAZIL. Bahia: …, 8 v 1994 (fl), Cardoso et al. 2066 (HUEFS, RB). Systematics and Biodiversity: Additional specimens examined. BRAZIL. Bahia: …, 8 May 1994, D. B. O. S. Cardoso et al. 2066 (HUEFS, RB). Acta Botanica Brasilica: Additional specimens examined: BRAZIL. Bahia: …, 13°23’ S, 41°48’ W, 8 May 1994, (fl), D.B.O.S. Cardoso et al. 2066 (HUEFS!, RB!). Plant Ecology and Evolution: Additional material examined. BRAZIL • Bahia, Abaíra, Catolés; 13°23′S, 41°48′W; 1200 m; 8 May 1994 (fl); Cardoso et al. 2066; HUEFS, RB. PhytoKeys: Additional specimens examined. Brazil. Bahia: Mun. Abaíra, Catolés, 13°23’S, 41°48’W, 1200 m alt., 8 May 1994, D.B.O.S. Cardoso et al. 2066 (HUEFS, RB). Willdenowia: Brazil: Bahia: Municipality Abaíra, Catolés, 13°23’S, 41°48’W, 1200 m, 8 May 1994, D. B. O. S. Cardoso & al. 2066 (HUEFS, RB); Serra do Barbado, … Municipality Mucugê, … . — Minas Gerais: … (header once, before all species) Annals of the Missouri Botanical Garden: Additional specimens examined. BRAZIL. Bahia: Abaíra, Catolés, 13°23′S, 41°48′W, 1200 m, 8 May 1994 (fl), D. B. O. S. Cardoso et al. 2066 (HUEFS, RB). Botanical Journal of the Linnean Society: Representative specimens examined: BRAZIL. Bahia: Abaíra, Catolés, 13°23′S, 41°48′W, 1200 m, 8.v.1994, D.B.O.S. Cardoso et al. 2066 (HUEFS, RB); Serra do Barbado, … Brazilian Journal of Botany: Selected additional specimens—BRAZIL. Bahia: …, 08 May 1994 (fl), Cardoso et al. 2066 (HUEFS, RB). Nordic Journal of Botany: Ormosia arborea – Brazil, Bahia, Abaíra, Catolés, …, 8 May 1994, (fl), Cardoso et al. 2066 (HUEFS, RB). Mucugê, … Rodriguésia: Additional material examined: BRAZIL. BAHIA: Abaíra, Catolés, …, 8.V.1994, fl, D.B.O.S. Cardoso et al. 2066 (HUEFS, RB). Mucugê, …, A. Fernandes (EAC 11356).\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame of herbarium records in Darwin Core format, e.g. the output of barroso_std() or barroso_dwc(). Not needed when path is given.\n\n\npath\nPath to an .xlsx, .xls or .csv file with the herbarium records, used when df is NULL.\n\n\nsheet\nSheet name or index of the .xlsx file. Default 1.\n\n\nspecies\nCharacter vector of species names, with or without authors (e.g. \"Ormosia arborea\"), to write the specimens of just these species. If NULL (default), the specimens of all species are written.\n\n\njournal\nName of the journal whose format is followed, as in recent papers of the journal: \"Systematic Botany\" (default), \"Acta Botanica Brasilica\", \"Annals of the Missouri Botanical Garden\", \"Botanical Journal of the Linnean Society\", \"Brazilian Journal of Botany\", \"Brittonia\", \"Candollea\", \"Edinburgh Journal of Botany\", \"Kew Bulletin\", \"Nordic Journal of Botany\", \"Phytotaxa\", \"PhytoKeys\", \"Plant Ecology and Evolution\", \"Rodriguesia\", \"Systematics and Biodiversity\", \"Taxon\" or \"Willdenowia\". The name can be written in any case, with or without accents, and abbreviated (e.g. \"systematic botany\", \"Kew\", \"Edinburgh\", \"Rodriguésia\").\n\n\nheader\nText of the header before the specimens, e.g. \"Additional specimens examined\", \"Paratypes\" or \"Selected specimens\", written with the format and punctuation of the journal. If NULL (default), the header of the journal, e.g. \"Representative Specimens Examined\" in Systematic Botany. Use \"\" to write no header.\n\n\nlanguage\nLanguage of the section header, months and countries: \"en\" (default) or \"pt\".\n\n\ncatalog_numbers\nLogical. If TRUE, the catalog number is written after each herbarium, e.g. \"(IAC no. 14754, NY no. 1162464)\" in Brittonia. Default FALSE.\n\n\ndir\nFolder where the .docx file is saved. By default, the folder of path, or \"results_specimens\" when the records are given in df.\n\n\nfilename\nName of the .docx file. By default, the name of path (or \"specimens\") followed by the journal, e.g. \"Ormosia_herbarium_records_Systematic_Botany.docx\".\n\n\nfont_family\nFont of the document. Default \"Times New Roman\".\n\n\nfont_size\nFont size in points. Default 12.\n\n\nverbose\nLogical. Print progress messages. Default TRUE.\n\n\n\n\n\nValue\nInvisibly, a data frame with the species (species_name) and their examined specimens (specimens_text, one specimen per line). The .docx file is written as a side effect.\n\n\nExamples\n# All species of a database standardized by barRoso\nbarroso_write_specimens(path = \"results/Ormosia_herbarium_records.xlsx\",\n                        journal = \"Systematic Botany\")\n\n# Two species, in the format of Kew Bulletin\nbarroso_write_specimens(df = data_all_clean,\n                        species = c(\"Ormosia arborea\", \"Ormosia fastigiata\"),\n                        journal = \"Kew Bulletin\",\n                        dir = \"results\")"
   },
   {
-    "objectID": "overview/index.html#what-is-barroso",
-    "href": "overview/index.html#what-is-barroso",
-    "title": "Overview",
-    "section": "What is barRoso?",
-    "text": "What is barRoso?\nbarRoso is an R package designed to clean, standardize, and reconcile plant specimen records, especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for GBIF, it is compatible with data from JABOT, SEINet, REFLORA, speciesLink, and others.\nThe package is named after Brazilian botanist Graziela Maciel Barroso, and also serves as an acronym: Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations."
+    "objectID": "reference/std_types.html",
+    "href": "reference/std_types.html",
+    "title": "std_types",
+    "section": "",
+    "text": "barRoso::std_types()\n\n\nDescription\nCleans and standardizes the typeStatus column in biodiversity datasets, addressing inconsistencies in type designations. It removes irrelevant entries, harmonizes formatting, and optionally fills missing values if present in other duplicate records (assumed to be handled outside this function).\n\n\nDetails\nThis function is used internally in the barRoso package to prepare type status data for reconciliation and label generation. It corrects known placeholder or non-type entries (e.g. “Fotografia do Tipo”, “NOTATYPE”, “Epítipo”) and simplifies terms like \"sim -\" to ensure clean type labels.\nThe same type designation written in English, Latin or Portuguese, and in any case, is converted into the lowercase Darwin Core term in English, e.g. \"ISOTYPE\", \"Isotypus\" and \"isótipo\" into \"isotype\", \"Parátipo\" into \"paratype\", and \"isosintipo\" into \"isosyntype\". A taxon name after the term is kept, e.g. \"ISOTYPUS of Ormosia amazonica Ducke\" into \"isotype of Ormosia amazonica Ducke\".\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing type designation records.\n\n\ncolname_typeStatus\nName of the column holding type status information (default: \"typeStatus\").\n\n\nrm_original_column\nLogical; if TRUE, the original column is removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with a standardized typeStatus column. If rm_original_column = FALSE, the original values are preserved in a column named typeStatusOriginal.\n\n\nExamples\ndf &lt;- read.csv(\"specimens.csv\")\ndf_clean &lt;- std_types(df,\n                      colname_typeStatus = \"tipo\",\n                      rm_original_column = FALSE)"
   },
   {
-    "objectID": "overview/index.html#what-does-barroso-do",
-    "href": "overview/index.html#what-does-barroso-do",
-    "title": "Overview",
-    "section": "What does barRoso do?",
-    "text": "What does barRoso do?\nbarRoso helps users:\n\nStandardize collector and determiner names and collection numbers using regex-based parsing\nHarmonize taxonomic, geographic, and temporal fields\nCombine records from GBIF, speciesLink and other sources\nFlag and remove potential duplicates across herbarium records, highlighting conflicting identifications\nFix and flag geographic coordinates, following the workflow of the bdc package\nGenerate herbarium labels from fieldbook data\nIntegrate with external taxonomic databases (e.g., LCVP, WFO)\nPrepare large-scale biodiversity datasets for publication and analysis"
+    "objectID": "news/index.html#initial-release",
+    "href": "news/index.html#initial-release",
+    "title": "News",
+    "section": "Initial Release",
+    "text": "Initial Release\nThe first official release of the barRoso R package — a comprehensive toolkit for standardizing, harmonizing, and preparing plant specimen records for research and reconciliation.\n\nHighlights\n\nbarroso_std(): Unified function to clean and standardize herbarium records across multiple fields (collector, geography, taxonomy, etc.).\nbarroso_flag_duplicates(): Flag potential duplicate specimens across herbaria using metadata patterns.\nbarroso_cat(): Combine and reconcile specimen records from multiple virtual herbaria (e.g., GBIF, SEINet, REFLORA, JABOT, speciesLink).\nbarroso_labels(): Generate printable herbarium labels from cleaned fieldbook data, with embedded maps and taxonomic authority retrieval.\nStandardize collector names and collection numbers using regex-based parsing\nHarmonize taxonomic, geographic, and temporal fields\nFlag and remove potential duplicates across herbarium records\nGenerate herbarium labels from fieldbook data\nIntegrate with external taxonomic databases (e.g., LCVP, WFO)\nPrepare large-scale biodiversity datasets for publication and analysis\nOptimized for datasets from REFLORA, speciesLink, and JABOT.\nSupports integration with tidyverse workflows for downstream analyses.\nTest coverage &gt;95%, continuous integration via GitHub Actions.\n\n\n\nPhilosophy\nUnlike other tools that aggressively clean (and discard) records, barRoso focuses on standardization first — ensuring that all specimens, even misidentified or ambiguous ones, remain usable and discoverable. Standardization also enables better duplicate detection and data reconciliation without losing valuable information.\n\n\nInfrastructure\n\nMIT license.\nGitHub Actions: R-CMD-check, test coverage, continuous integration.\nWebsite: barRoso documentation site\n\n\n\nFeedback\nPlease report bugs or feature requests here:\nhttps://github.com/DBOSlab/barRoso/issues"
   },
   {
-    "objectID": "overview/index.html#who-should-use-barroso",
-    "href": "overview/index.html#who-should-use-barroso",
-    "title": "Overview",
-    "section": "Who should use barRoso?",
-    "text": "Who should use barRoso?\n\nTaxonomists and herbarium curators\nBiodiversity data scientists\nFloristic inventory teams\nGraduate students and researchers managing field collections"
+    "objectID": "index.html#graziela-maciel-barroso",
+    "href": "index.html#graziela-maciel-barroso",
+    "title": "barRoso",
+    "section": "Graziela Maciel Barroso",
+    "text": "Graziela Maciel Barroso\nGraziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.\nShe authored the landmark three-volume Sistemática de Angiospermas do Brasil (1978–1986), still a cornerstone of botanical education, as well as Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.\nBarroso remained professionally active until her passing at age 92. A month before her death, she was elected to the Brazilian Academy of Sciences, a distinction awarded posthumously."
   },
   {
-    "objectID": "overview/index.html#what-makes-barroso-different",
-    "href": "overview/index.html#what-makes-barroso-different",
-    "title": "Overview",
-    "section": "What makes barRoso different?",
-    "text": "What makes barRoso different?\nUnlike other packages that rely on static collector name dictionaries, barRoso uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow."
-  },
-  {
-    "objectID": "overview/index.html#data-preservation-philosophy",
-    "href": "overview/index.html#data-preservation-philosophy",
-    "title": "Overview",
-    "section": "Data Preservation Philosophy",
-    "text": "Data Preservation Philosophy\nWhile many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, barRoso takes a different approach. Its philosophy centers on standardization rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, barRoso focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, barRoso allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research."
-  },
-  {
-    "objectID": "overview/index.html#learn-more",
-    "href": "overview/index.html#learn-more",
-    "title": "Overview",
-    "section": "Learn more",
-    "text": "Learn more\nExplore the full documentation:\n\nInstall and Setup\nStandardize Specimen Records\nDetect and Flag Duplicates\nFix and Flag Coordinates\nGenerate Herbarium Labels"
-  },
-  {
-    "objectID": "about.html#overview",
-    "href": "about.html#overview",
-    "title": "About barRoso",
+    "objectID": "articles/compare_herbarium_sources.html#overview",
+    "href": "articles/compare_herbarium_sources.html#overview",
+    "title": "Compare Herbarium Sources",
     "section": "Overview",
-    "text": "Overview\nbarRoso (Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations) is an R package that streamlines biodiversity data cleaning, integration, and reconciliation, particularly for herbarium records. The toolkit supports workflows from data curation to label production, helping botanists, curators, and researchers analyze plant specimen collections more efficiently.\nNamed in honor of Graziela Maciel Barroso, one of Brazil’s most respected botanists, the name barRoso also nods to its native programming environment—R.\nThe package was originally developed for the JABOT Virtual Herbarium, maintained by the Rio de Janeiro Botanical Garden, but it is generalizable to other biodiversity repositories such as GBIF, SEINet, REFLORA, and speciesLink. The package was originally developed to support the cleaning and reconciliation of plant specimen records retrieved from the Global Biodiversity Information Facility (GBIF), but its flexible design makes it broadly applicable to other biodiversity data sources. These include national and institutional repositories such as the JABOT Virtual Herbarium, maintained by the Rio de Janeiro Botanical Garden and REFLORA, as well as SEINet and speciesLink."
-  },
-  {
-    "objectID": "about.html#package-description",
-    "href": "about.html#package-description",
-    "title": "About barRoso",
-    "section": "Package Description",
-    "text": "Package Description\nPackage: barRoso\nType: R Package\nVersion: 1.0.0\nAuthor and Maintainer: Domingos Cardoso (@DBOSlab ORCID domingoscardoso@jbrj.gov.br)\n\nPackage Features\n✅ Clean and standardize collector names, record numbers, and geographic fields\n✅ Reconcile records from multiple herbarium sources (e.g., GBIF, JABOT, speciesLink)\n✅ Flag and optionally remove duplicated specimen records\n✅ Generate herbarium labels from field books with embedded maps and taxonomic authorities\n✅ Integrate with taxonomic reference tools like LCVP and lcvplants"
-  },
-  {
-    "objectID": "about.html#how-to-contribute",
-    "href": "about.html#how-to-contribute",
-    "title": "About barRoso",
-    "section": "How to Contribute",
-    "text": "How to Contribute\nWe welcome community contributions:\n💬 Report bugs or feature requests via GitHub Issues 🔧 Submit pull requests with improvements or new features 🌱 Suggest new functionality or integration ideas"
-  },
-  {
-    "objectID": "about.html#license",
-    "href": "about.html#license",
-    "title": "About barRoso",
-    "section": "License",
-    "text": "License\nThis package is released under the MIT License, supporting open science and data accessibility for biodiversity research."
-  },
-  {
-    "objectID": "about.html#acknowledgements",
-    "href": "about.html#acknowledgements",
-    "title": "About barRoso",
-    "section": "Acknowledgements",
-    "text": "Acknowledgements\nDevelopment of barRoso is led by the Rio de Janeiro Botanical Garden (JBRJ). I also gratefully acknowledge the financial support provided by CNPq - Conselho Nacional de Desenvolvimento Científico e Tecnológico, Brazil’s National Council for Scientific and Technological Development, and FINEP - Financiadora de Estudos e Projetos, Brazil’s Funding Authority for Studies and Projects. I honor Graziela Maciel Barroso’s legacy in taxonomy and herbaria through this tool."
-  },
-  {
-    "objectID": "articles/case_study_reflora.html",
-    "href": "articles/case_study_reflora.html",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "",
-    "text": "This article walks through a practical case study using the barRoso package to clean and harmonize plant specimen records downloaded from the REFLORA Virtual Herbarium using the refloraR package.",
+    "text": "Overview\nWhen working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. barRoso offers the barroso_cat() function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.\nThis article demonstrates how to:\n\nMerge multiple data sources into a unified data frame\nCombine raw speciesLink downloads with GBIF downloads\nPrioritize a preferred source when herbaria overlap",
     "crumbs": [
       "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
     ]
   },
   {
-    "objectID": "articles/case_study_reflora.html#goal",
-    "href": "articles/case_study_reflora.html#goal",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Goal",
-    "text": "Goal\nDemonstrate a full cleaning pipeline for biodiversity records from REFLORA, covering:\n\nProgrammatic data download with refloraR\nCollector and record number standardization\nDuplicate detection\nOutput preparation for downstream analysis",
+    "objectID": "articles/compare_herbarium_sources.html#function-barroso_cat",
+    "href": "articles/compare_herbarium_sources.html#function-barroso_cat",
+    "title": "Compare Herbarium Sources",
+    "section": "Function: barroso_cat()",
+    "text": "Function: barroso_cat()\ncombined_df &lt;- barroso_cat(\n  list_sources = list(\n    GBIF = gbif_data,\n    speciesLink = splink_data,\n    JABOT = jabot_data\n  ),\n  keep_source = \"GBIF\"\n)",
     "crumbs": [
       "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
     ]
   },
   {
-    "objectID": "articles/case_study_reflora.html#step-1-install-required-packages",
-    "href": "articles/case_study_reflora.html#step-1-install-required-packages",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Step 1: Install Required Packages",
-    "text": "Step 1: Install Required Packages\n# install.packages(\"devtools\")\ndevtools::install_github(\"DBOSlab/refloraR\")\ndevtools::install_github(\"DBOSlab/barRoso\")",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/case_study_reflora.html#step-2-download-specimens-from-reflora",
-    "href": "articles/case_study_reflora.html#step-2-download-specimens-from-reflora",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Step 2: Download Specimens from REFLORA",
-    "text": "Step 2: Download Specimens from REFLORA\nUse the refloraR package to retrieve specimen records for a given taxon and herbarium:\nlibrary(refloraR)\n\nrecords &lt;- reflora_records(taxon = \"Fabaceae\", \n                           herbarium = \"RB\",\n                           save = FALSE)",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/case_study_reflora.html#step-3-run-barroso-standardization",
-    "href": "articles/case_study_reflora.html#step-3-run-barroso-standardization",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Step 3: Run barRoso Standardization",
-    "text": "Step 3: Run barRoso Standardization\nlibrary(barRoso)\n\ncleaned &lt;- barroso_std(records,\n                       colname_recordedBy = \"recordedBy\",\n                       colname_recordNumber = \"recordNumber\",\n                       colname_country = \"country\",\n                       colname_stateProvince = \"stateProvince\",\n                       flag_duplicates = TRUE,\n                       rm_duplicates = FALSE)",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/case_study_reflora.html#step-4-explore-results",
-    "href": "articles/case_study_reflora.html#step-4-explore-results",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Step 4: Explore Results",
-    "text": "Step 4: Explore Results\ntable(cleaned$duplicate)\nhead(cleaned[, c(\"recordedBy\", \"recordNumber\", \"duplicate\")])",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/case_study_reflora.html#step-5-save-cleaned-output",
-    "href": "articles/case_study_reflora.html#step-5-save-cleaned-output",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Step 5: Save Cleaned Output",
-    "text": "Step 5: Save Cleaned Output\nwrite.csv(cleaned, \"reflora_cleaned.csv\", row.names = FALSE)",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/case_study_reflora.html#summary",
-    "href": "articles/case_study_reflora.html#summary",
-    "title": "REFLORA Cleaning Workflow",
-    "section": "Summary",
-    "text": "Summary\nWith this REFLORA case study, we demonstrated how to:\n\nDownload REFLORA data programmatically with refloraR\nClean and harmonize biodiversity records using barRoso\nDetect and flag duplicates across herbarium specimens\n\nThis workflow is reusable for any REFLORA-supported taxa and institutions. Explore additional tools like barroso_cat() to merge datasets from GBIF, JABOT, and speciesLink next.",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "REFLORA Cleaning Workflow"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html",
-    "href": "articles/cleaning_gbif_data.html",
-    "title": "Cleaning GBIF Data",
-    "section": "",
-    "text": "This article walks through a practical case study using the barRoso package to standardize and harmonize plant specimen records downloaded from the Global Biodiversity Information Facility (GBIF) portal.",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#goal",
-    "href": "articles/cleaning_gbif_data.html#goal",
-    "title": "Cleaning GBIF Data",
-    "section": "Goal",
-    "text": "Goal\nPerform a full cleaning workflow for GBIF records using barRoso, including:\n\nStandardizing collector names and record numbers\nHarmonizing taxonomic and geographic fields\nFlagging and filtering duplicate specimens\nFixing and flagging geographic coordinates\nGenerating a cleaned dataset ready for downstream use",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#step-1-download-gbif-records",
-    "href": "articles/cleaning_gbif_data.html#step-1-download-gbif-records",
-    "title": "Cleaning GBIF Data",
-    "section": "Step 1: Download GBIF Records",
-    "text": "Step 1: Download GBIF Records\nUse the rgbif package to download occurrence records. Here’s an example for the Fabaceae family:\n# install.packages(\"rgbif\")\nlibrary(rgbif)\n\nocc &lt;- occ_search(scientificName = \"Fabaceae\", limit = 1000, hasCoordinate = TRUE)\ndf &lt;- occ$data",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#step-2-load-barroso-and-standardize-records",
-    "href": "articles/cleaning_gbif_data.html#step-2-load-barroso-and-standardize-records",
-    "title": "Cleaning GBIF Data",
-    "section": "Step 2: Load barRoso and Standardize Records",
-    "text": "Step 2: Load barRoso and Standardize Records\n# install.packages(\"devtools\")\ndevtools::install_github(\"DBOSlab/barRoso\")\n\nlibrary(barRoso)\n\ncleaned &lt;- barroso_std(df,\n                       flag_duplicates = TRUE,\n                       rm_duplicates = FALSE)",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#step-3-review-standardized-output",
-    "href": "articles/cleaning_gbif_data.html#step-3-review-standardized-output",
-    "title": "Cleaning GBIF Data",
-    "section": "Step 3: Review Standardized Output",
-    "text": "Step 3: Review Standardized Output\ntable(cleaned$duplicate)\nhead(cleaned[, c(\"recordedBy\", \"recordNumber\", \"duplicate\")])\nBlocks of duplicates with conflicting identifications can be inspected with:\nsubset(cleaned, identificationConflict %in% TRUE,\n       select = c(recordedBy, recordNumber, duplicateIdentifications, duplicateCatalogNumbers))",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#step-4-fix-and-flag-coordinates",
-    "href": "articles/cleaning_gbif_data.html#step-4-fix-and-flag-coordinates",
-    "title": "Cleaning GBIF Data",
-    "section": "Step 4: Fix and Flag Coordinates",
-    "text": "Step 4: Fix and Flag Coordinates\ncleaned &lt;- std_coordinates(cleaned)\ntable(unlist(strsplit(cleaned$coordinateIssues, \"; \")))\nSee Fix and Flag Coordinates for details.",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#step-5-save-results",
-    "href": "articles/cleaning_gbif_data.html#step-5-save-results",
-    "title": "Cleaning GBIF Data",
-    "section": "Step 5: Save Results",
-    "text": "Step 5: Save Results\nwrite.csv(cleaned, \"gbif_cleaned.csv\", row.names = FALSE)",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/cleaning_gbif_data.html#summary",
-    "href": "articles/cleaning_gbif_data.html#summary",
-    "title": "Cleaning GBIF Data",
-    "section": "Summary",
-    "text": "Summary\nIn this case study, we:\n\nProgrammatically downloaded GBIF data for a plant family\nUsed barRoso to standardize and harmonize specimen metadata\nFlagged duplicates and conflicting identifications\nFixed and flagged geographic coordinates, preparing a clean dataset for biodiversity research\n\nYou can apply this pipeline to other sources such as SEINet, REFLORA Virtual Herbarium, JABOT, or speciesLink.",
-    "crumbs": [
-      "Articles",
-      "Case Studies & Workflows",
-      "Standardize GBIF Data"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#overview",
-    "href": "articles/standardize_specimens.html#overview",
-    "title": "Standardize Specimen Records",
-    "section": "Overview",
-    "text": "Overview\nThe barroso_std() function is the primary tool in the barRoso package for performing full data cleaning and standardization of biodiversity specimen records. It is designed to process raw data from herbaria, virtual repositories, and field collections, ensuring harmonized fields across taxonomic, geographic, and collector-related information.",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#key-features",
-    "href": "articles/standardize_specimens.html#key-features",
-    "title": "Standardize Specimen Records",
-    "section": "Key Features",
-    "text": "Key Features\n\nNormalize collector names and collection numbers\nNormalize determiner names (identifiedBy)\nStandardize geographic fields like country, state, and locality\nHarmonize taxonomic names including family, genus, and species\nClean and normalize type status\nOptionally remove unvouchered or duplicate records\nSupport for multilingual column names (e.g., Portuguese, Spanish)",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#usage",
-    "href": "articles/standardize_specimens.html#usage",
-    "title": "Standardize Specimen Records",
-    "section": "Usage",
-    "text": "Usage\nlibrary(barRoso)\n\ndf &lt;- read.csv(\"raw_herbarium_data.csv\")\n\nstandardized_df &lt;- barroso_std(df,\n                               unvouchered = TRUE,\n                               delunkcoll = FALSE,\n                               flag_missid = TRUE,\n                               flag_duplicates = TRUE,\n                               rm_duplicates = FALSE,\n                               colname_recordedBy = \"recordedBy\",\n                               colname_recordNumber = \"recordNumber\",\n                               colname_identifiedBy = \"identifiedBy\",\n                               colname_country = \"country\",\n                               colname_stateProvince = \"stateProvince\",\n                               colname_county = \"county\",\n                               colname_municipality = \"municipality\",\n                               colname_locality = \"locality\",\n                               colname_collectionCode = \"collectionCode\",\n                               colname_institutionCode = \"institutionCode\",\n                               colname_typeStatus = \"typeStatus\",\n                               colname_family = \"family\",\n                               colname_genus = \"genus\",\n                               colname_specificEpithet = \"specificEpithet\",\n                               rm_original_column = TRUE)",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#arguments",
-    "href": "articles/standardize_specimens.html#arguments",
-    "title": "Standardize Specimen Records",
+    "objectID": "articles/compare_herbarium_sources.html#arguments",
+    "href": "articles/compare_herbarium_sources.html#arguments",
+    "title": "Compare Herbarium Sources",
     "section": "Arguments",
-    "text": "Arguments\n\n...: A data frame or list of data frames with raw biodiversity records\nunvouchered: Remove unvouchered (non-herbarium) records\ndelunkcoll: Optionally delete records with unknown collectors\nflag_duplicates, rm_duplicates: Detect and optionally remove duplicates\nrm_original_column: Remove original (uncleaned) fields after standardization",
+    "text": "Arguments\n\nlist_sources: A named list of data frames, one per biodiversity source. The names (e.g. GBIF, speciesLink) must be unique, as they are used to identify the source of each record.\nkeep_source: Optionally, the name of the preferred source (e.g. \"GBIF\"). The records of any herbarium also present in the preferred source are removed from the other sources.\n\nIf no source is specified, the function merges all sources, retaining potential duplicates for further reconciliation with barroso_flag_duplicates().",
     "crumbs": [
       "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
     ]
   },
   {
-    "objectID": "articles/standardize_specimens.html#collector-and-determiner-names",
-    "href": "articles/standardize_specimens.html#collector-and-determiner-names",
-    "title": "Standardize Specimen Records",
-    "section": "Collector and determiner names",
-    "text": "Collector and determiner names\nCollector names (recordedBy) are standardized with std_recordedBy() into initials followed by the surname, and additional collectors are moved to a new column addCollector (or stored as \"et al.\" when there are more than two collectors). Determiner names (identifiedBy) are standardized with std_identifiedBy(), using the same rules, but all determiners are kept in the same cell. The original columns are kept with the suffix Original.\n\n\n\n\n\n\n\nOriginal\nStandardized\n\n\n\n\nCardoso, D.B.O.S.\nD. B. O. S. Cardoso\n\n\nPadgurschi, MCG\nM. C. G. Padgurschi\n\n\nMartius, CFP von\nC. F. P. von Martius\n\n\nUribe Uribe AL\nA. L. Uribe-Uribe\n\n\nDusén\nDusén\n\n\nA. Gómez Pompa, A. J. Sharp & P. Hernández\nA. Gómez Pompa (addCollector: et al.)\n\n\nLobato, LC; Soares, CRA; Silva, CA (determiners)\nL. C. Lobato, C. R. A. Soares & C. A. Silva\n\n\nR.Barneby (NY) 1994-06 (determiner)\nR. Barneby\n\n\n\nChinese names written as unicode escapes, as in some GBIF downloads (e.g. &lt;U+674E&gt;&lt;U+5149&gt;&lt;U+7167&gt;, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. G. Z. Li, T. S. Yi (易婷双) and R. Zhang (张荣). Family names of two characters (e.g. Ouyang) and family names with a special reading (e.g. 曾, Zeng) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full.\nThe function barroso_std() does not check geographic coordinates. Use std_coordinates() for that.",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#output",
-    "href": "articles/standardize_specimens.html#output",
-    "title": "Standardize Specimen Records",
-    "section": "Output",
-    "text": "Output\nReturns a cleaned and fully standardized data frame ready for:\n\nReconciliation and deduplication\nTaxonomic and biogeographic analysis\nHerbarium label generation workflows",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#notes",
-    "href": "articles/standardize_specimens.html#notes",
-    "title": "Standardize Specimen Records",
-    "section": "Notes",
-    "text": "Notes\n\nUses dynamic regular expressions for name harmonization rather than static dictionaries\nOptimized for scalability and flexible input schema\nRecommended to run before calling downstream functions like barroso_flag_duplicates() or barroso_labels()",
-    "crumbs": [
-      "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
-    ]
-  },
-  {
-    "objectID": "articles/standardize_specimens.html#example",
-    "href": "articles/standardize_specimens.html#example",
-    "title": "Standardize Specimen Records",
+    "objectID": "articles/compare_herbarium_sources.html#example",
+    "href": "articles/compare_herbarium_sources.html#example",
+    "title": "Compare Herbarium Sources",
     "section": "Example",
-    "text": "Example\ncleaned_data &lt;- barroso_std(df,\n                            colname_country = \"pais\",\n                            colname_stateProvince = \"estado\",\n                            rm_duplicates = TRUE)\nFor a complete list of supported fields, refer to the function documentation with ?barroso_std.",
+    "text": "Example\nlibrary(barRoso)\n\n# Load datasets downloaded from GBIF and speciesLink\ngbif &lt;- read.csv(\"gbif.csv\")\nsplink &lt;- read.csv(\"speciesLink.csv\", fileEncoding = \"latin1\")\n\n# Merge, giving preference to GBIF for overlapping herbaria\ncombined_df &lt;- barroso_cat(\n  list_sources = list(\n    GBIF = gbif,\n    speciesLink = splink\n  ),\n  keep_source = \"GBIF\"\n)\n\ntable(combined_df$datasource)\nFor example, when combining 9,806 GBIF records and 4,432 speciesLink records of Ormosia, 1,259 speciesLink records of 74 herbaria also available in GBIF are removed, resulting in 12,979 records (9,806 from GBIF and 3,173 from speciesLink).",
     "crumbs": [
       "Articles",
-      "Data Standardization",
-      "Standardize Specimen Records"
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
+    ]
+  },
+  {
+    "objectID": "articles/compare_herbarium_sources.html#how-it-works",
+    "href": "articles/compare_herbarium_sources.html#how-it-works",
+    "title": "Compare Herbarium Sources",
+    "section": "How It Works",
+    "text": "How It Works\n\n1. Raw speciesLink columns are renamed into Darwin Core\nEach source is first formatted with barroso_dwc(), which can also be used alone.\nRaw speciesLink downloads use lowercase column names that differ from the Darwin Core terms used by GBIF. barroso_cat() detects them and renames them automatically, so records of both sources end up in the same columns:\n\n\n\n\n\n\n\nspeciesLink\nDarwin Core\n\n\n\n\ncollector\nrecordedBy\n\n\ncollectornumber\nrecordNumber\n\n\ncollectioncode\ncollectionCode\n\n\ninstitutioncode\ninstitutionCode\n\n\ncatalognumber\ncatalogNumber\n\n\nidentifiedby\nidentifiedBy\n\n\ntypestatus\ntypeStatus\n\n\nyearcollected, monthcollected, daycollected\nyear, month, day\n\n\nstateprovince\nstateProvince\n\n\nlatitude, longitude\ndecimalLatitude, decimalLongitude\n\n\nspecies\nspecificEpithet\n\n\n\nIn speciesLink, the column species is just the specific epithet (e.g. arborea), while in GBIF it is the binomial (e.g. Ormosia arborea). So the speciesLink species becomes specificEpithet, and a binomial species column is created, as in GBIF.\n\n\n2. REFLORA and JABOT values are standardized\nRecords downloaded with refloraR and jabotR already have Darwin Core column names, but some of their values are written differently from GBIF. barroso_cat() recognizes these sources by their content, whatever their names in list_sources, and standardizes them:\n\n\n\n\n\n\n\n\n\nSource\nColumn\nBefore\nAfter\n\n\n\n\nREFLORA\nidentifiedBy\nAdministrador (the system user, in most records)\nNA\n\n\nREFLORA\neventDate, dateIdentified\n2/12/1940, --/5/1880, 9/10/1990 até 12/10/1990\n1940-12-02, 1880-05, 1990-10-09/1990-10-12\n\n\nREFLORA\ntypeStatus\nHOLOTYPUS, ISOTYPUS, TYPUS\nholotype, isotype, type\n\n\nREFLORA\ninstitutionCode of RB\nRB\nJBRJ, as in GBIF and JABOT\n\n\nJABOT\neventDate, dateIdentified\n2008-9-26, 22/4/2020, 4/2020\n2008-09-26, 2020-04-22, 2020-04\n\n\n\nlibrary(refloraR)\nlibrary(jabotR)\n\nreflora &lt;- reflora_records(herbarium = c(\"RB\", \"K\"), taxon = \"Ormosia\", save = FALSE)\njabot &lt;- jabot_records(herbarium = c(\"MBM\", \"UPCB\"), taxon = \"Ormosia\", save = FALSE)\n\ncombined_df &lt;- barroso_cat(\n  list_sources = list(GBIF = gbif, speciesLink = splink, REFLORA = reflora, JABOT = jabot),\n  keep_source = \"GBIF\"\n)\nThe REFLORA collection of RB is fed by JABOT, so the same RB specimens are often found in both sources, and also in GBIF. With keep_source = \"GBIF\", they are kept just once.\n\n\n3. Overlapping herbaria are removed when keep_source is given\nOverlapping herbaria are detected with collectionCode. When keep_source = \"GBIF\", the records of any herbarium present in GBIF are removed from the other sources. Herbaria shared only among the other sources (e.g. present in both speciesLink and JABOT, but not in GBIF) are kept in all of them, and their duplicates can then be flagged with barroso_flag_duplicates().\n\n\n4. Columns are aligned\n\nColumns missing in some sources are filled with NA.\nColumns with different types across sources (e.g. year as numbers in GBIF and as text in speciesLink) are combined as text, instead of failing.\nA new column datasource stores the source of each record (e.g. \"GBIF\", \"speciesLink\").",
+    "crumbs": [
+      "Articles",
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
+    ]
+  },
+  {
+    "objectID": "articles/compare_herbarium_sources.html#tips",
+    "href": "articles/compare_herbarium_sources.html#tips",
+    "title": "Compare Herbarium Sources",
+    "section": "Tips",
+    "text": "Tips\n\nName each data source in list_sources, e.g. list(GBIF = gbif, speciesLink = splink)\nEnsure each dataset includes a collectionCode column, otherwise overlapping herbaria cannot be detected for that source\nUse keep_source = NULL if you want to preserve all records\nUse barroso_std() after combining to clean the remaining fields and flag duplicates\n\ncleaned_df &lt;- barroso_std(combined_df, flag_duplicates = TRUE)",
+    "crumbs": [
+      "Articles",
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
+    ]
+  },
+  {
+    "objectID": "articles/compare_herbarium_sources.html#see-also",
+    "href": "articles/compare_herbarium_sources.html#see-also",
+    "title": "Compare Herbarium Sources",
+    "section": "See Also",
+    "text": "See Also\n\nbarroso_cat() reference\nDetect and Flag Duplicates",
+    "crumbs": [
+      "Articles",
+      "Duplicate Detection",
+      "Compare Herbarium Sources"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#overview",
+    "href": "articles/generate_herbarium_labels.html#overview",
+    "title": "Generate Herbarium Labels",
+    "section": "Overview",
+    "text": "Overview\nThe barroso_labels() function generates printable herbarium labels directly from field book spreadsheets or CSV files. Labels include specimen information, taxonomic authority, formatted locality descriptions, and location maps (with greater resolution for USA-based collections).\nTaxonomic updates and authority strings are automatically fetched via the lcvplants package.",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#main-capabilities",
+    "href": "articles/generate_herbarium_labels.html#main-capabilities",
+    "title": "Generate Herbarium Labels",
+    "section": "Main Capabilities",
+    "text": "Main Capabilities\n\nFormats collection records into standardized labels\nAutomatically retrieves and updates scientific names with taxonomic authorities\nProduces mapped visual references (USA: county-level, Others: country-level)\nPaginates and saves results as multi-page PDF files (6 labels/page)",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#usage",
+    "href": "articles/generate_herbarium_labels.html#usage",
+    "title": "Generate Herbarium Labels",
+    "section": "Usage",
+    "text": "Usage\nbarroso_labels(fieldbook = \"fieldbook_collections.csv\",\n               dir_create = \"results_herbarium_labels\",\n               file_label = \"herbarium_labels.pdf\")\n\nfieldbook: Data frame or path to CSV containing specimen records\ndir_create: Folder to output results (defaults to creating dated subfolder)\nfile_label: Base name for PDF output files",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#required-fields",
+    "href": "articles/generate_herbarium_labels.html#required-fields",
+    "title": "Generate Herbarium Labels",
+    "section": "Required Fields",
+    "text": "Required Fields\nThe function expects the following minimal columns in your input:\n\ngenus, species, family, recordedBy, recordNumber\nstateProvince, country, locality, decimalLatitude, decimalLongitude\n\nOptional enhancements: - vernacularName, plantDescription, vegetation, catalogNumber, addCollector, altitude, day, month, year",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#output",
+    "href": "articles/generate_herbarium_labels.html#output",
+    "title": "Generate Herbarium Labels",
+    "section": "Output",
+    "text": "Output\n\nA series of .pdf files are saved with six herbarium labels per page\nOutput directory is timestamped with current date",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#example-fieldbook-csv-minimal",
+    "href": "articles/generate_herbarium_labels.html#example-fieldbook-csv-minimal",
+    "title": "Generate Herbarium Labels",
+    "section": "Example Fieldbook CSV (minimal):",
+    "text": "Example Fieldbook CSV (minimal):\ngenus,species,family,recordedBy,recordNumber,stateProvince,country,locality,decimalLatitude,decimalLongitude\nQuercus,robur,Fagaceae,John Doe,102,Texas,USA,Austin,30.2672,-97.7431",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#notes",
+    "href": "articles/generate_herbarium_labels.html#notes",
+    "title": "Generate Herbarium Labels",
+    "section": "Notes",
+    "text": "Notes\n\nFor USA records, both state and county maps are shown.\nFor all other countries, only the country-level map is included.\nRecords without stateProvince will halt processing.\nLabels are parsed into line breaks based on text length for improved readability.",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/generate_herbarium_labels.html#see-also",
+    "href": "articles/generate_herbarium_labels.html#see-also",
+    "title": "Generate Herbarium Labels",
+    "section": "See Also",
+    "text": "See Also\n\nStandardize Specimen Records\nCompare Herbarium Sources",
+    "crumbs": [
+      "Articles",
+      "Herbarium Label Generation",
+      "Generate Herbarium Labels"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#overview",
+    "href": "articles/write_examined_specimens.html#overview",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Overview",
+    "text": "Overview\nTaxonomic revisions and descriptions of new species cite the specimens examined for each species, in a format that differs from journal to journal: the header, the case and format (bold, italics, small capitals) of countries, states and collectors, how dates and coordinates are written, and how herbaria are listed.\nThe function barroso_write_specimens() writes these lists for one, several or all species of a database of herbarium records into a Word (.docx) file, in the format of a chosen journal. This article goes through the whole workflow with two R scripts, using the herbarium records of Luetzelburgia (Leguminosae), a genus of 15 species of South American trees:\n\n01_get_standardized_records_script.R downloads the records from GBIF, REFLORA and JABOT, combines and standardizes them, and saves a spreadsheet;\n02_write_examined_specimens_script.R writes the lists of examined specimens from this spreadsheet, in the format of several journals.\n\nBoth scripts are run from an RStudio project, e.g. build_herbarium_records_database, with the scripts in a folder scripts and the results saved in a folder results.",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#script-1-get-standardized-records",
+    "href": "articles/write_examined_specimens.html#script-1-get-standardized-records",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Script 1: get standardized records",
+    "text": "Script 1: get standardized records\nThe records are downloaded with plantR (GBIF), refloraR (REFLORA Virtual Herbarium) and jabotR (JABOT, Rio de Janeiro Botanical Garden). The list of accepted species comes from Kew’s WCVP, with the package rWCVPdata.\n# 01_get_standardized_records_script.R\n\nlibrary(barRoso)\nlibrary(refloraR)\nlibrary(jabotR)\nlibrary(plantR)\nlibrary(dplyr)\nlibrary(openxlsx)\nlibrary(rWCVPdata)\n\n# Create a folder for the results of today\ndir &lt;- \"results\"\nfolder_name &lt;- paste0(dir, \"/\", format(Sys.time(), \"%d%b%Y\"))\nif (!dir.exists(folder_name)) dir.create(folder_name, recursive = TRUE)\n\n# All accepted species of Luetzelburgia in WCVP\nwcvp_names &lt;- rWCVPdata::wcvp_names\nluetz_wcvp &lt;- subset(wcvp_names,\n                     genus == \"Luetzelburgia\" &\n                       taxon_rank == \"Species\" &\n                       taxon_status == \"Accepted\")\nluetz_list &lt;- sort(luetz_wcvp$taxon_name)\n\n# GBIF: one search for each species, skipping species without records\ndata_gbif &lt;- lapply(luetz_list, function(x) {\n  gbif &lt;- tryCatch(plantR::rgbif2(species = x, n.records = 5000, force = TRUE,\n                                  remove_na = FALSE, save = FALSE, compress = FALSE),\n                   error = function(e) NULL)\n  if (!is.data.frame(gbif) || nrow(gbif) == 0) return(NULL)\n  gbif\n})\nnames(data_gbif) &lt;- luetz_list\ndata_gbif &lt;- dplyr::bind_rows(data_gbif, .id = \"original_search\")\n\n# REFLORA Virtual Herbarium\ndata_reflora &lt;- refloraR::reflora_records(repatriated = TRUE, taxon = \"Luetzelburgia\",\n                                          indets = TRUE, updates = TRUE,\n                                          verbose = TRUE, save = FALSE)\nunlink(\"reflora_download/\", recursive = TRUE, force = TRUE)\n\n# JABOT\ndata_jabot &lt;- jabotR::jabot_records(taxon = \"Luetzelburgia\", indets = TRUE,\n                                    updates = TRUE, verbose = TRUE, save = FALSE)\nunlink(\"jabot_download/\", recursive = TRUE, force = TRUE)\n\n# Combine the sources, keeping GBIF for the herbaria present in more than one\nrecords_list &lt;- list(GBIF = data_gbif,\n                     REFLORA = data_reflora,\n                     JABOT = data_jabot)\ndata_all &lt;- barRoso::barroso_cat(list_sources = records_list,\n                                 keep_source = \"GBIF\")\n\n# Standardize collectors, herbaria, places and taxa, and remove duplicates\ndata_all_clean &lt;- barRoso::barroso_std(data_all,\n                                       unvouchered = TRUE,\n                                       delunkcoll = TRUE,\n                                       flag_duplicates = TRUE,\n                                       rm_duplicates = TRUE)\n\n# Fix and flag coordinates\ndata_all_clean &lt;- barRoso::std_coordinates(data_all_clean)\n\n# Save the database\nopenxlsx::write.xlsx(data_all_clean,\n                     paste0(folder_name, \"/Luetzelburgia_herbarium_records.xlsx\"))\nIn November 2026, this script found 3,215 records in GBIF, 1,093 in REFLORA and 351 in JABOT:\n#&gt; barroso_cat: removing 1089 records of 39 herbaria from REFLORA also present in GBIF\n#&gt; barroso_cat: removing 337 records of 10 herbaria from JABOT also present in GBIF\nAfter the standardization, without duplicates, unvouchered records and records of unknown collectors, the database has 1,202 records of 15 species, from Brazil (1,155), Bolivia (35), Colombia (3) and Guyana (3).",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#script-2-write-the-examined-specimens",
+    "href": "articles/write_examined_specimens.html#script-2-write-the-examined-specimens",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Script 2: write the examined specimens",
+    "text": "Script 2: write the examined specimens\nThe second script reads the spreadsheet saved by the first one, and writes one .docx file for each journal, in the same folder:\n# 02_write_examined_specimens_script.R\n\nlibrary(barRoso)\nlibrary(openxlsx)\n\n# The most recent spreadsheet within the results folder\ndir &lt;- \"results\"\nrecords_files &lt;- list.files(dir,\n                            pattern = \"^Luetzelburgia_herbarium_records[.]xlsx$\",\n                            recursive = TRUE,\n                            full.names = TRUE)\nrecords_file &lt;- records_files[which.max(file.mtime(records_files))]\nfolder_name &lt;- dirname(records_file)\n\n# Read the records once, so the spreadsheet is not read again for each journal\ndata_records &lt;- openxlsx::read.xlsx(records_file)\n\n# One Word (.docx) file for each journal. To write just some species, use the\n# argument species, e.g. species = c(\"Luetzelburgia andina\", \"Luetzelburgia harleyi\")\njournals &lt;- c(\"Annals of the Missouri Botanical Garden\",\n              \"Systematic Botany\",\n              \"Kew Bulletin\",\n              \"Rodriguesia\")\n\nfor (journal in journals) {\n  barRoso::barroso_write_specimens(\n    df = data_records,\n    species = NULL,\n    journal = journal,\n    dir = folder_name,\n    filename = paste0(\"Luetzelburgia_examined_specimens_\", gsub(\"\\\\s+\", \"_\", journal))\n  )\n}\n#&gt; Skipping 5 records not identified to species\n#&gt; Examined specimens of 15 species (1131 specimens) written in the format of\n#&gt; Annals of the Missouri Botanical Garden to:\n#&gt; results/01Nov2026/Luetzelburgia_examined_specimens_Annals_of_the_Missouri_Botanical_Garden.docx\n#&gt; ...\nFor each species, the file has the species name and its author, followed by a paragraph with its specimens, e.g. in the format of Systematic Botany:\n\nLuetzelburgia auriculata (Allemão) Ducke\nRepresentative Specimens Examined—Brazil. —Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, D. Cardoso 2628 (HUEFS). —Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, F.H.F. Nascimento 1402 (HUEFS).",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#arguments",
+    "href": "articles/write_examined_specimens.html#arguments",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Arguments",
+    "text": "Arguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf or path\nThe records, as a data frame or an .xlsx/.csv file, in Darwin Core format (e.g. the output of barroso_std() or barroso_dwc())\n\n\nspecies\nSpecies to write, with or without authors (e.g. \"Luetzelburgia andina\"); NULL for all species\n\n\njournal\nThe journal whose format is followed, one of the 17 journals below\n\n\nheader\nText of the header, e.g. \"Paratypes\" or \"Additional specimens examined\"; NULL for the header of the journal, \"\" for no header\n\n\nlanguage\n\"en\" or \"pt\", for the default header, months and countries\n\n\ncatalog_numbers\nIf TRUE, the catalog number is written after each herbarium, e.g. \"IAC no. 14754\" in Brittonia\n\n\ndir, filename\nFolder and name of the .docx file\n\n\nfont_family, font_size\nFont of the document",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#journal-formats",
+    "href": "articles/write_examined_specimens.html#journal-formats",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Journal formats",
+    "text": "Journal formats\nThe journal argument lists all available formats, each checked against recent papers of the journal, including the bold, italics and small capitals used. The journal can be written in any case, with or without accents, and abbreviated, e.g. \"systematic botany\", \"Kew\", \"Edinburgh\" or \"Rodriguesia\". The examples below show the same records of Luetzelburgia auriculata in each format, as written in the .docx file. The records of D. Cardoso et al. 2379 and D. Machado Cardoso 2379 are duplicates of the same collection, and are cited once, with all their herbaria.\n\nSystematic Botany\nWith header in bold italics, countries in bold, states in small capitals after an em dash, and collectors with numbers in italics:\n\nRepresentative Specimens Examined—Brazil. —Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, D. Cardoso 2628 (HUEFS). —Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nActa Botanica Brasilica\nWith header, countries and states in bold, collectors in italics, herbaria marked as seen, and municipalities separated by periods:\n\nAdditional specimens examined: BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08’48” S, 45°00’55” W, 1 May 2009, D. Cardoso 2628 (HUEFS!). Ceará: Caucaia, Lagoa dos Caetanos, 3° S, 38° W, 21 January 2009, D. Cardoso et al. 2379 (ASE!, BOTU!, CNMT!, HDJF!, HEPH!, HUCS!, HUEFS!, HUESB!, SORO!, UB!, UESC!, VIC!). Crateús, RPPN Serra das Almas, 5°09’44” S, 40°53’18” W, 15 June 2014, F.H.F. Nascimento 1402 (HUEFS!).\n\n\n\nAnnals of the Missouri Botanical Garden\nWith states in bold, and collectors with spaced initials in italics:\n\nAdditional specimens examined. BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, F. H. F. Nascimento 1402 (HUEFS).\n\n\n\nBotanical Journal of the Linnean Society\nWith header in italics, states in bold, dates like “16.vi.2007”, and each municipality cited once:\n\nRepresentative specimens examined: BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1.v.2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21.i.2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15.vi.2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nBrazilian Journal of Botany\nWith collectors cited by surname, and days with two digits:\n\nSelected additional specimens—BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 01 May 2009, Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, Nascimento 1402 (HUEFS).\n\n\n\nBrittonia\nWith countries and states in bold, phenology between square brackets, and “et al.” not in italics:\n\nAdditional specimens examined.—BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, F. H. F. Nascimento 1402 (HUEFS).\n\n\n\nCandollea\nWith countries in bold small capitals, states in bold, and dates with Roman numerals:\n\nAdditional specimens examined. – Brazil. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S 45°00’55”W, 1.V.2009, Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S 38°W, 21.I.2009, Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09’44”S 40°53’18”W, 15.VI.2014, Nascimento 1402 (HUEFS).\n\n\n\nEdinburgh Journal of Botany\nWith states in bold, just the surname of collectors in italics, and municipalities separated by periods:\n\nAdditional specimens examined. BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 v 2009, Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 i 2009, Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 vi 2014, Nascimento 1402 (HUEFS).\n\n\n\nKew Bulletin\nWith header and countries in bold uppercase Arial, and numbers not in italics:\n\nSPECIMENS EXAMINED. BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 June 2014, F. H. F. Nascimento 1402 (HUEFS).\n\n\n\nNordic Journal of Botany\nWith the species cited in the paragraph of its specimens, under a single header:\n\nAdditional specimen examined\nLuetzelburgia auriculata – Brazil, Bahia, Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, Cardoso 2628 (HUEFS). Ceará, Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, Nascimento 1402 (HUEFS).\n\n\n\nPhytotaxa\nWith municipalities followed by a colon:\n\nAdditional specimens examined:―BRAZIL. Bahia: Barreiras: Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia: Lagoa dos Caetanos, 3°S, 38°W, 21 January 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús: RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 June 2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nPhytoKeys\nWith countries in bold small capitals, states in bold, and municipalities after “Mun.”:\n\nAdditional specimens examined. Brazil. Bahia: Mun. Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Mun. Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Mun. Crateús, RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 June 2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nPlant Ecology and Evolution\nWith specimens separated by bullets, fields by semicolons, and herbaria without parentheses:\n\nAdditional material examined. BRAZIL • Bahia, Barreiras, Prainha, margem do Rio das Ondas; 12°08’48”S, 45°00’55”W; 1 May 2009; Cardoso 2628; HUEFS • Ceará, Caucaia, Lagoa dos Caetanos; 3°S, 38°W; 21 Jan. 2009; Cardoso et al. 2379; ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC • Crateús, RPPN Serra das Almas; 5°09’44”S, 40°53’18”W; 15 June 2014; Nascimento 1402; HUEFS.\n\n\n\nRodriguésia\nWith specimens separated by periods, and collections without number cited with the catalog number instead of “s.n.”:\n\nAdditional material examined: BRAZIL. BAHIA: Barreiras, Prainha, margem do Rio das Ondas, 12º08’48”S, 45º00’55”W, 1.V.2009, D. Cardoso 2628 (HUEFS). CEARÁ: Caucaia, Lagoa dos Caetanos, 3ºS, 38ºW, 21.I.2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5º09’44”S, 40º53’18”W, 15.VI.2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nSystematics and Biodiversity\nWith header in bold:\n\nAdditional specimens analysed. BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 January 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 June 2014, F. H. F. Nascimento 1402 (HUEFS).\n\n\n\nTaxon\nWith states in uppercase, “& al.”, and elevation in “m a.s.l.”:\n\nAdditional specimens examined. – BRAZIL. BAHIA: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, D. Cardoso 2628 (HUEFS); CEARÁ: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, D. Cardoso & al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, F.H.F. Nascimento 1402 (HUEFS).\n\n\n\nWilldenowia\nWith a single header before all species, countries and states in small capitals, and each municipality cited once, after “Municipality”:\n\nAdditional specimens examined.\nBrazil: Bahia: Municipality Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1 May 2009, D. Cardoso 2628 (HUEFS). — Ceará: Municipality Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, D. Cardoso & al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Municipality Crateús, RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15 Jun 2014, F. H. F. Nascimento 1402 (HUEFS).",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#how-the-specimens-are-written",
+    "href": "articles/write_examined_specimens.html#how-the-specimens-are-written",
+    "title": "Write Lists of Examined Specimens",
+    "section": "How the specimens are written",
+    "text": "How the specimens are written\n\nColumns. The function uses the Darwin Core columns species, country, stateProvince, municipality (or county, where GBIF keeps the municipalities of Brazil), locality, decimalLatitude, decimalLongitude, minimumElevationInMeters, maximumElevationInMeters, day, month, year, reproductiveCondition (phenology), recordedBy, addCollector, recordNumber, collectionCode, catalogNumber. Missing columns are just skipped.\nCollectors. The names standardized by barroso_std() (e.g. D. B. O. S. Cardoso) are written as each journal cites them. The additional collector (addCollector) is written as et al. (& al. in Taxon) or as the name of the second collector, e.g. R.M. Harley & A.M. Giulietti.\nDuplicates. Duplicates of the same collection (same species, collector surname and number, or same collector, date and locality when there is no number) are written once, with all their herbaria in alphabetical order, including those found by barroso_flag_duplicates() (duplicateCollectionCodes).\nTypes. The type status is not written, as types are cited apart from the examined specimens.\nCollections without number. The catalog number of the first herbarium is written, e.g. R. Spruce s.n. (K000892474, LD), so that the specimen can be found. Use catalog_numbers = TRUE to write the catalog numbers of all herbaria.\nOrder. Specimens are ordered by country, state, municipality and date. Records not identified to species are skipped.\nSpecies. For each species, a heading with the species name in italics and its author (from scientificNameAuthorship, acceptedScientificName or scientificName) is followed by the paragraph of its specimens.\n\nThe function returns, invisibly, a data frame with the species and their specimens, one per line, which can be checked in R:\nres &lt;- barroso_write_specimens(path = \"results/01Nov2026/Luetzelburgia_herbarium_records.xlsx\",\n                               species = \"Luetzelburgia andina\", verbose = FALSE)\ncat(res$specimens_text)",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#tips",
+    "href": "articles/write_examined_specimens.html#tips",
+    "title": "Write Lists of Examined Specimens",
+    "section": "Tips",
+    "text": "Tips\n\nStandardize the database first with barroso_std(), so that collectors, herbarium acronyms and places are written consistently, and duplicates are removed.\nCheck the countries and states of the database before writing: the specimens are cited as they are in the data.\nFor the paratypes of a new species, use species and header = \"Paratypes\".",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
+    ]
+  },
+  {
+    "objectID": "articles/write_examined_specimens.html#see-also",
+    "href": "articles/write_examined_specimens.html#see-also",
+    "title": "Write Lists of Examined Specimens",
+    "section": "See Also",
+    "text": "See Also\n\nbarroso_write_specimens() reference\nStandardize Specimen Records\nCompare Herbarium Sources\nWrite Taxonomic Descriptions",
+    "crumbs": [
+      "Articles",
+      "Write Examined Specimens",
+      "Write Lists of Examined Specimens"
     ]
   },
   {
@@ -593,34 +532,6 @@
     ]
   },
   {
-    "objectID": "faq/index.html",
-    "href": "faq/index.html",
-    "title": "Frequently Asked Questions",
-    "section": "",
-    "text": "What is the barRoso?\nbarRoso is an R package for cleaning, standardizing, and reconciling plant specimen records—especially from biodiversity repositories like GBIF. It streamlines workflows for curators, researchers, and data scientists by automating the harmonization of taxonomic, geographic, and collector metadata. Optimized for reproducibility, barRoso facilitates the detection of duplicate specimens and improves data quality across herbarium datasets.\n\n\nWhat can I use barRoso for?\n\nStandardize collector names and associated collector numbers — a crucial step for detecting duplicate specimens across herbaria\nHarmonize taxonomic and geographic fields (e.g., family, genus, locality, country)\nDetect and flag potential duplicate records using cleaned metadata\nGenerate herbarium labels from field notebooks, including taxon authority and geolocation maps\nPrepare high-quality datasets for biodiversity, floristic, and taxonomic studies\n\n\n\nHow do I install barRoso?\nFollow the Get Started guide for full instructions on installing the package and its dependencies via GitHub.\n\n\nIs barRoso free to use?\nYes. barRoso is open-source software licensed under the MIT License, which permits unrestricted use, modification, and distribution.\n\n\nWhat output can barRoso generate?\nWhile barRoso does not directly produce formatted reports, it supports:\n\nCleaned and standardized data frames for downstream biodiversity analysis\nVisual maps in herbarium label generation\nEasy integration with RMarkdown, Quarto, and Shiny for reporting and dashboards\n\n\n\nHow does barRoso work?\nUnlike many packages that rely on static dictionaries to clean collector names, barRoso uses a robust set of regular expressions (regex) to dynamically identify and standardize collector patterns across datasets. This approach allows barRoso to generalize better across sources and spelling variations — even when names are inconsistently formatted. Combined with harmonization of geographic and taxonomic fields, this makes the package especially powerful for detecting duplicates and preparing data for downstream analysis.\n\n\nWhy doesn’t barRoso remove incomplete or inconsistent records?\nBecause standardization is more powerful than deletion. Many biodiversity records contain valuable metadata even when some fields are missing or messy. barRoso standardizes and flags potential problems but leaves the final decision to the user—preserving data integrity and maximizing research potential.\n\n\nWho are the developers of barRoso?\nDevelopment is sponsored by JBRJ, FINEP, and CNPq. Main developer:\n\nDomingos Cardoso (@DBOSlab)\n\nView the code and contribute on GitHub: https://github.com/DBOSlab/barRoso\n\n\nWhy the name barRoso?\nThe name honors Graziela Maciel Barroso (1912–2003), a pioneering Brazilian botanist. It also serves as an acronym: Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations, highlighting both its mission and its deep roots in the R programming ecosystem.\n\n\nWhere can I report bugs or request features?\nSubmit issues on GitHub: barRoso Issues.\n\n\nWhere can I ask questions or join the community?\nVisit GitHub Discussions to ask questions, share ideas, or connect with other users."
-  },
-  {
-    "objectID": "LICENSE.html",
-    "href": "LICENSE.html",
-    "title": "",
-    "section": "",
-    "text": "Code\n\n\n \n\n\n\n\n\n\nMIT License\nCopyright (c) 2025 barRoso authors\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-  },
-  {
-    "objectID": "authors/index.html",
-    "href": "authors/index.html",
-    "title": "",
-    "section": "",
-    "text": "Code"
-  },
-  {
-    "objectID": "authors/index.html#the-barroso-developer",
-    "href": "authors/index.html#the-barroso-developer",
-    "title": "",
-    "section": "The barRoso Developer",
-    "text": "The barRoso Developer\n\n\n  \n    \n    \n      Domingos Cardoso\n      \n        \n        \n        \n      \n      Taxonomist and bioinformatician leading the barroso package, responsible for designing and coding functions as well as developing the project website"
-  },
-  {
     "objectID": "articles/detect_duplicates.html#overview",
     "href": "articles/detect_duplicates.html#overview",
     "title": "Detect and Flag Duplicates",
@@ -714,6 +625,118 @@
       "Articles",
       "Duplicate Detection",
       "Detect and Flag Duplicates"
+    ]
+  },
+  {
+    "objectID": "authors/index.html",
+    "href": "authors/index.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "authors/index.html#the-barroso-developer",
+    "href": "authors/index.html#the-barroso-developer",
+    "title": "",
+    "section": "The barRoso Developer",
+    "text": "The barRoso Developer\n\n\n  \n    \n    \n      Domingos Cardoso\n      \n        \n        \n        \n      \n      Taxonomist and bioinformatician leading the barroso package, responsible for designing and coding functions as well as developing the project website"
+  },
+  {
+    "objectID": "LICENSE.html",
+    "href": "LICENSE.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n \n\n\n\n\n\n\nMIT License\nCopyright (c) 2025 barRoso authors\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+  },
+  {
+    "objectID": "faq/index.html",
+    "href": "faq/index.html",
+    "title": "Frequently Asked Questions",
+    "section": "",
+    "text": "What is the barRoso?\nbarRoso is an R package for cleaning, standardizing, and reconciling plant specimen records—especially from biodiversity repositories like GBIF. It streamlines workflows for curators, researchers, and data scientists by automating the harmonization of taxonomic, geographic, and collector metadata. Optimized for reproducibility, barRoso facilitates the detection of duplicate specimens and improves data quality across herbarium datasets.\n\n\nWhat can I use barRoso for?\n\nStandardize collector names and associated collector numbers — a crucial step for detecting duplicate specimens across herbaria\nHarmonize taxonomic and geographic fields (e.g., family, genus, locality, country)\nDetect and flag potential duplicate records using cleaned metadata\nGenerate herbarium labels from field notebooks, including taxon authority and geolocation maps\nPrepare high-quality datasets for biodiversity, floristic, and taxonomic studies\n\n\n\nHow do I install barRoso?\nFollow the Get Started guide for full instructions on installing the package and its dependencies via GitHub.\n\n\nIs barRoso free to use?\nYes. barRoso is open-source software licensed under the MIT License, which permits unrestricted use, modification, and distribution.\n\n\nWhat output can barRoso generate?\nWhile barRoso does not directly produce formatted reports, it supports:\n\nCleaned and standardized data frames for downstream biodiversity analysis\nVisual maps in herbarium label generation\nEasy integration with RMarkdown, Quarto, and Shiny for reporting and dashboards\n\n\n\nHow does barRoso work?\nUnlike many packages that rely on static dictionaries to clean collector names, barRoso uses a robust set of regular expressions (regex) to dynamically identify and standardize collector patterns across datasets. This approach allows barRoso to generalize better across sources and spelling variations — even when names are inconsistently formatted. Combined with harmonization of geographic and taxonomic fields, this makes the package especially powerful for detecting duplicates and preparing data for downstream analysis.\n\n\nWhy doesn’t barRoso remove incomplete or inconsistent records?\nBecause standardization is more powerful than deletion. Many biodiversity records contain valuable metadata even when some fields are missing or messy. barRoso standardizes and flags potential problems but leaves the final decision to the user—preserving data integrity and maximizing research potential.\n\n\nWho are the developers of barRoso?\nDevelopment is sponsored by JBRJ, FINEP, and CNPq. Main developer:\n\nDomingos Cardoso (@DBOSlab)\n\nView the code and contribute on GitHub: https://github.com/DBOSlab/barRoso\n\n\nWhy the name barRoso?\nThe name honors Graziela Maciel Barroso (1912–2003), a pioneering Brazilian botanist. It also serves as an acronym: Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations, highlighting both its mission and its deep roots in the R programming ecosystem.\n\n\nWhere can I report bugs or request features?\nSubmit issues on GitHub: barRoso Issues.\n\n\nWhere can I ask questions or join the community?\nVisit GitHub Discussions to ask questions, share ideas, or connect with other users."
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#overview",
+    "href": "articles/format_darwin_core.html#overview",
+    "title": "Format Datasets into Darwin Core",
+    "section": "Overview",
+    "text": "Overview\nHerbarium records downloaded from different portals rarely share the same column names and formats. GBIF uses Darwin Core terms such as recordedBy and decimalLatitude, while a speciesLink download may call them collector and latitude, write dates as 23/11/2011, or keep the year, month and day of identification in separate columns.\nThe function barroso_dwc() formats a dataset into Darwin Core column names and value formats, so records from GBIF, speciesLink, REFLORA and JABOT can be combined and standardized together. It recognizes the source of the data by itself.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#usage",
+    "href": "articles/format_darwin_core.html#usage",
+    "title": "Format Datasets into Darwin Core",
+    "section": "Usage",
+    "text": "Usage\nlibrary(barRoso)\n\nsplink &lt;- readxl::read_excel(\"speciesLink-20260409091223-0027073.xlsx\", col_types = \"text\")\n\nsplink &lt;- barroso_dwc(splink)\n#&gt; barroso_dwc: speciesLink format; renamed 20 columns (collector -&gt; recordedBy,\n#&gt; collectornumber -&gt; recordNumber, yearcollected -&gt; year, monthcollected -&gt; month, ...);\n#&gt; renamed 13 columns (basisofrecord -&gt; basisOfRecord, stateprovince -&gt; stateProvince, ...);\n#&gt; cleaned 3097 specificEpithet (e.g. \"cf. platychila\", \"sp. 2\"); created dateIdentified\n#&gt; from year, month and day of identification; added the author to 133418 scientificName;\n#&gt; took 1585 missing recordNumber from fieldNumber; created species from genus and\n#&gt; specificEpithet\nThe report tells what was changed. The source can also be given explicitly:\nsplink &lt;- barroso_dwc(splink, source = \"speciesLink\")   # also \"REFLORA\", \"JABOT\", \"GBIF\"\nYou don’t need to call barroso_dwc() before barroso_cat(): it formats each source by itself before combining them.\ncombined &lt;- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = \"GBIF\")\nAll columns are returned as character, so the outputs of different downloads can always be combined. For example, when querying several species with plantR::rspeciesLink(), a column like coordinatePrecision may come as integer for one species and as character for another, and dplyr::bind_rows() would fail:\ndata_speciesLink &lt;- lapply(targeted_taxa, function(x) {\n  splink &lt;- plantR::rspeciesLink(key = personal_key, species = x, save = FALSE)\n  barroso_dwc(splink)\n})\nnames(data_speciesLink) &lt;- targeted_taxa\ndata_speciesLink &lt;- dplyr::bind_rows(data_speciesLink, .id = \"original_search\")\nUse as_character = FALSE to keep the original column types.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#recognized-sources",
+    "href": "articles/format_darwin_core.html#recognized-sources",
+    "title": "Format Datasets into Darwin Core",
+    "section": "Recognized sources",
+    "text": "Recognized sources\n\n\n\nSource\nRecognized by\nExample of columns\n\n\n\n\nspeciesLink, older format\nlowercase names of the speciesLink\ncollector, collectornumber, latitude, yearidentified\n\n\nspeciesLink, lowercase Darwin Core\nlowercase Darwin Core terms\nrecordedby, decimallatitude, yearidentified\n\n\nspeciesLink, current format\nthe column spp\nrecordedBy, decimalLatitude, spp\n\n\nREFLORA (refloraR)\ncitation of the REFLORA Virtual Herbarium\nDarwin Core\n\n\nJABOT (jabotR)\noccurrenceID like urn:catalog:RB:123\nDarwin Core\n\n\nGBIF\ngbifID\nDarwin Core",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#what-is-changed",
+    "href": "articles/format_darwin_core.html#what-is-changed",
+    "title": "Format Datasets into Darwin Core",
+    "section": "What is changed",
+    "text": "What is changed\n\nColumn names\n\nDarwin Core terms written in other cases, e.g. recordedby or decimallatitude, become recordedBy and decimalLatitude, whatever the source.\nColumns of the older speciesLink format are renamed:\n\n\n\n\n\n\n\n\nspeciesLink\nDarwin Core\n\n\n\n\ncollector\nrecordedBy\n\n\ncollectornumber\nrecordNumber\n\n\nyearcollected, monthcollected, daycollected\nyear, month, day\n\n\nlatitude, longitude\ndecimalLatitude, decimalLongitude\n\n\nscientificnameauthor\nscientificNameAuthorship\n\n\nspecies (just the epithet)\nspecificEpithet\n\n\nsubspecies\ninfraspecificEpithet\n\n\nordem, taxonclass\norder, class\n\n\ncontinentocean\ncontinent\n\n\nminimumelevation, maximumelevation\nminimumElevationInMeters, maximumElevationInMeters\n\n\nnotes\noccurrenceRemarks\n\n\nspp (the binomial)\nspecies, as in GBIF\n\n\n\n\nA column is never renamed into a name already in the data, and columns that are not Darwin Core terms (e.g. barcode, julianday) are kept unchanged.\n\n\n\nValues of speciesLink records\n\n\n\n\n\n\n\n\nWhat\nBefore\nAfter\n\n\n\n\nDate of identification\nyearidentified 2005, monthidentified 3, dayidentified 7\ndateIdentified 2005-03-07\n\n\nDates\n23/11/2011\n2011-11-23\n\n\nAuthor in the scientific name\nOrmosia arborea + (Vell.) Harms\nOrmosia arborea (Vell.) Harms\n\n\nQualifier in the epithet\ncf. platychila, cf.andarahiensis, af. acuminata\nplatychila + identificationQualifier cf.\n\n\nInfraspecific name in the epithet\nstygium var. annulatum\nstygium + infraspecificEpithet annulatum\n\n\nMorphospecies\nsp., sp. 2, sp. nov., fabaceae sp1\nNA\n\n\nEpithet with quotes or a final dot\n\"sincorense\", brasiliana.\nsincorense, brasiliana\n\n\nMissing collector number\nrecordNumber empty, fieldNumber 88\nrecordNumber 88\n\n\n\n\n\nValues of REFLORA and JABOT records\n\n\n\n\n\n\n\n\n\nSource\nWhat\nBefore\nAfter\n\n\n\n\nREFLORA\nDeterminer\nAdministrador (the system user)\nNA\n\n\nREFLORA\nDates\n2/12/1940, --/5/1880\n1940-12-02, 1880-05\n\n\nREFLORA\nType status in Latin\nISOTYPUS\nisotype\n\n\nREFLORA\nInstitution of RB\nRB\nJBRJ, as in GBIF and JABOT\n\n\nJABOT\nDates\n2008-9-26, 22/4/2020\n2008-09-26, 2020-04-22\n\n\n\n\n\nIn all sources\nA binomial species column is created from genus and specificEpithet when missing, as in GBIF downloads.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#example-with-specieslink-records-of-the-chapada-diamantina-region",
+    "href": "articles/format_darwin_core.html#example-with-specieslink-records-of-the-chapada-diamantina-region",
+    "title": "Format Datasets into Darwin Core",
+    "section": "Example with speciesLink records of the Chapada Diamantina region",
+    "text": "Example with speciesLink records of the Chapada Diamantina region\nThe eleven speciesLink downloads of the municipalities around the Chapada Diamantina National Park (194,560 records) share the older speciesLink format, with 71 columns. After barroso_dwc(), 44 of them are Darwin Core terms, and:\n\n3,097 epithets were cleaned, e.g. 274 qualifiers like cf. moved to identificationQualifier;\n88,192 records got a dateIdentified in ISO 8601;\n133,418 scientific names got their author;\n1,585 missing collector numbers were taken from fieldNumber.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#next-steps",
+    "href": "articles/format_darwin_core.html#next-steps",
+    "title": "Format Datasets into Darwin Core",
+    "section": "Next steps",
+    "text": "Next steps\nAfter formatting, the records can be combined and standardized:\ncombined &lt;- barroso_cat(list(GBIF = gbif, speciesLink = splink))\ncleaned &lt;- barroso_std(combined)",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
+    ]
+  },
+  {
+    "objectID": "articles/format_darwin_core.html#see-also",
+    "href": "articles/format_darwin_core.html#see-also",
+    "title": "Format Datasets into Darwin Core",
+    "section": "See Also",
+    "text": "See Also\n\nbarroso_dwc() reference\nCompare Herbarium Sources\nStandardize Specimen Records",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Format Datasets into Darwin Core"
     ]
   },
   {
@@ -841,212 +864,407 @@
     "href": "articles/index.html",
     "title": "How-To Articles",
     "section": "",
-    "text": "These “how-to” articles walk through barRoso’s functions in the order you would typically reach for them: combining sources, standardizing the records, reconciling duplicates and checking coordinates, and finally generating labels and taxonomic descriptions. The diagram below gives the overall shape of that workflow before you dive into the individual guides.\n\n\n\n\nData Standardization\n\nStandardize Specimen Records\nFlexible Column Names\n\n\n\nDuplicate Detection\n\nDetect and Flag Duplicates\nCompare Herbarium Sources\n\n\n\n\n\nGeographic Coordinates\n\nFix and Flag Coordinates\n\n\n\nCase Studies & Workflows\n\nStandardize GBIF Data\nREFLORA Cleaning Workflow\n\n\n\n\n\nHerbarium Label Generation\n\nGenerate Herbarium Labels\n\n\n\nWrite Taxonomic Descriptions\n\nAutomatically generated taxonomic descriptions",
+    "text": "These “how-to” articles walk through barRoso’s functions in the order you would typically reach for them: combining sources, standardizing the records, reconciling duplicates and checking coordinates, and finally generating labels, lists of examined specimens and taxonomic descriptions. The diagram below gives the overall shape of that workflow before you dive into the individual guides.\n\n\n\n\nData Standardization\n\nFormat Datasets into Darwin Core\nStandardize Specimen Records\nFlexible Column Names\n\n\n\nDuplicate Detection\n\nDetect and Flag Duplicates\nCompare Herbarium Sources\n\n\n\n\n\nGeographic Coordinates\n\nFix and Flag Coordinates\n\n\n\nCase Studies & Workflows\n\nStandardize GBIF Data\nREFLORA Cleaning Workflow\n\n\n\n\n\nHerbarium Label Generation\n\nGenerate Herbarium Labels\n\n\n\nWrite Examined Specimens\n\nWrite Lists of Examined Specimens\n\n\n\n\n\nWrite Taxonomic Descriptions\n\nAutomatically generated taxonomic descriptions",
     "crumbs": [
       "Articles",
       "Overview"
     ]
   },
   {
-    "objectID": "articles/generate_herbarium_labels.html#overview",
-    "href": "articles/generate_herbarium_labels.html#overview",
-    "title": "Generate Herbarium Labels",
+    "objectID": "articles/standardize_specimens.html#overview",
+    "href": "articles/standardize_specimens.html#overview",
+    "title": "Standardize Specimen Records",
     "section": "Overview",
-    "text": "Overview\nThe barroso_labels() function generates printable herbarium labels directly from field book spreadsheets or CSV files. Labels include specimen information, taxonomic authority, formatted locality descriptions, and location maps (with greater resolution for USA-based collections).\nTaxonomic updates and authority strings are automatically fetched via the lcvplants package.",
+    "text": "Overview\nThe barroso_std() function is the primary tool in the barRoso package for performing full data cleaning and standardization of biodiversity specimen records. It is designed to process raw data from herbaria, virtual repositories, and field collections, ensuring harmonized fields across taxonomic, geographic, and collector-related information.",
     "crumbs": [
       "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
+      "Data Standardization",
+      "Standardize Specimen Records"
     ]
   },
   {
-    "objectID": "articles/generate_herbarium_labels.html#main-capabilities",
-    "href": "articles/generate_herbarium_labels.html#main-capabilities",
-    "title": "Generate Herbarium Labels",
-    "section": "Main Capabilities",
-    "text": "Main Capabilities\n\nFormats collection records into standardized labels\nAutomatically retrieves and updates scientific names with taxonomic authorities\nProduces mapped visual references (USA: county-level, Others: country-level)\nPaginates and saves results as multi-page PDF files (6 labels/page)",
+    "objectID": "articles/standardize_specimens.html#key-features",
+    "href": "articles/standardize_specimens.html#key-features",
+    "title": "Standardize Specimen Records",
+    "section": "Key Features",
+    "text": "Key Features\n\nNormalize collector names and collection numbers\nNormalize determiner names (identifiedBy)\nStandardize geographic fields like country, state, and locality\nHarmonize taxonomic names including family, genus, and species\nClean and normalize type status\nOptionally remove unvouchered or duplicate records\nSupport for multilingual column names (e.g., Portuguese, Spanish)",
     "crumbs": [
       "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
+      "Data Standardization",
+      "Standardize Specimen Records"
     ]
   },
   {
-    "objectID": "articles/generate_herbarium_labels.html#usage",
-    "href": "articles/generate_herbarium_labels.html#usage",
-    "title": "Generate Herbarium Labels",
+    "objectID": "articles/standardize_specimens.html#usage",
+    "href": "articles/standardize_specimens.html#usage",
+    "title": "Standardize Specimen Records",
     "section": "Usage",
-    "text": "Usage\nbarroso_labels(fieldbook = \"fieldbook_collections.csv\",\n               dir_create = \"results_herbarium_labels\",\n               file_label = \"herbarium_labels.pdf\")\n\nfieldbook: Data frame or path to CSV containing specimen records\ndir_create: Folder to output results (defaults to creating dated subfolder)\nfile_label: Base name for PDF output files",
+    "text": "Usage\nlibrary(barRoso)\n\ndf &lt;- read.csv(\"raw_herbarium_data.csv\")\n\nstandardized_df &lt;- barroso_std(df,\n                               unvouchered = TRUE,\n                               delunkcoll = FALSE,\n                               flag_missid = TRUE,\n                               flag_duplicates = TRUE,\n                               rm_duplicates = FALSE,\n                               colname_recordedBy = \"recordedBy\",\n                               colname_recordNumber = \"recordNumber\",\n                               colname_identifiedBy = \"identifiedBy\",\n                               colname_country = \"country\",\n                               colname_stateProvince = \"stateProvince\",\n                               colname_county = \"county\",\n                               colname_municipality = \"municipality\",\n                               colname_locality = \"locality\",\n                               colname_collectionCode = \"collectionCode\",\n                               colname_institutionCode = \"institutionCode\",\n                               colname_typeStatus = \"typeStatus\",\n                               colname_family = \"family\",\n                               colname_genus = \"genus\",\n                               colname_specificEpithet = \"specificEpithet\",\n                               rm_original_column = TRUE)",
     "crumbs": [
       "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
+      "Data Standardization",
+      "Standardize Specimen Records"
     ]
   },
   {
-    "objectID": "articles/generate_herbarium_labels.html#required-fields",
-    "href": "articles/generate_herbarium_labels.html#required-fields",
-    "title": "Generate Herbarium Labels",
-    "section": "Required Fields",
-    "text": "Required Fields\nThe function expects the following minimal columns in your input:\n\ngenus, species, family, recordedBy, recordNumber\nstateProvince, country, locality, decimalLatitude, decimalLongitude\n\nOptional enhancements: - vernacularName, plantDescription, vegetation, catalogNumber, addCollector, altitude, day, month, year",
-    "crumbs": [
-      "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
-    ]
-  },
-  {
-    "objectID": "articles/generate_herbarium_labels.html#output",
-    "href": "articles/generate_herbarium_labels.html#output",
-    "title": "Generate Herbarium Labels",
-    "section": "Output",
-    "text": "Output\n\nA series of .pdf files are saved with six herbarium labels per page\nOutput directory is timestamped with current date",
-    "crumbs": [
-      "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
-    ]
-  },
-  {
-    "objectID": "articles/generate_herbarium_labels.html#example-fieldbook-csv-minimal",
-    "href": "articles/generate_herbarium_labels.html#example-fieldbook-csv-minimal",
-    "title": "Generate Herbarium Labels",
-    "section": "Example Fieldbook CSV (minimal):",
-    "text": "Example Fieldbook CSV (minimal):\ngenus,species,family,recordedBy,recordNumber,stateProvince,country,locality,decimalLatitude,decimalLongitude\nQuercus,robur,Fagaceae,John Doe,102,Texas,USA,Austin,30.2672,-97.7431",
-    "crumbs": [
-      "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
-    ]
-  },
-  {
-    "objectID": "articles/generate_herbarium_labels.html#notes",
-    "href": "articles/generate_herbarium_labels.html#notes",
-    "title": "Generate Herbarium Labels",
-    "section": "Notes",
-    "text": "Notes\n\nFor USA records, both state and county maps are shown.\nFor all other countries, only the country-level map is included.\nRecords without stateProvince will halt processing.\nLabels are parsed into line breaks based on text length for improved readability.",
-    "crumbs": [
-      "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
-    ]
-  },
-  {
-    "objectID": "articles/generate_herbarium_labels.html#see-also",
-    "href": "articles/generate_herbarium_labels.html#see-also",
-    "title": "Generate Herbarium Labels",
-    "section": "See Also",
-    "text": "See Also\n\nStandardize Specimen Records\nCompare Herbarium Sources",
-    "crumbs": [
-      "Articles",
-      "Herbarium Label Generation",
-      "Generate Herbarium Labels"
-    ]
-  },
-  {
-    "objectID": "articles/compare_herbarium_sources.html#overview",
-    "href": "articles/compare_herbarium_sources.html#overview",
-    "title": "Compare Herbarium Sources",
-    "section": "Overview",
-    "text": "Overview\nWhen working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. barRoso offers the barroso_cat() function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.\nThis article demonstrates how to:\n\nMerge multiple data sources into a unified data frame\nCombine raw speciesLink downloads with GBIF downloads\nPrioritize a preferred source when herbaria overlap",
-    "crumbs": [
-      "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
-    ]
-  },
-  {
-    "objectID": "articles/compare_herbarium_sources.html#function-barroso_cat",
-    "href": "articles/compare_herbarium_sources.html#function-barroso_cat",
-    "title": "Compare Herbarium Sources",
-    "section": "Function: barroso_cat()",
-    "text": "Function: barroso_cat()\ncombined_df &lt;- barroso_cat(\n  list_sources = list(\n    GBIF = gbif_data,\n    speciesLink = splink_data,\n    JABOT = jabot_data\n  ),\n  keep_source = \"GBIF\"\n)",
-    "crumbs": [
-      "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
-    ]
-  },
-  {
-    "objectID": "articles/compare_herbarium_sources.html#arguments",
-    "href": "articles/compare_herbarium_sources.html#arguments",
-    "title": "Compare Herbarium Sources",
+    "objectID": "articles/standardize_specimens.html#arguments",
+    "href": "articles/standardize_specimens.html#arguments",
+    "title": "Standardize Specimen Records",
     "section": "Arguments",
-    "text": "Arguments\n\nlist_sources: A named list of data frames, one per biodiversity source. The names (e.g. GBIF, speciesLink) must be unique, as they are used to identify the source of each record.\nkeep_source: Optionally, the name of the preferred source (e.g. \"GBIF\"). The records of any herbarium also present in the preferred source are removed from the other sources.\n\nIf no source is specified, the function merges all sources, retaining potential duplicates for further reconciliation with barroso_flag_duplicates().",
+    "text": "Arguments\n\n...: A data frame or list of data frames with raw biodiversity records\nunvouchered: Remove records of wood, seed, fruit, pollen and spirit collections (e.g. INPAw, INPA-Carpoteca, BHZBcarpo), and observations without a specimen (basisOfRecord like HUMAN_OBSERVATION), before the herbarium codes are standardized\ndelunkcoll: Optionally delete records with unknown collectors\nflag_duplicates, rm_duplicates: Detect and optionally remove duplicates\nrm_original_column: Remove original (uncleaned) fields after standardization",
     "crumbs": [
       "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
+      "Data Standardization",
+      "Standardize Specimen Records"
     ]
   },
   {
-    "objectID": "articles/compare_herbarium_sources.html#example",
-    "href": "articles/compare_herbarium_sources.html#example",
-    "title": "Compare Herbarium Sources",
+    "objectID": "articles/standardize_specimens.html#collector-and-determiner-names",
+    "href": "articles/standardize_specimens.html#collector-and-determiner-names",
+    "title": "Standardize Specimen Records",
+    "section": "Collector and determiner names",
+    "text": "Collector and determiner names\nCollector names (recordedBy) are standardized with std_recordedBy() into initials followed by the surname, and additional collectors are moved to a new column addCollector (or stored as \"et al.\" when there are more than two collectors). Determiner names (identifiedBy) are standardized with std_identifiedBy(), using the same rules, but all determiners are kept in the same cell. The original columns are kept with the suffix Original.\n\n\n\n\n\n\n\nOriginal\nStandardized\n\n\n\n\nCardoso, D.B.O.S.\nD. B. O. S. Cardoso\n\n\nPadgurschi, MCG\nM. C. G. Padgurschi\n\n\nMartius, CFP von\nC. F. P. von Martius\n\n\nUribe Uribe AL\nA. L. Uribe-Uribe\n\n\nDusén\nDusén\n\n\nA. Gómez Pompa, A. J. Sharp & P. Hernández\nA. Gómez Pompa (addCollector: et al.)\n\n\nLobato, LC; Soares, CRA; Silva, CA (determiners)\nL. C. Lobato, C. R. A. Soares & C. A. Silva\n\n\nR.Barneby (NY) 1994-06 (determiner)\nR. Barneby\n\n\n\nChinese names written in Chinese characters (e.g. 丁广奇、余莲) or as unicode escapes, as in some GBIF downloads (e.g. &lt;U+674E&gt;&lt;U+5149&gt;&lt;U+7167&gt;, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. G. Z. Li, T. S. Yi (易婷双) and R. Zhang (张荣). Family names of two characters (e.g. Ouyang) and family names with a special reading (e.g. 曾, Zeng) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full. When the name is also written in Latin, e.g. K.C.Yang 楊國禎 or Peng, Ching-I (彭鏡毅), the Latin name is kept (K. C. Yang, C.-I. Peng).\nIdentifiers like (Wikidata Q5850623), given names in lowercase (katherine Bravo) and abbreviations like Edm.Pereira are also cleaned, and names of teams and herbaria (e.g. Equipe do Jardim Botânico de Brasília, Belem Herbarium) are kept as they are.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Standardize Specimen Records"
+    ]
+  },
+  {
+    "objectID": "articles/standardize_specimens.html#herbarium-acronyms",
+    "href": "articles/standardize_specimens.html#herbarium-acronyms",
+    "title": "Standardize Specimen Records",
+    "section": "Herbarium acronyms",
+    "text": "Herbarium acronyms\nHerbarium acronyms (collectionCode) are standardized with std_collection() into the acronyms of Index Herbariorum, using regular expressions rather than a list of every code:\n\n\n\n\n\n\n\n\nOriginal collectionCode\ninstitutionCode or catalogNumber\nStandardized\n\n\n\n\nTropicos, MO-Duplicates\nNY\nNY (the herbarium of the specimen)\n\n\nBotany, Herbarium, Vascular Plants\ncatalogNumber U.1317533\nU\n\n\n(missing, GenBank voucher)\ncatalogNumber D. Cardoso 2118 (HUEFS)\nHUEFS\n\n\nF-Seedplants, BHCB-Fanerogamas, R-Tipos, UIS-H\n\nF, BHCB, R, UIS\n\n\nBSMvplantscoll, NL-Botany, CJBG-G-DC\n\nM, L, G-DC\n\n\nHerbario INPA, Herbario Nacional de Costa Rica (CR)\n\nINPA, CR\n\n\n(missing)\nInstituto Florestal, Unicamp\nSPSF, UEC\n\n\nObservations, Dados de Pesquisa SISBio, Ecopetrol S.A\n\nNA\n\n\n\nCodes of wood collections, like INPAw, are kept, as they are Index Herbariorum codes.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Standardize Specimen Records"
+    ]
+  },
+  {
+    "objectID": "articles/standardize_specimens.html#places",
+    "href": "articles/standardize_specimens.html#places",
+    "title": "Standardize Specimen Records",
+    "section": "Places",
+    "text": "Places\nCountries, states, counties and municipalities are standardized with std_place(), e.g. BRASIL into Brazil and BA into Bahia. Words for municipality are removed from county and municipality, leaving just the name, e.g. Manaus Mun., Mun. de Castelo and Município de Mucugê into Manaus, Castelo and Mucugê.\nThe function barroso_std() does not check geographic coordinates. Use std_coordinates() for that.",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Standardize Specimen Records"
+    ]
+  },
+  {
+    "objectID": "articles/standardize_specimens.html#output",
+    "href": "articles/standardize_specimens.html#output",
+    "title": "Standardize Specimen Records",
+    "section": "Output",
+    "text": "Output\nReturns a cleaned and fully standardized data frame ready for:\n\nReconciliation and deduplication\nTaxonomic and biogeographic analysis\nHerbarium label generation workflows",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Standardize Specimen Records"
+    ]
+  },
+  {
+    "objectID": "articles/standardize_specimens.html#notes",
+    "href": "articles/standardize_specimens.html#notes",
+    "title": "Standardize Specimen Records",
+    "section": "Notes",
+    "text": "Notes\n\nUses dynamic regular expressions for name harmonization rather than static dictionaries\nOptimized for scalability and flexible input schema\nRecommended to run before calling downstream functions like barroso_flag_duplicates() or barroso_labels()",
+    "crumbs": [
+      "Articles",
+      "Data Standardization",
+      "Standardize Specimen Records"
+    ]
+  },
+  {
+    "objectID": "articles/standardize_specimens.html#example",
+    "href": "articles/standardize_specimens.html#example",
+    "title": "Standardize Specimen Records",
     "section": "Example",
-    "text": "Example\nlibrary(barRoso)\n\n# Load datasets downloaded from GBIF and speciesLink\ngbif &lt;- read.csv(\"gbif.csv\")\nsplink &lt;- read.csv(\"speciesLink.csv\", fileEncoding = \"latin1\")\n\n# Merge, giving preference to GBIF for overlapping herbaria\ncombined_df &lt;- barroso_cat(\n  list_sources = list(\n    GBIF = gbif,\n    speciesLink = splink\n  ),\n  keep_source = \"GBIF\"\n)\n\ntable(combined_df$datasource)\nFor example, when combining 9,806 GBIF records and 4,432 speciesLink records of Ormosia, 1,259 speciesLink records of 74 herbaria also available in GBIF are removed, resulting in 12,979 records (9,806 from GBIF and 3,173 from speciesLink).",
+    "text": "Example\ncleaned_data &lt;- barroso_std(df,\n                            colname_country = \"pais\",\n                            colname_stateProvince = \"estado\",\n                            rm_duplicates = TRUE)\nFor a complete list of supported fields, refer to the function documentation with ?barroso_std.",
     "crumbs": [
       "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
+      "Data Standardization",
+      "Standardize Specimen Records"
     ]
   },
   {
-    "objectID": "articles/compare_herbarium_sources.html#how-it-works",
-    "href": "articles/compare_herbarium_sources.html#how-it-works",
-    "title": "Compare Herbarium Sources",
-    "section": "How It Works",
-    "text": "How It Works\n\n1. Raw speciesLink columns are renamed into Darwin Core\nRaw speciesLink downloads use lowercase column names that differ from the Darwin Core terms used by GBIF. barroso_cat() detects them and renames them automatically, so records of both sources end up in the same columns:\n\n\n\n\n\n\n\nspeciesLink\nDarwin Core\n\n\n\n\ncollector\nrecordedBy\n\n\ncollectornumber\nrecordNumber\n\n\ncollectioncode\ncollectionCode\n\n\ninstitutioncode\ninstitutionCode\n\n\ncatalognumber\ncatalogNumber\n\n\nidentifiedby\nidentifiedBy\n\n\ntypestatus\ntypeStatus\n\n\nyearcollected, monthcollected, daycollected\nyear, month, day\n\n\nstateprovince\nstateProvince\n\n\nlatitude, longitude\ndecimalLatitude, decimalLongitude\n\n\nspecies\nspecificEpithet\n\n\n\nIn speciesLink, the column species is just the specific epithet (e.g. arborea), while in GBIF it is the binomial (e.g. Ormosia arborea). So the speciesLink species becomes specificEpithet, and a binomial species column is created, as in GBIF.\n\n\n2. REFLORA and JABOT values are standardized\nRecords downloaded with refloraR and jabotR already have Darwin Core column names, but some of their values are written differently from GBIF. barroso_cat() recognizes these sources by their content, whatever their names in list_sources, and standardizes them:\n\n\n\n\n\n\n\n\n\nSource\nColumn\nBefore\nAfter\n\n\n\n\nREFLORA\nidentifiedBy\nAdministrador (the system user, in most records)\nNA\n\n\nREFLORA\neventDate, dateIdentified\n2/12/1940, --/5/1880, 9/10/1990 até 12/10/1990\n1940-12-02, 1880-05, 1990-10-09/1990-10-12\n\n\nREFLORA\ntypeStatus\nHOLOTYPUS, ISOTYPUS, TYPUS\nholotype, isotype, type\n\n\nREFLORA\ninstitutionCode of RB\nRB\nJBRJ, as in GBIF and JABOT\n\n\nJABOT\neventDate, dateIdentified\n2008-9-26, 22/4/2020, 4/2020\n2008-09-26, 2020-04-22, 2020-04\n\n\n\nlibrary(refloraR)\nlibrary(jabotR)\n\nreflora &lt;- reflora_records(herbarium = c(\"RB\", \"K\"), taxon = \"Ormosia\", save = FALSE)\njabot &lt;- jabot_records(herbarium = c(\"MBM\", \"UPCB\"), taxon = \"Ormosia\", save = FALSE)\n\ncombined_df &lt;- barroso_cat(\n  list_sources = list(GBIF = gbif, speciesLink = splink, REFLORA = reflora, JABOT = jabot),\n  keep_source = \"GBIF\"\n)\nThe REFLORA collection of RB is fed by JABOT, so the same RB specimens are often found in both sources, and also in GBIF. With keep_source = \"GBIF\", they are kept just once.\n\n\n3. Overlapping herbaria are removed when keep_source is given\nOverlapping herbaria are detected with collectionCode. When keep_source = \"GBIF\", the records of any herbarium present in GBIF are removed from the other sources. Herbaria shared only among the other sources (e.g. present in both speciesLink and JABOT, but not in GBIF) are kept in all of them, and their duplicates can then be flagged with barroso_flag_duplicates().\n\n\n4. Columns are aligned\n\nColumns missing in some sources are filled with NA.\nColumns with different types across sources (e.g. year as numbers in GBIF and as text in speciesLink) are combined as text, instead of failing.\nA new column datasource stores the source of each record (e.g. \"GBIF\", \"speciesLink\").",
-    "crumbs": [
-      "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
-    ]
-  },
-  {
-    "objectID": "articles/compare_herbarium_sources.html#tips",
-    "href": "articles/compare_herbarium_sources.html#tips",
-    "title": "Compare Herbarium Sources",
-    "section": "Tips",
-    "text": "Tips\n\nName each data source in list_sources, e.g. list(GBIF = gbif, speciesLink = splink)\nEnsure each dataset includes a collectionCode column, otherwise overlapping herbaria cannot be detected for that source\nUse keep_source = NULL if you want to preserve all records\nUse barroso_std() after combining to clean the remaining fields and flag duplicates\n\ncleaned_df &lt;- barroso_std(combined_df, flag_duplicates = TRUE)",
-    "crumbs": [
-      "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
-    ]
-  },
-  {
-    "objectID": "articles/compare_herbarium_sources.html#see-also",
-    "href": "articles/compare_herbarium_sources.html#see-also",
-    "title": "Compare Herbarium Sources",
-    "section": "See Also",
-    "text": "See Also\n\nbarroso_cat() reference\nDetect and Flag Duplicates",
-    "crumbs": [
-      "Articles",
-      "Duplicate Detection",
-      "Compare Herbarium Sources"
-    ]
-  },
-  {
-    "objectID": "index.html#graziela-maciel-barroso",
-    "href": "index.html#graziela-maciel-barroso",
-    "title": "barRoso",
-    "section": "Graziela Maciel Barroso",
-    "text": "Graziela Maciel Barroso\nGraziela Maciel Barroso (1912–2003) was one of Brazil’s most influential botanists, with a 58-year career at the Rio de Janeiro Botanical Garden. She specialized in plant taxonomy and morphology, shaping how generations of scientists understand and classify Brazil’s flora. Her work was instrumental in developing identification keys and guides used in herbaria across Brazil and abroad.\nShe authored the landmark three-volume Sistemática de Angiospermas do Brasil (1978–1986), still a cornerstone of botanical education, as well as Frutos e Sementes – Morfologia Aplicada à Sistemática de Dicotiledôneas (1999). Beyond her scientific contributions, she was a committed educator and mentor, and a courageous advocate for science and democracy during Brazil’s military dictatorship.\nBarroso remained professionally active until her passing at age 92. A month before her death, she was elected to the Brazilian Academy of Sciences, a distinction awarded posthumously."
-  },
-  {
-    "objectID": "news/index.html#initial-release",
-    "href": "news/index.html#initial-release",
-    "title": "News",
-    "section": "Initial Release",
-    "text": "Initial Release\nThe first official release of the barRoso R package — a comprehensive toolkit for standardizing, harmonizing, and preparing plant specimen records for research and reconciliation.\n\nHighlights\n\nbarroso_std(): Unified function to clean and standardize herbarium records across multiple fields (collector, geography, taxonomy, etc.).\nbarroso_flag_duplicates(): Flag potential duplicate specimens across herbaria using metadata patterns.\nbarroso_cat(): Combine and reconcile specimen records from multiple virtual herbaria (e.g., GBIF, SEINet, REFLORA, JABOT, speciesLink).\nbarroso_labels(): Generate printable herbarium labels from cleaned fieldbook data, with embedded maps and taxonomic authority retrieval.\nStandardize collector names and collection numbers using regex-based parsing\nHarmonize taxonomic, geographic, and temporal fields\nFlag and remove potential duplicates across herbarium records\nGenerate herbarium labels from fieldbook data\nIntegrate with external taxonomic databases (e.g., LCVP, WFO)\nPrepare large-scale biodiversity datasets for publication and analysis\nOptimized for datasets from REFLORA, speciesLink, and JABOT.\nSupports integration with tidyverse workflows for downstream analyses.\nTest coverage &gt;95%, continuous integration via GitHub Actions.\n\n\n\nPhilosophy\nUnlike other tools that aggressively clean (and discard) records, barRoso focuses on standardization first — ensuring that all specimens, even misidentified or ambiguous ones, remain usable and discoverable. Standardization also enables better duplicate detection and data reconciliation without losing valuable information.\n\n\nInfrastructure\n\nMIT license.\nGitHub Actions: R-CMD-check, test coverage, continuous integration.\nWebsite: barRoso documentation site\n\n\n\nFeedback\nPlease report bugs or feature requests here:\nhttps://github.com/DBOSlab/barRoso/issues"
-  },
-  {
-    "objectID": "reference/std_types.html",
-    "href": "reference/std_types.html",
-    "title": "std_types",
+    "objectID": "articles/cleaning_gbif_data.html",
+    "href": "articles/cleaning_gbif_data.html",
+    "title": "Cleaning GBIF Data",
     "section": "",
-    "text": "barRoso::std_types()\n\n\nDescription\nCleans and standardizes the typeStatus column in biodiversity datasets, addressing inconsistencies in type designations. It removes irrelevant entries, harmonizes formatting, and optionally fills missing values if present in other duplicate records (assumed to be handled outside this function).\n\n\nDetails\nThis function is used internally in the barRoso package to prepare type status data for reconciliation and label generation. It corrects known placeholder or non-type entries (e.g. “Fotografia do Tipo”, “NOTATYPE”, “Epítipo”) and simplifies terms like \"sim -\" to ensure clean type labels.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\ndf\nA data frame containing type designation records.\n\n\ncolname_typeStatus\nName of the column holding type status information (default: \"typeStatus\").\n\n\nrm_original_column\nLogical; if TRUE, the original column is removed after cleaning (default: TRUE).\n\n\n\n\n\nValue\nA data frame with a standardized typeStatus column. If rm_original_column = FALSE, the original values are preserved in a column named typeStatusOriginal.\n\n\nExamples\ndf &lt;- read.csv(\"specimens.csv\")\ndf_clean &lt;- std_types(df,\n                      colname_typeStatus = \"tipo\",\n                      rm_original_column = FALSE)"
+    "text": "This article walks through a practical case study using the barRoso package to standardize and harmonize plant specimen records downloaded from the Global Biodiversity Information Facility (GBIF) portal.",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#goal",
+    "href": "articles/cleaning_gbif_data.html#goal",
+    "title": "Cleaning GBIF Data",
+    "section": "Goal",
+    "text": "Goal\nPerform a full cleaning workflow for GBIF records using barRoso, including:\n\nStandardizing collector names and record numbers\nHarmonizing taxonomic and geographic fields\nFlagging and filtering duplicate specimens\nFixing and flagging geographic coordinates\nGenerating a cleaned dataset ready for downstream use",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#step-1-download-gbif-records",
+    "href": "articles/cleaning_gbif_data.html#step-1-download-gbif-records",
+    "title": "Cleaning GBIF Data",
+    "section": "Step 1: Download GBIF Records",
+    "text": "Step 1: Download GBIF Records\nUse the rgbif package to download occurrence records. Here’s an example for the Fabaceae family:\n# install.packages(\"rgbif\")\nlibrary(rgbif)\n\nocc &lt;- occ_search(scientificName = \"Fabaceae\", limit = 1000, hasCoordinate = TRUE)\ndf &lt;- occ$data",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#step-2-load-barroso-and-standardize-records",
+    "href": "articles/cleaning_gbif_data.html#step-2-load-barroso-and-standardize-records",
+    "title": "Cleaning GBIF Data",
+    "section": "Step 2: Load barRoso and Standardize Records",
+    "text": "Step 2: Load barRoso and Standardize Records\n# install.packages(\"devtools\")\ndevtools::install_github(\"DBOSlab/barRoso\")\n\nlibrary(barRoso)\n\ncleaned &lt;- barroso_std(df,\n                       flag_duplicates = TRUE,\n                       rm_duplicates = FALSE)",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#step-3-review-standardized-output",
+    "href": "articles/cleaning_gbif_data.html#step-3-review-standardized-output",
+    "title": "Cleaning GBIF Data",
+    "section": "Step 3: Review Standardized Output",
+    "text": "Step 3: Review Standardized Output\ntable(cleaned$duplicate)\nhead(cleaned[, c(\"recordedBy\", \"recordNumber\", \"duplicate\")])\nBlocks of duplicates with conflicting identifications can be inspected with:\nsubset(cleaned, identificationConflict %in% TRUE,\n       select = c(recordedBy, recordNumber, duplicateIdentifications, duplicateCatalogNumbers))",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#step-4-fix-and-flag-coordinates",
+    "href": "articles/cleaning_gbif_data.html#step-4-fix-and-flag-coordinates",
+    "title": "Cleaning GBIF Data",
+    "section": "Step 4: Fix and Flag Coordinates",
+    "text": "Step 4: Fix and Flag Coordinates\ncleaned &lt;- std_coordinates(cleaned)\ntable(unlist(strsplit(cleaned$coordinateIssues, \"; \")))\nSee Fix and Flag Coordinates for details.",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#step-5-save-results",
+    "href": "articles/cleaning_gbif_data.html#step-5-save-results",
+    "title": "Cleaning GBIF Data",
+    "section": "Step 5: Save Results",
+    "text": "Step 5: Save Results\nwrite.csv(cleaned, \"gbif_cleaned.csv\", row.names = FALSE)",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/cleaning_gbif_data.html#summary",
+    "href": "articles/cleaning_gbif_data.html#summary",
+    "title": "Cleaning GBIF Data",
+    "section": "Summary",
+    "text": "Summary\nIn this case study, we:\n\nProgrammatically downloaded GBIF data for a plant family\nUsed barRoso to standardize and harmonize specimen metadata\nFlagged duplicates and conflicting identifications\nFixed and flagged geographic coordinates, preparing a clean dataset for biodiversity research\n\nYou can apply this pipeline to other sources such as SEINet, REFLORA Virtual Herbarium, JABOT, or speciesLink.",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "Standardize GBIF Data"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html",
+    "href": "articles/case_study_reflora.html",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "",
+    "text": "This article walks through a practical case study using the barRoso package to clean and harmonize plant specimen records downloaded from the REFLORA Virtual Herbarium using the refloraR package.",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#goal",
+    "href": "articles/case_study_reflora.html#goal",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Goal",
+    "text": "Goal\nDemonstrate a full cleaning pipeline for biodiversity records from REFLORA, covering:\n\nProgrammatic data download with refloraR\nCollector and record number standardization\nDuplicate detection\nOutput preparation for downstream analysis",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#step-1-install-required-packages",
+    "href": "articles/case_study_reflora.html#step-1-install-required-packages",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Step 1: Install Required Packages",
+    "text": "Step 1: Install Required Packages\n# install.packages(\"devtools\")\ndevtools::install_github(\"DBOSlab/refloraR\")\ndevtools::install_github(\"DBOSlab/barRoso\")",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#step-2-download-specimens-from-reflora",
+    "href": "articles/case_study_reflora.html#step-2-download-specimens-from-reflora",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Step 2: Download Specimens from REFLORA",
+    "text": "Step 2: Download Specimens from REFLORA\nUse the refloraR package to retrieve specimen records for a given taxon and herbarium:\nlibrary(refloraR)\n\nrecords &lt;- reflora_records(taxon = \"Fabaceae\", \n                           herbarium = \"RB\",\n                           save = FALSE)",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#step-3-run-barroso-standardization",
+    "href": "articles/case_study_reflora.html#step-3-run-barroso-standardization",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Step 3: Run barRoso Standardization",
+    "text": "Step 3: Run barRoso Standardization\nlibrary(barRoso)\n\ncleaned &lt;- barroso_std(records,\n                       colname_recordedBy = \"recordedBy\",\n                       colname_recordNumber = \"recordNumber\",\n                       colname_country = \"country\",\n                       colname_stateProvince = \"stateProvince\",\n                       flag_duplicates = TRUE,\n                       rm_duplicates = FALSE)",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#step-4-explore-results",
+    "href": "articles/case_study_reflora.html#step-4-explore-results",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Step 4: Explore Results",
+    "text": "Step 4: Explore Results\ntable(cleaned$duplicate)\nhead(cleaned[, c(\"recordedBy\", \"recordNumber\", \"duplicate\")])",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#step-5-save-cleaned-output",
+    "href": "articles/case_study_reflora.html#step-5-save-cleaned-output",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Step 5: Save Cleaned Output",
+    "text": "Step 5: Save Cleaned Output\nwrite.csv(cleaned, \"reflora_cleaned.csv\", row.names = FALSE)",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "articles/case_study_reflora.html#summary",
+    "href": "articles/case_study_reflora.html#summary",
+    "title": "REFLORA Cleaning Workflow",
+    "section": "Summary",
+    "text": "Summary\nWith this REFLORA case study, we demonstrated how to:\n\nDownload REFLORA data programmatically with refloraR\nClean and harmonize biodiversity records using barRoso\nDetect and flag duplicates across herbarium specimens\n\nThis workflow is reusable for any REFLORA-supported taxa and institutions. Explore additional tools like barroso_cat() to merge datasets from GBIF, JABOT, and speciesLink next.",
+    "crumbs": [
+      "Articles",
+      "Case Studies & Workflows",
+      "REFLORA Cleaning Workflow"
+    ]
+  },
+  {
+    "objectID": "about.html#overview",
+    "href": "about.html#overview",
+    "title": "About barRoso",
+    "section": "Overview",
+    "text": "Overview\nbarRoso (Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations) is an R package that streamlines biodiversity data cleaning, integration, and reconciliation, particularly for herbarium records. The toolkit supports workflows from data curation to label production, helping botanists, curators, and researchers analyze plant specimen collections more efficiently.\nNamed in honor of Graziela Maciel Barroso, one of Brazil’s most respected botanists, the name barRoso also nods to its native programming environment—R.\nThe package was originally developed for the JABOT Virtual Herbarium, maintained by the Rio de Janeiro Botanical Garden, but it is generalizable to other biodiversity repositories such as GBIF, SEINet, REFLORA, and speciesLink. The package was originally developed to support the cleaning and reconciliation of plant specimen records retrieved from the Global Biodiversity Information Facility (GBIF), but its flexible design makes it broadly applicable to other biodiversity data sources. These include national and institutional repositories such as the JABOT Virtual Herbarium, maintained by the Rio de Janeiro Botanical Garden and REFLORA, as well as SEINet and speciesLink."
+  },
+  {
+    "objectID": "about.html#package-description",
+    "href": "about.html#package-description",
+    "title": "About barRoso",
+    "section": "Package Description",
+    "text": "Package Description\nPackage: barRoso\nType: R Package\nVersion: 1.0.0\nAuthor and Maintainer: Domingos Cardoso (@DBOSlab ORCID domingoscardoso@jbrj.gov.br)\n\nPackage Features\n✅ Clean and standardize collector names, record numbers, and geographic fields\n✅ Reconcile records from multiple herbarium sources (e.g., GBIF, JABOT, speciesLink)\n✅ Flag and optionally remove duplicated specimen records\n✅ Generate herbarium labels from field books with embedded maps and taxonomic authorities\n✅ Integrate with taxonomic reference tools like LCVP and lcvplants"
+  },
+  {
+    "objectID": "about.html#how-to-contribute",
+    "href": "about.html#how-to-contribute",
+    "title": "About barRoso",
+    "section": "How to Contribute",
+    "text": "How to Contribute\nWe welcome community contributions:\n💬 Report bugs or feature requests via GitHub Issues 🔧 Submit pull requests with improvements or new features 🌱 Suggest new functionality or integration ideas"
+  },
+  {
+    "objectID": "about.html#license",
+    "href": "about.html#license",
+    "title": "About barRoso",
+    "section": "License",
+    "text": "License\nThis package is released under the MIT License, supporting open science and data accessibility for biodiversity research."
+  },
+  {
+    "objectID": "about.html#acknowledgements",
+    "href": "about.html#acknowledgements",
+    "title": "About barRoso",
+    "section": "Acknowledgements",
+    "text": "Acknowledgements\nDevelopment of barRoso is led by the Rio de Janeiro Botanical Garden (JBRJ). I also gratefully acknowledge the financial support provided by CNPq - Conselho Nacional de Desenvolvimento Científico e Tecnológico, Brazil’s National Council for Scientific and Technological Development, and FINEP - Financiadora de Estudos e Projetos, Brazil’s Funding Authority for Studies and Projects. I honor Graziela Maciel Barroso’s legacy in taxonomy and herbaria through this tool."
+  },
+  {
+    "objectID": "overview/index.html#what-is-barroso",
+    "href": "overview/index.html#what-is-barroso",
+    "title": "Overview",
+    "section": "What is barRoso?",
+    "text": "What is barRoso?\nbarRoso is an R package designed to clean, standardize, and reconcile plant specimen records, especially those retrieved from herbarium databases and biodiversity repositories. Originally developed for GBIF, it is compatible with data from JABOT, SEINet, REFLORA, speciesLink, and others.\nThe package is named after Brazilian botanist Graziela Maciel Barroso, and also serves as an acronym: Biodiversity Analysis and Record Reconciliation for Organizing Specimen Observations."
+  },
+  {
+    "objectID": "overview/index.html#what-does-barroso-do",
+    "href": "overview/index.html#what-does-barroso-do",
+    "title": "Overview",
+    "section": "What does barRoso do?",
+    "text": "What does barRoso do?\nbarRoso helps users:\n\nStandardize collector and determiner names and collection numbers using regex-based parsing\nHarmonize taxonomic, geographic, and temporal fields\nCombine records from GBIF, speciesLink and other sources\nFlag and remove potential duplicates across herbarium records, highlighting conflicting identifications\nFix and flag geographic coordinates, following the workflow of the bdc package\nGenerate herbarium labels from fieldbook data\nWrite lists of examined specimens in the format of 17 botanical journals\nIntegrate with external taxonomic databases (e.g., LCVP, WFO)\nPrepare large-scale biodiversity datasets for publication and analysis"
+  },
+  {
+    "objectID": "overview/index.html#who-should-use-barroso",
+    "href": "overview/index.html#who-should-use-barroso",
+    "title": "Overview",
+    "section": "Who should use barRoso?",
+    "text": "Who should use barRoso?\n\nTaxonomists and herbarium curators\nBiodiversity data scientists\nFloristic inventory teams\nGraduate students and researchers managing field collections"
+  },
+  {
+    "objectID": "overview/index.html#what-makes-barroso-different",
+    "href": "overview/index.html#what-makes-barroso-different",
+    "title": "Overview",
+    "section": "What makes barRoso different?",
+    "text": "What makes barRoso different?\nUnlike other packages that rely on static collector name dictionaries, barRoso uses robust, extensible regular expressions to detect name patterns and correct inconsistencies across data sources. It also includes modular, tidyverse-compatible functions for a reproducible and efficient workflow."
+  },
+  {
+    "objectID": "overview/index.html#data-preservation-philosophy",
+    "href": "overview/index.html#data-preservation-philosophy",
+    "title": "Overview",
+    "section": "Data Preservation Philosophy",
+    "text": "Data Preservation Philosophy\nWhile many data tools prioritize aggressive cleaning, often at the cost of discarding valuable records, barRoso takes a different approach. Its philosophy centers on standardization rather than removal. All herbarium specimens carry potential scientific value, even when incomplete or inconsistently entered. Instead of omitting such records, barRoso focuses on harmonizing fields to enhance comparability across collections. By standardizing collector names, geographic fields, and taxonomic labels, barRoso allows users to flag rather than erase inconsistencies, enabling more transparent workflows and tracing potential misidentifications, especially across distributed duplicates. This inclusive approach honors the archival role of herbaria while facilitating reproducible biodiversity research."
+  },
+  {
+    "objectID": "overview/index.html#learn-more",
+    "href": "overview/index.html#learn-more",
+    "title": "Overview",
+    "section": "Learn more",
+    "text": "Learn more\nExplore the full documentation:\n\nInstall and Setup\nStandardize Specimen Records\nDetect and Flag Duplicates\nFix and Flag Coordinates\nGenerate Herbarium Labels\nWrite Lists of Examined Specimens"
+  },
+  {
+    "objectID": "reference/barroso_cat.html",
+    "href": "reference/barroso_cat.html",
+    "title": "barroso_cat",
+    "section": "",
+    "text": "barRoso::barroso_cat()\n\n\nDescription\nMerges herbarium records from two or more biodiversity data sources into a single harmonized data frame. Optionally prioritizes specific sources when duplicates are detected across herbaria, retaining records based on a flexible exclusion strategy.\n\n\nDetails\nThis function aligns column structures, removes redundant records from overlapping herbaria, and merges all sources into a single output. Duplicate filtering is based on matching collectionCode across sources: when keep_source is given, the records of any herbarium that is also present in keep_source are removed from the other sources. Herbaria shared only among the other sources are kept.\nEach source is first formatted into Darwin Core column names and values with barroso_dwc(), e.g. the columns of speciesLink downloads (collector, collectornumber, recordedby) are renamed into recordedBy and recordNumber, and the dates and type status of REFLORA and JABOT records are standardized. The sources are recognized by their content, so their names in list_sources can be any name.\nColumns with different types across sources (e.g. numeric year in one source and character in another) are combined as character. A column datasource records the source of each record.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nlist_sources\nA named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering.\n\n\nkeep_source\nOptional character string specifying the preferred data source (e.g., “GBIF”) for resolving duplicate collectionCode conflicts. If NULL, all records are retained.\n\n\n\n\n\nValue\nA harmonized data frame combining all provided herbarium sources, with columns aligned, a datasource column, and optionally filtered to resolve duplicate collections.\n\n\nExamples\nreflora &lt;- refloraR::reflora_records(herbarium = \"RB\", taxon = \"Ormosia\", save = FALSE)\njabot &lt;- jabotR::jabot_records(herbarium = \"MBM\", taxon = \"Ormosia\", save = FALSE)\n\ncombined_df &lt;- barroso_cat(list_sources = list(GBIF = gbif_data,\n                                               speciesLink = splink_data,\n                                               REFLORA = reflora,\n                                               JABOT = jabot),\n                           keep_source = \"GBIF\")"
   },
   {
     "objectID": "reference/barroso_flag_duplicates.html",
@@ -1067,7 +1285,14 @@
     "href": "reference/barroso_write_taxon_descr.html",
     "title": "barroso_write_taxon_descr",
     "section": "",
-    "text": "barRoso::barroso_write_taxon_descr()\n\n\nDescription\nThis function reads morphological data from an Excel spreadsheet, generates standardized species descriptions in plain text and Word document formats, and exports them to a Word (.docx) file. It handles complex morphological data structures including measurements, subterms, and grouping of related characters. The function automatically detects measurement ranges and formats them with en dashes (e.g., “4.3–14.5 cm”).\n\n\nDetails\nThe function expects an Excel file with specific column naming conventions. Morphological characters should be grouped with consistent naming patterns:\n\n\n\nSimple characters: “Habit”, “LEAF shape”, “LEAF margin”\n\nMeasurements: “LEAF length (cm)”, “LEAF width (mm)”\n\nHierarchical structures: “FLOWER SEPALS length (mm)”, “FLOWER SEPALS width (mm)”\n\nThe package includes an example dataset morphological_dataset containing morphological data for 15 species of Ouratea (Ochnaceae) that demonstrates these naming conventions. This dataset can be used to test the function and understand the required data structure.\nThe function automatically:\n\n\n\nDetects and groups related morphological characters\n\n\nHandles measurement ranges (e.g., “4.3-14.5” becomes “4.3–14.5”)\n\n\nMerges duplicate species entries\n\n\nFormats descriptions with customizable text formatting\n\n\nExports to Word with proper scientific typography\n\n\nText formatting can be controlled via the species_bold, group_bold, and related parameters. Species names are italicized by default following botanical conventions.\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nxlsx_path\nCharacter string. Path to the .xlsx file containing morphological data.\n\n\nspecies_cols\nCharacter vector or integer indices. Column names or indices used to build the species header (e.g., c(“Genus”, “Species”, “Author”) or 1:3).\n\n\ncharacter_cols\nCharacter vector or integer indices. Column names or indices of morphological character columns (e.g., c(“Habit”, “Leaf.length”, “Leaf.width”) or 4:20).\n\n\nsheet\nCharacter string or integer. Sheet name or index passed to readxl::read_excel(). Default is 1.\n\n\nspecies_filter\nOptional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the species_cols columns (without authorship).\n\n\nfont_family\nCharacter string. Font family for the Word document. Default is “Times New Roman”. Common options include “Arial”, “Calibri”, “Cambria”.\n\n\nfont_size\nNumeric. Font size in points. Default is 12.\n\n\nspecies_bold\nLogical. Whether to make species names bold. Default is TRUE.\n\n\nspecies_italic\nLogical. Whether to make species names italic. Default is TRUE (following botanical conventions).\n\n\ngroup_bold\nLogical. Whether to make group names (e.g., “Habit”, “Leaf”) bold. Default is TRUE.\n\n\ngroup_italic\nLogical. Whether to make group names italic. Default is FALSE.\n\n\ndescription_bold\nLogical. Whether to make description text bold. Default is FALSE.\n\n\ndescription_italic\nLogical. Whether to make description text italic. Default is FALSE.\n\n\nverbose\nLogical. If TRUE (default), progress messages are printed to the console. Set to FALSE for silent operation.\n\n\ndir\nCharacter string. Directory path where output will be saved. A date-stamped subfolder will be created inside this directory. If NULL, uses the Excel filename as directory name.\n\n\nfilename\nCharacter string. Basename for output files (without extension). If NULL, uses the Excel filename with “_descriptions” suffix.\n\n\n\n\n\nValue\nInvisibly returns a data.frame with two columns:\n\n\n\nspecies_name: Full species name with authorship\n\n\ndescription_plain: Plain text description\n\n\nThe main output is a Word document (.docx) saved to the specified directory.\n\n\nExamples\n# Basic usage - generate descriptions for all species\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = c(\"Genus\", \"Species\", \"Author\"),\n  character_cols = 4:20\n)\n\n# Generate descriptions only for specific species\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = c(\"Genus\", \"Species\"),\n  character_cols = 3:15,\n  species_filter = c(\"Ouratea concinna\", \"Ouratea coarctata\")\n)\n\n# Customize formatting\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = 1:3,\n  character_cols = 4:25,\n  font_family = \"Arial\",\n  font_size = 11,\n  species_bold = TRUE,\n  species_italic = TRUE,\n  group_bold = FALSE,\n  group_italic = TRUE,\n  description_bold = FALSE,\n  description_italic = FALSE,\n  filename = \"MySpeciesDescriptions\",\n  dir = \"Output\"\n)\n\n# Using column indices instead of names\nbarroso_write_taxon_descr(\n  xlsx_path = \"data.xlsx\",\n  species_cols = 1:2,          # First two columns: Genus and Species\n  character_cols = 3:18        # Columns 3-18: morphological characters\n)\n\n\n# Using the included morphological_dataset\n\n# First save the dataset to Excel format=\nlibrary(openxlsx)\nopenxlsx::write.xlsx(morphological_dataset, \"morphological_dataset.xlsx\")\n\n# Generate descriptions using the example dataset\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_dataset.xlsx\",\n  species_cols = c(\"Genus\", \"Species\", \"Author\"),\n  character_cols = 19:131  # Morphological character columns\n)"
+    "text": "barRoso::barroso_write_taxon_descr()\n\n\nDescription\nThis function reads morphological data from an Excel spreadsheet, generates standardized species descriptions in plain text and Word document formats, and exports them to a Word (.docx) file. It handles complex morphological data structures including measurements, subterms and grouping of related characters. The function automatically detects measurement ranges and formats them with en dashes (e.g., “4.3–14.5 cm”). Optionally, it can compute and print averages for user-selected measurement columns when a species has more than a threshold number of values (see avg_cols and avg_min_n).\n\n\nDetails\nColumn naming conventions\nThe function relies on a structured column naming system to parse and organize morphological traits. Columns must follow these conventions:\nMain character groupsUse ALL CAPS for the primary category: HABIT, STIPULE, LEAF, INFLORESCENCE, FLOWER, FRUIT, SEED. These will become section headers.\nSimple charactersLowercase descriptive terms after the main group. Examples: LEAF shape, LEAF margin, FLOWER symmetry. These will be appended directly after the lowercase group name.\nHierarchical charactersUse ALL CAPS for subgroup terms. Examples: LEAF PETIOLE length (cm), FLOWER SEPALS shape. The capitalized term (PETIOLE, SEPALS) is extracted once and used as a subheading.\nMeasurementsInclude units in parentheses for automatic detection: LEAF length (cm), STIPULE width (mm), HABIT height (m). Multiple measurements (e.g., length + width) are automatically combined with “×” and the unit is placed at the end.\nColumn name flexibilitySpaces, dots, or underscores can be used as separators. All of the following are valid:\n\nSTIPULE length (mm)\nSTIPULE.length.(mm)\nSTIPULE_length_mm\nLEAF PETIOLE shape\nLEAF.PETIOLE.shape\n\nExample dataset\nThe package includes an example dataset morphological_dataset containing morphological data for 15 species of Ouratea (Ochnaceae) compiled from herbarium specimens and field observations for a taxonomic revision. This dataset demonstrates proper column naming conventions and can be used to test the function:\ndata(morphological_dataset) head(names(morphological_dataset))\nCreating a template\nTo create a properly formatted Excel template with all required columns for your plant group, use the companion function barroso_add_char_template. This function generates a ready-to-use template based on your species list and selected plant group (e.g., “Ochnaceae”, “Asteraceae”, “Orchidaceae”, “Leguminosae-Papilionoideae”), saving hours of manual column creation.\n\n\nCreate a template for Ochnaceae\nbarroso_add_char_template( species_df = my_species_list, plant_group = “Ochnaceae”, filename = “Ochnaceae_template” )\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nxlsx_path\nCharacter. Path to the .xlsx file containing morphological data with properly structured column names (see Details for naming conventions).\n\n\nspecies_cols\nCharacter vector or integer indices. Column names or indices used to build the species header (e.g., c(“Genus”, “Species”, “Author”) or 1:3). These can be combined flexibly (e.g., a single “Scientific_name” column or separate Genus, Species, and Author columns).\n\n\ncharacter_cols\nCharacter vector or integer indices. Column names or indices of morphological character columns (e.g., c(“HABIT”, “LEAF shape”, “LEAF length (cm)”) or 4:20). These must follow the naming conventions described in Details.\n\n\nsheet\nCharacter string or integer. Sheet name or index passed to readxl::read_excel(). Default is 1.\n\n\nspecies_filter\nOptional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the species_cols columns (without authorship).\n\n\navg_cols\nOptional character vector or integer indices of columns for which an average should be reported, displayed immediately after the existing range (e.g. “3–8 × 1–2 cm, average 5.5 × 1.5 cm”). Must be a subset of character_cols. Default NULL (no averages reported).\n\n\navg_min_n\nInteger. Minimum number of non-empty observations per species required for an average to be reported. Averages are emitted only when the number of observed values is strictly greater than avg_min_n. Default 3 (i.e., need at least 4 values for averaging).\n\n\napprox_char\nCharacter string to use for approximate measurements when no variation is present (e.g., “ca.” or “c.”). Default is “ca.”. Set to NULL to disable adding approximation. Examples: \"ca. 0.1 × 0.1 cm\" (no variation) vs \"1.3–2.5 × 0.6–1.1 cm\" (variation present, no “ca.”).\n\n\nfont_family\nCharacter string. Font family for the Word document. Default is “Times New Roman”. Common options include “Arial”, “Calibri”, “Cambria”.\n\n\nfont_size\nNumeric. Font size in points. Default is 12.\n\n\nspecies_bold\nLogical. Whether to make species names bold. Default is TRUE.\n\n\nspecies_italic\nLogical. Whether to make species names italic. Default is TRUE (following botanical conventions).\n\n\ngroup_bold\nLogical. Whether to make group names (e.g., “Habit”, “Leaf”) bold. Default is TRUE.\n\n\ngroup_italic\nLogical. Whether to make group names italic. Default is FALSE.\n\n\ndescription_bold\nLogical. Whether to make description text bold. Default is FALSE.\n\n\ndescription_italic\nLogical. Whether to make description text italic. Default is FALSE.\n\n\nverbose\nLogical. Print progress messages. Default TRUE.\n\n\nfilename\nOutput file base name (without extension). Default NULL (uses Excel filename with “_descriptions” suffix).\n\n\ndir\nOutput directory. Default NULL (uses Excel filename as directory name).\n\n\n\n\n\nValue\nInvisibly returns a data.frame with two columns:\n\nspecies_name: Full species name with authorship\ndescription_plain: Plain text description\n\nThe main output is a Word document (.docx) saved to the specified directory.\n\n\nExamples\n# Basic usage with example dataset\ndata(morphological_dataset)\n\n# First, save the example dataset to Excel\nlibrary(openxlsx)\nwrite.xlsx(morphological_dataset, \"morphological_dataset.xlsx\")\n\n# Generate descriptions using proper column selection\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_dataset.xlsx\",\n  species_cols = c(\"Genus\", \"Species\", \"Author\"),  # Taxonomic identification\n  character_cols = 19:131,  # Morphological character columns\n  approx_char = \"ca.\"  # Add \"ca.\" to measurements without variation\n)\n\n# Generate descriptions with average calculation\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = c(\"Genus\", \"Species\", \"Author\"),\n  character_cols = 4:20,\n  avg_cols = c(\"LEAF length (cm)\", \"FRUIT length (cm)\"),\n  avg_min_n = 3,  # Calculate averages when n &gt; 3 observations\n  approx_char = \"ca.\"\n)\n\n# Filter to specific species only\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = c(\"Genus\", \"Species\"),\n  character_cols = 3:15,\n  species_filter = c(\"Ouratea concinna\", \"Ouratea coarctata\")\n)\n\n# Customize text formatting in Word output\nbarroso_write_taxon_descr(\n  xlsx_path = \"morphological_data.xlsx\",\n  species_cols = 1:3,\n  character_cols = 4:25,\n  font_family = \"Arial\",\n  font_size = 11,\n  species_bold = TRUE,\n  species_italic = TRUE,\n  group_bold = FALSE,\n  group_italic = TRUE,\n  description_bold = FALSE,\n  description_italic = FALSE,\n  filename = \"MySpeciesDescriptions\",\n  dir = \"Output\"\n)"
+  },
+  {
+    "objectID": "reference/barroso_add_char_template.html",
+    "href": "reference/barroso_add_char_template.html",
+    "title": "barroso_add_char_template",
+    "section": "",
+    "text": "barRoso::barroso_add_char_template()\n\n\nDescription\nGiven a data.frame of species (one row per species, or per specimen) OR a path to an Excel file containing such data, this function writes an .xlsx file whose columns begin with whatever identification columns are in species_df — Genus/Species/Author, Family/Taxon, etc. — and continue with a standard morphological-character template (HABIT, STIPULE, LEAF, INFLORESCENCE, FLOWER, FRUIT, SEED) left empty for the user to fill in.\nWhen plant_group is specified, INFLORESCENCE/FLOWER/FRUIT blocks are replaced with the morphology that group actually has — e.g. Leguminosae-Papilionoideae swaps generic petals for STANDARD / WING / KEEL and adds stamen arrangement and fruit dehiscence; Asteraceae replaces the inflorescence with capitulum + involucre and the flower block with RAY / DISC florets + pappus; Ochnaceae uses the full carpophore/mericarp fruit and seed-apical-hook block; Orchidaceae uses dorsal/lateral sepals, labellum and column. Supported groups:\n\n“Leguminosae-Papilionoideae”\n“Leguminosae-Caesalpinioideae”\n“Leguminosae-Mimosoideae”\n“Asteraceae”\n“Ochnaceae”\n“Orchidaceae”\n\nThe resulting file is the input format expected by barroso_write_taxon_descr(): column-name conventions match (capitalised group prefixes, lowercase subterms, “(cm)” / “(mm)” / “(m)” units, “length” / “width” / “height” keywords).\n\n\nArguments\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nspecies_df\nEither a data.frame containing the species-identification columns you want preserved (e.g. Genus, Species, Author), OR a character string path to an Excel file (.xlsx) containing such data. Every column in species_df is copied into the output as-is; template columns are appended after them and written empty. Any template column whose name already exists in species_df is skipped, so user data is never overwritten.\n\n\nsheet\nCharacter string or integer. Sheet name or index to read when species_df is a path to an Excel file. Default is 1.\n\n\nplant_group\nOptional character. One of the supported profiles listed above. NULL (default) uses the generic flowering-plant profile.\n\n\nspecies_cols\nCharacter vector or integer indices. Column names or indices used to build the species header (e.g., c(“Genus”, “Species”, “Author”) or 1:3). These can be combined flexibly (e.g., a single “Scientific_name” column or separate Genus, Species, and Author columns).\n\n\noverwrite\nLogical. If TRUE (default), an existing file at the target path is overwritten; if FALSE, the function errors out.\n\n\nformat_excel\nLogical. If TRUE (default), the function will use more user-friendly format for the spreadsheet.\n\n\nsheet_name\nCharacter. Name of the worksheet. Default “described_specimens”.\n\n\nbase_font_size\nNumeric. Base font size. Default 10.\n\n\nbase_font_name\nCharacter. Base font name. Default “Calibri Light”.\n\n\nverbose\nLogical. Print progress messages. Default TRUE.\n\n\nfilename\nOutput file base name (with or without “.xlsx”). If NULL, uses “taxon_template” or “_template” when a group is given.\n\n\ndir\nOutput directory. If NULL, a directory named after filename (without extension) is created in the working directory. A date-stamped subfolder is created inside.\n\n\n\n\n\nValue\nInvisibly returns the absolute path to the written .xlsx file.\n\n\nExamples\n# Using a data frame\nspecies_df &lt;- data.frame(\n  Genus   = c(\"Ouratea\", \"Ouratea\", \"Ouratea\"),\n  Species = c(\"acicularis\", \"acuminata\", \"cassinefolia\"),\n  Author  = c(\"R.G.Chacon & K.Yamam.\", \"(DC.) Engl.\", \"(DC.) Engl.\")\n)\n\nbarroso_add_char_template(\n  species_df = species_df,\n  filename   = \"Ouratea_template\"\n)\n\n# Using an Excel file path\nbarroso_add_char_template(\n  species_df = \"my_species_list.xlsx\",\n  sheet = 1,\n  plant_group = \"Ochnaceae\",\n  filename = \"Ouratea_Ochnaceae_template\"\n)"
   },
   {
     "objectID": "reference/std_taxa.html",

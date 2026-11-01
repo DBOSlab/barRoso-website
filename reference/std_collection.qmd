@@ -16,16 +16,22 @@ barRoso::std_collection()
 Cleans and standardizes herbarium acronyms in biodiversity datasets by harmonizing
 values from the `collectionCode` and `institutionCode` fields. The function
 corrects common issues in GBIF and other aggregated records, replacing ambiguous
-or placeholder codes with recognized herbarium acronyms. It also flags missing
-values with fallback rules and optional original column retention.
+or placeholder codes with the herbarium acronyms of
+[Index Herbariorum](https://sweetgum.nybg.org/science/ih/).
 
 ### Details
 
-This function is part of the `barRoso` package, and applies a large set of
-conditional replacements based on known patterns and integrates fallback from
-`institutionCode` when `collectionCode` is missing or ambiguous. Common aliases
-like `"Herbarium"`, `"Botany"`, or `"Angiosperms"` are converted to valid acronyms
-when possible.
+This function is part of the `barRoso` package. Instead of a dictionary of
+every code, it uses regular expressions that generalize across datasets, in
+the following order:
+
+- Aggregated collections like `"Tropicos"` or `"MO-Duplicates"` are replaced with the herbarium of the specimen given in `institutionCode` (e.g. `"NY"`), or with `"MO"` when it is missing.
+- Generic words like `"Botany"`, `"Herbarium"`, `"Vascular Plants"` or `"PNGplants"` are replaced with the acronym in `institutionCode` or, when missing, with the acronym at the beginning of `catalogNumber` (e.g. `"U.1317533"` into `"U"`) or in `occurrenceID` (e.g. `"urn:catalog:INB:..."`).
+- Names of collections, like `"F-Seedplants"`, `"BHCB-Fanerogamas"`, `"INPA-Carpoteca"`, `"R-Tipos"`, `"UIS-H"` or `"BSMvplantscoll"`, are reduced to the herbarium acronym. Codes of wood collections, like `"INPAw"`, are kept, as they are Index Herbariorum codes.
+- Names of herbaria and institutions, like `"Herbario INPA"`, `"Herbario Nacional de Costa Rica (CR)"` or `"Instituto de Botanica de Sao Paulo"`, are replaced with the acronym given in the name or with the known acronym.
+- Codes that are not acronyms, like observation projects (`"Observations"`, `"Dados de Pesquisa SISBio"`), companies (`"Ecopetrol S.A"`) or numbers, are replaced with the acronym in `institutionCode` or `catalogNumber`, or with `NA`.
+
+The columns `catalogNumber` and `occurrenceID` are used when present.
 
 ### Arguments
 
@@ -44,11 +50,12 @@ If `rm_original_column = FALSE`, the original values are saved with a *Original 
 ### Examples
 
 ```r
-df <- read.csv("gbif_download.csv")
-df_clean <- std_collection(df,
-                           colname_collectionCode = "collection_code",
-                           colname_institutionCode = "institution_code",
-                           rm_original_column = FALSE)
+df <- data.frame(collectionCode = c("Tropicos", "Botany", "F-Seedplants",
+                                    "Herbario INPA", "Observations"),
+                 institutionCode = c("NY", NA, "F", "INPA", "iNaturalist"),
+                 catalogNumber = c("100595392", "U.1317533", "V0059731F",
+                                   "123", "340214363"))
+std_collection(df)$collectionCode
 ```
 
 

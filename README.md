@@ -44,7 +44,8 @@ revealed.
 Instead of static dictionaries, `barRoso` uses an extensive set of
 regular expressions tested on real datasets, which generalizes across
 sources and spelling variations. It also generates herbarium labels from
-field books and taxonomic descriptions from morphological data.
+field books, lists of examined specimens in the format of botanical
+journals, and taxonomic descriptions from morphological data.
 
 ### Data preservation philosophy
 
@@ -69,7 +70,7 @@ biodiversity research.
 Core columns
 
 ✅ Standardize collector and determiner names and collection numbers,
-including Chinese names written in unicode
+including Chinese names written in Chinese characters or in unicode
 
 ✅ Clean herbarium acronyms and geographic, taxonomic and type status
 fields
@@ -82,6 +83,9 @@ identifications
 
 ✅ Generate herbarium labels from field books, with maps and taxon
 authorities from [LCVP](https://github.com/idiv-biodiversity/LCVP)
+
+✅ Write lists of examined specimens in the format of 17 botanical
+journals
 
 ✅ Generate taxonomic descriptions from morphological data
 
@@ -123,14 +127,17 @@ The functions below follow the order of the [workflow](#workflow).
 
 ### 1. `barroso_cat()`: Combine Herbarium Sources
 
-Merges records from two or more sources into a single data frame. Raw
-speciesLink columns (e.g. `collector`, `collectornumber`) are renamed
-into Darwin Core terms (`recordedBy`, `recordNumber`), and a column
-`datasource` stores the source of each record. With `keep_source`, the
-records of herbaria also present in the preferred source are removed
-from the other sources.
+Merges records from two or more sources into a single data frame. Each
+source is first formatted into Darwin Core with `barroso_dwc()`, which
+can also be used alone: e.g. speciesLink columns like `collector` or
+`recordedby` become `recordedBy`, and the dates and type status of
+REFLORA and JABOT records are standardized. A column `datasource` stores
+the source of each record. With `keep_source`, the records of herbaria
+also present in the preferred source are removed from the other sources.
 
 ``` r
+splink <- barroso_dwc(splink)   # optional, barroso_cat() also runs it
+
 combined <- barroso_cat(list_sources = list(GBIF = gbif,
                                             speciesLink = splink),
                         keep_source = "GBIF")
@@ -145,12 +152,12 @@ functions, which can also be used alone:
 |----|----|----|
 | `std_recordedBy()` | collector names and numbers; additional collectors go to `addCollector` | `Cardoso, D.B.O.S.` → `D. B. O. S. Cardoso` |
 | `std_identifiedBy()` | determiner names, all kept in the same cell | `Lobato, LC; Soares, CRA` → `L. C. Lobato & C. R. A. Soares` |
-| `std_collection()` | herbarium acronyms | `MOBOT_BR` → `MO` |
+| `std_collection()` | herbarium acronyms | `Herbario INPA` → `INPA` |
 | `std_place()` | continent, country, state, county, municipality and locality | `BRASIL` → `Brazil` |
 | `std_taxa()` | family, genus and specific epithet | `Leguminosae` → `Fabaceae` |
 | `std_types()` | type status | `Fotografia do Tipo` → removed |
 
-Chinese names written as unicode escapes
+Chinese names written in Chinese characters or as unicode escapes
 (e.g. `<U+674E><U+5149><U+7167>`, 李光照) are converted as Chinese
 authors cite themselves in publications (e.g. `G. Z. Li`). The original
 values are kept in columns with the suffix `Original`, and all column
@@ -219,7 +226,35 @@ barroso_labels(fieldbook = df,
                file_label = "herbarium_labels.pdf")
 ```
 
-### 6. `barroso_write_taxon_descr()`: Generate Taxonomic Descriptions
+### 6. `barroso_write_specimens()`: Write Lists of Examined Specimens
+
+Writes the lists of examined specimens of one, several or all species of
+a database into a Word (.docx) file, in the format of a botanical
+journal, with its bold, italics and small capitals: Systematic Botany,
+Acta Botanica Brasilica, Annals of the Missouri Botanical Garden,
+Botanical Journal of the Linnean Society, Brazilian Journal of Botany,
+Brittonia, Candollea, Edinburgh Journal of Botany, Kew Bulletin, Nordic
+Journal of Botany, Phytotaxa, PhytoKeys, Plant Ecology and Evolution,
+Rodriguésia, Systematics and Biodiversity, Taxon and Willdenowia.
+Duplicates are cited once with all their herbaria, and the header can be
+changed (e.g. `header = "Paratypes"`).
+
+``` r
+barroso_write_specimens(path = "Luetzelburgia_herbarium_records.xlsx",
+                        species = "Luetzelburgia auriculata",
+                        journal = "Systematic Botany")
+```
+
+> ***Representative Specimens Examined***—**Brazil.**
+> —<span class="smallcaps">Bahia</span>: Barreiras, Prainha, margem do
+> Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628*
+> (HUEFS). —<span class="smallcaps">Ceará</span>: Caucaia, Lagoa dos
+> Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso et al. 2379* (ASE, BOTU,
+> CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús,
+> RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F.H.F.
+> Nascimento 1402* (HUEFS).
+
+### 7. `barroso_write_taxon_descr()`: Generate Taxonomic Descriptions
 
 Builds standardized species descriptions from a spreadsheet of
 morphological characters, and exports them to a Word (.docx) file. The

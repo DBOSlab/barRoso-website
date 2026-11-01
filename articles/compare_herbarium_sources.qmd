@@ -66,6 +66,8 @@ For example, when combining 9,806 GBIF records and 4,432 speciesLink records of 
 
 ### 1. Raw speciesLink columns are renamed into Darwin Core
 
+Each source is first formatted with [`barroso_dwc()`](/articles/format_darwin_core.qmd), which can also be used alone.
+
 Raw speciesLink downloads use lowercase column names that differ from the Darwin Core terms used by GBIF. `barroso_cat()` detects them and renames them automatically, so records of both sources end up in the same columns:
 
 | speciesLink | Darwin Core |

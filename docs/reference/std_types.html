@@ -4425,6 +4425,7 @@ height: 400px;
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
 <p>This function is used internally in the <code>barRoso</code> package to prepare type status data for reconciliation and label generation. It corrects known placeholder or non-type entries (e.g. “Fotografia do Tipo”, “NOTATYPE”, “Epítipo”) and simplifies terms like <code>&quot;sim -&quot;</code> to ensure clean type labels.</p>
+<p>The same type designation written in English, Latin or Portuguese, and in any case, is converted into the lowercase Darwin Core term in English, e.g. <code>&quot;ISOTYPE&quot;</code>, <code>&quot;Isotypus&quot;</code> and <code>&quot;isótipo&quot;</code> into <code>&quot;isotype&quot;</code>, <code>&quot;Parátipo&quot;</code> into <code>&quot;paratype&quot;</code>, and <code>&quot;isosintipo&quot;</code> into <code>&quot;isosyntype&quot;</code>. A taxon name after the term is kept, e.g. <code>&quot;ISOTYPUS of Ormosia amazonica Ducke&quot;</code> into <code>&quot;isotype of Ormosia amazonica Ducke&quot;</code>.</p>
 </section>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
@@ -4963,28 +4964,35 @@ height: 400px;
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>placeholder or non-type entries (e.g. “Fotografia do Tipo”, “NOTATYPE”, “Epítipo”)</span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>and simplifies terms like <span class="in">`&quot;sim -&quot;`</span> to ensure clean type labels.</span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame containing type designation records. <span class="pp">|</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Name of the column holding type status information (default: <span class="in">`&quot;typeStatus&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the original column is removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>A data frame with a standardized <span class="in">`typeStatus`</span> column.</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>If <span class="in">`rm_original_column = FALSE`</span>, the original values are preserved in a column named <span class="in">`typeStatusOriginal`</span>.</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>The same type designation written in English, Latin or Portuguese, and in</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>any case, is converted into the lowercase Darwin Core term in English, e.g.</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;ISOTYPE&quot;`</span>, <span class="in">`&quot;Isotypus&quot;`</span> and <span class="in">`&quot;isótipo&quot;`</span> into <span class="in">`&quot;isotype&quot;`</span>, <span class="in">`&quot;Parátipo&quot;`</span> into</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;paratype&quot;`</span>, and <span class="in">`&quot;isosintipo&quot;`</span> into <span class="in">`&quot;isosyntype&quot;`</span>. A taxon name after the</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>term is kept, e.g. <span class="in">`&quot;ISOTYPUS of Ormosia amazonica Ducke&quot;`</span> into</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;isotype of Ormosia amazonica Ducke&quot;`</span>.</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame containing type designation records. <span class="pp">|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Name of the column holding type status information (default: <span class="in">`&quot;typeStatus&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the original column is removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;specimens.csv&quot;</span>)</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_types</span>(df,</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_typeStatus =</span> <span class="st">&quot;tipo&quot;</span>,</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>A data frame with a standardized <span class="in">`typeStatus`</span> column.</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>If <span class="in">`rm_original_column = FALSE`</span>, the original values are preserved in a column named <span class="in">`typeStatusOriginal`</span>.</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;specimens.csv&quot;</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_types</span>(df,</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_typeStatus =</span> <span class="st">&quot;tipo&quot;</span>,</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

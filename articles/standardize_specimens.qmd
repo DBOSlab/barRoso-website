@@ -50,7 +50,7 @@ standardized_df <- barroso_std(df,
 ## Arguments
 
 - `...`: A data frame or list of data frames with raw biodiversity records
-- `unvouchered`: Remove unvouchered (non-herbarium) records
+- `unvouchered`: Remove records of wood, seed, fruit, pollen and spirit collections (e.g. `INPAw`, `INPA-Carpoteca`, `BHZBcarpo`), and observations without a specimen (`basisOfRecord` like `HUMAN_OBSERVATION`), before the herbarium codes are standardized
 - `delunkcoll`: Optionally delete records with unknown collectors
 - `flag_duplicates`, `rm_duplicates`: Detect and optionally remove duplicates
 - `rm_original_column`: Remove original (uncleaned) fields after standardization
@@ -70,7 +70,30 @@ Collector names (`recordedBy`) are standardized with `std_recordedBy()` into ini
 | `Lobato, LC; Soares, CRA; Silva, CA` (determiners) | `L. C. Lobato, C. R. A. Soares & C. A. Silva` |
 | `R.Barneby (NY) 1994-06` (determiner) | `R. Barneby` |
 
-Chinese names written as unicode escapes, as in some GBIF downloads (e.g. `<U+674E><U+5149><U+7167>`, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. `G. Z. Li`, `T. S. Yi` (易婷双) and `R. Zhang` (张荣). Family names of two characters (e.g. `Ouyang`) and family names with a special reading (e.g. 曾, `Zeng`) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full.
+Chinese names written in Chinese characters (e.g. 丁广奇、余莲) or as unicode escapes, as in some GBIF downloads (e.g. `<U+674E><U+5149><U+7167>`, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. `G. Z. Li`, `T. S. Yi` (易婷双) and `R. Zhang` (张荣). Family names of two characters (e.g. `Ouyang`) and family names with a special reading (e.g. 曾, `Zeng`) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full. When the name is also written in Latin, e.g. `K.C.Yang 楊國禎` or `Peng, Ching-I (彭鏡毅)`, the Latin name is kept (`K. C. Yang`, `C.-I. Peng`).
+
+Identifiers like `(Wikidata Q5850623)`, given names in lowercase (`katherine Bravo`) and abbreviations like `Edm.Pereira` are also cleaned, and names of teams and herbaria (e.g. `Equipe do Jardim Botânico de Brasília`, `Belem Herbarium`) are kept as they are.
+
+## Herbarium acronyms
+
+Herbarium acronyms (`collectionCode`) are standardized with `std_collection()` into the acronyms of [Index Herbariorum](https://sweetgum.nybg.org/science/ih/), using regular expressions rather than a list of every code:
+
+| Original `collectionCode` | `institutionCode` or `catalogNumber` | Standardized |
+|---|---|---|
+| `Tropicos`, `MO-Duplicates` | `NY` | `NY` (the herbarium of the specimen) |
+| `Botany`, `Herbarium`, `Vascular Plants` | `catalogNumber` `U.1317533` | `U` |
+| (missing, GenBank voucher) | `catalogNumber` `D. Cardoso 2118 (HUEFS)` | `HUEFS` |
+| `F-Seedplants`, `BHCB-Fanerogamas`, `R-Tipos`, `UIS-H` | | `F`, `BHCB`, `R`, `UIS` |
+| `BSMvplantscoll`, `NL-Botany`, `CJBG-G-DC` | | `M`, `L`, `G-DC` |
+| `Herbario INPA`, `Herbario Nacional de Costa Rica (CR)` | | `INPA`, `CR` |
+| (missing) | `Instituto Florestal`, `Unicamp` | `SPSF`, `UEC` |
+| `Observations`, `Dados de Pesquisa SISBio`, `Ecopetrol S.A` | | `NA` |
+
+Codes of wood collections, like `INPAw`, are kept, as they are Index Herbariorum codes.
+
+## Places
+
+Countries, states, counties and municipalities are standardized with `std_place()`, e.g. `BRASIL` into `Brazil` and `BA` into `Bahia`. Words for municipality are removed from `county` and `municipality`, leaving just the name, e.g. `Manaus Mun.`, `Mun. de Castelo` and `Município de Mucugê` into `Manaus`, `Castelo` and `Mucugê`.
 
 The function `barroso_std()` does not check geographic coordinates. Use [`std_coordinates()`](/articles/fix_flag_coordinates.qmd) for that.
 

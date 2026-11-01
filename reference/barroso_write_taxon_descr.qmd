@@ -16,68 +16,83 @@ barRoso::barroso_write_taxon_descr()
 This function reads morphological data from an Excel spreadsheet,
 generates standardized species descriptions in plain text and Word document formats,
 and exports them to a Word (.docx) file. It handles complex morphological data
-structures including measurements, subterms, and grouping of related characters.
+structures including measurements, subterms and grouping of related characters.
 The function automatically detects measurement ranges and formats them with
-en dashes (e.g., "4.3–14.5 cm").
+en dashes (e.g., "4.3–14.5 cm"). Optionally, it can compute and print averages
+for user-selected measurement columns when a species has more than a threshold
+number of values (see `avg_cols` and `avg_min_n`).
 
 ### Details
 
-The function expects an Excel file with specific column naming conventions.
-Morphological characters should be grouped with consistent naming patterns:
+**Column naming conventions**
 
-- 
+The function relies on a structured column naming system to parse and organize
+morphological traits. Columns must follow these conventions:
 
-- 
--  Simple characters: "Habit", "LEAF shape", "LEAF margin"
+**Main character groups**Use ALL CAPS for the primary category:
+`HABIT`, `STIPULE`, `LEAF`, `INFLORESCENCE`,
+`FLOWER`, `FRUIT`, `SEED`. These will become section headers.
 
-- 
--  Measurements: "LEAF length (cm)", "LEAF width (mm)"
+**Simple characters**Lowercase descriptive terms after the main group.
+Examples: `LEAF shape`, `LEAF margin`, `FLOWER symmetry`.
+These will be appended directly after the lowercase group name.
 
-- 
--  Hierarchical structures: "FLOWER SEPALS length (mm)", "FLOWER SEPALS width (mm)"
+**Hierarchical characters**Use ALL CAPS for subgroup terms.
+Examples: `LEAF PETIOLE length (cm)`, `FLOWER SEPALS shape`.
+The capitalized term (`PETIOLE`, `SEPALS`) is extracted once
+and used as a subheading.
+
+**Measurements**Include units in parentheses for automatic detection:
+`LEAF length (cm)`, `STIPULE width (mm)`, `HABIT height (m)`.
+Multiple measurements (e.g., length + width) are automatically combined
+with "×" and the unit is placed at the end.
+
+**Column name flexibility**Spaces, dots, or underscores can be used
+as separators. All of the following are valid:
+
+- `STIPULE length (mm)`
+- `STIPULE.length.(mm)`
+- `STIPULE_length_mm`
+- `LEAF PETIOLE shape`
+- `LEAF.PETIOLE.shape`
+
+**Example dataset**
 
 The package includes an example dataset `morphological_dataset` containing
-morphological data for 15 species of *Ouratea* (Ochnaceae) that demonstrates
-these naming conventions. This dataset can be used to test the function
-and understand the required data structure.
+morphological data for 15 species of *Ouratea* (Ochnaceae) compiled from
+herbarium specimens and field observations for a taxonomic revision. This dataset
+demonstrates proper column naming conventions and can be used to test the function:
 
-The function automatically:
+data(morphological_dataset)
+head(names(morphological_dataset))
 
-- 
+**Creating a template**
 
-- 
-- Detects and groups related morphological characters
-- 
+To create a properly formatted Excel template with all required columns for your
+plant group, use the companion function `barroso_add_char_template`.
+This function generates a ready-to-use template based on your species list and
+selected plant group (e.g., "Ochnaceae", "Asteraceae", "Orchidaceae",
+"Leguminosae-Papilionoideae"), saving hours of manual column creation.
 
-- 
-- Handles measurement ranges (e.g., "4.3-14.5" becomes "4.3–14.5")
-- 
-
-- 
-- Merges duplicate species entries
-- 
-
-- 
-- Formats descriptions with customizable text formatting
-- 
-
-- 
-- Exports to Word with proper scientific typography
-- 
-
-Text formatting can be controlled via the `species_bold`, `group_bold`,
-and related parameters. Species names are italicized by default following
-botanical conventions.
+# Create a template for Ochnaceae
+barroso_add_char_template(
+  species_df = my_species_list,
+  plant_group = "Ochnaceae",
+  filename = "Ochnaceae_template"
+)
 
 ### Arguments
 
 | Argument | Description |
 |---|---|
-| xlsx_path | Character string. Path to the .xlsx file containing morphological data. |
-| species_cols | Character vector or integer indices. Column names or indices used to build the species header (e.g., c("Genus", "Species", "Author") or 1:3). |
-| character_cols | Character vector or integer indices. Column names or indices of morphological character columns (e.g., c("Habit", "Leaf.length", "Leaf.width") or 4:20). |
+| xlsx_path | Character. Path to the .xlsx file containing morphological data with properly structured column names (see Details for naming conventions). |
+| species_cols | Character vector or integer indices. Column names or indices used to build the species header (e.g., c("Genus", "Species", "Author") or 1:3). These can be combined flexibly (e.g., a single "Scientific_name" column or separate Genus, Species, and Author columns). |
+| character_cols | Character vector or integer indices. Column names or indices of morphological character columns (e.g., c("HABIT", "LEAF shape", "LEAF length (cm)") or 4:20). These must follow the naming conventions described in Details. |
 | sheet | Character string or integer. Sheet name or index passed to `readxl::read_excel()`. Default is 1. |
 | species_filter | Optional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the `species_cols` columns (without authorship). |
+| avg_cols | Optional character vector or integer indices of columns for which an average should be reported, displayed immediately after the existing range (e.g. "3–8 × 1–2 cm, average 5.5 × 1.5 cm"). Must be a subset of `character_cols`. Default `NULL` (no averages reported). |
+| avg_min_n | Integer. Minimum number of non-empty observations per species required for an average to be reported. Averages are emitted only when the number of observed values is strictly greater than `avg_min_n`. Default `3` (i.e., need at least 4 values for averaging). |
+| approx_char | Character string to use for approximate measurements when no variation is present (e.g., "ca." or "c."). Default is "ca.". Set to `NULL` to disable adding approximation. Examples: `"ca. 0.1 × 0.1 cm"` (no variation) vs `"1.3–2.5 × 0.6–1.1 cm"` (variation present, no "ca."). |
 | font_family | Character string. Font family for the Word document. Default is "Times New Roman". Common options include "Arial", "Calibri", "Cambria". |
 | font_size | Numeric. Font size in points. Default is 12. |
 | species_bold | Logical. Whether to make species names bold. Default is TRUE. |
@@ -86,37 +101,48 @@ botanical conventions.
 | group_italic | Logical. Whether to make group names italic. Default is FALSE. |
 | description_bold | Logical. Whether to make description text bold. Default is FALSE. |
 | description_italic | Logical. Whether to make description text italic. Default is FALSE. |
-| verbose | Logical. If `TRUE` (default), progress messages are printed to the console. Set to `FALSE` for silent operation. |
-| dir | Character string. Directory path where output will be saved. A date-stamped subfolder will be created inside this directory. If `NULL`, uses the Excel filename as directory name. |
-| filename | Character string. Basename for output files (without extension). If `NULL`, uses the Excel filename with "_descriptions" suffix. |
+| verbose | Logical. Print progress messages. Default TRUE. |
+| filename | Output file base name (without extension). Default NULL (uses Excel filename with "_descriptions" suffix). |
+| dir | Output directory. Default NULL (uses Excel filename as directory name). |
 
 ### Value
 
 Invisibly returns a data.frame with two columns:
 
-- 
-
-- 
 - `species_name`: Full species name with authorship
-- 
-
-- 
 - `description_plain`: Plain text description
-- 
 
 The main output is a Word document (.docx) saved to the specified directory.
 
 ### Examples
 
 ```r
-# Basic usage - generate descriptions for all species
+# Basic usage with example dataset
+data(morphological_dataset)
+
+# First, save the example dataset to Excel
+library(openxlsx)
+write.xlsx(morphological_dataset, "morphological_dataset.xlsx")
+
+# Generate descriptions using proper column selection
+barroso_write_taxon_descr(
+  xlsx_path = "morphological_dataset.xlsx",
+  species_cols = c("Genus", "Species", "Author"),  # Taxonomic identification
+  character_cols = 19:131,  # Morphological character columns
+  approx_char = "ca."  # Add "ca." to measurements without variation
+)
+
+# Generate descriptions with average calculation
 barroso_write_taxon_descr(
   xlsx_path = "morphological_data.xlsx",
   species_cols = c("Genus", "Species", "Author"),
-  character_cols = 4:20
+  character_cols = 4:20,
+  avg_cols = c("LEAF length (cm)", "FRUIT length (cm)"),
+  avg_min_n = 3,  # Calculate averages when n > 3 observations
+  approx_char = "ca."
 )
 
-# Generate descriptions only for specific species
+# Filter to specific species only
 barroso_write_taxon_descr(
   xlsx_path = "morphological_data.xlsx",
   species_cols = c("Genus", "Species"),
@@ -124,7 +150,7 @@ barroso_write_taxon_descr(
   species_filter = c("Ouratea concinna", "Ouratea coarctata")
 )
 
-# Customize formatting
+# Customize text formatting in Word output
 barroso_write_taxon_descr(
   xlsx_path = "morphological_data.xlsx",
   species_cols = 1:3,
@@ -139,27 +165,6 @@ barroso_write_taxon_descr(
   description_italic = FALSE,
   filename = "MySpeciesDescriptions",
   dir = "Output"
-)
-
-# Using column indices instead of names
-barroso_write_taxon_descr(
-  xlsx_path = "data.xlsx",
-  species_cols = 1:2,          # First two columns: Genus and Species
-  character_cols = 3:18        # Columns 3-18: morphological characters
-)
-
-
-# Using the included morphological_dataset
-
-# First save the dataset to Excel format=
-library(openxlsx)
-openxlsx::write.xlsx(morphological_dataset, "morphological_dataset.xlsx")
-
-# Generate descriptions using the example dataset
-barroso_write_taxon_descr(
-  xlsx_path = "morphological_dataset.xlsx",
-  species_cols = c("Genus", "Species", "Author"),
-  character_cols = 19:131  # Morphological character columns
 )
 ```
 
