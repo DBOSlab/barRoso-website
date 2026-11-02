@@ -4424,7 +4424,7 @@ height: 400px;
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>This function is used internally by the <code>barRoso</code> package to support record reconciliation, duplicate detection, and label generation across different biodiversity databases. It ensures consistency of location fields by correcting common mistakes and variations. Country names are translated to English and harmonized using <code>countrycode</code> Brazilian and U.S. state abbreviations are expanded to full names. Words for municipality in <code>county</code> and <code>municipality</code>, e.g. <code>&quot;Manaus Mun.&quot;</code>, <code>&quot;Mun. de Castelo&quot;</code>, <code>&quot;Município de Mucugê&quot;</code> or <code>&quot;Arriaga Municipio&quot;</code>, are removed, leaving just the name.</p>
+<p>This function is used internally by the <code>barRoso</code> package to support record reconciliation, duplicate detection, and label generation across different biodiversity databases. It ensures consistency of location fields by correcting common mistakes and variations. Country names are translated to English and harmonized using <code>countrycode</code>, and country codes like <code>&quot;BR&quot;</code> or <code>&quot;BRA&quot;</code> are converted into names. Missing countries are taken from the Brazilian state (e.g. <code>&quot;Bahia&quot;</code>), from a country name in the locality (e.g. <code>&quot;Manaus, Brasil&quot;</code>), or from other records with the same state and county. Brazilian and U.S. state abbreviations are expanded to full names. Missing municipalities are taken from the county. Words for municipality in <code>county</code> and <code>municipality</code>, e.g. <code>&quot;Manaus Mun.&quot;</code>, <code>&quot;Mun. de Castelo&quot;</code>, <code>&quot;Município de Mucugê&quot;</code> or <code>&quot;Arriaga Municipio&quot;</code>, are removed, leaving just the name.</p>
 </section>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
@@ -4984,40 +4984,44 @@ height: 400px;
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>reconciliation, duplicate detection, and label generation across different</span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>biodiversity databases. It ensures consistency of location fields by correcting</span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>common mistakes and variations. Country names are translated to English and</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>harmonized using <span class="in">`countrycode`</span> Brazilian and U.S. state abbreviations are</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>expanded to full names. Words for municipality in <span class="in">`county`</span> and <span class="in">`municipality`</span>,</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>e.g. <span class="in">`&quot;Manaus Mun.&quot;`</span>, <span class="in">`&quot;Mun. de Castelo&quot;`</span>, <span class="in">`&quot;Município de Mucugê&quot;`</span> or</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Arriaga Municipio&quot;`</span>, are removed, leaving just the name.</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame containing biodiversity records. <span class="pp">|</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent (default: <span class="in">`&quot;continent&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country (default: <span class="in">`&quot;country&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state or province (default: <span class="in">`&quot;stateProvince&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county (default: <span class="in">`&quot;county&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality (default: <span class="in">`&quot;municipality&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality (default: <span class="in">`&quot;locality&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, original columns are removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>A data frame with standardized geographic information. If</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="in">`rm_original_column = FALSE`</span>, the original columns are retained with *Original</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>suffixes.</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>harmonized using <span class="in">`countrycode`</span>, and country codes like <span class="in">`&quot;BR&quot;`</span> or <span class="in">`&quot;BRA&quot;`</span> are</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>converted into names. Missing countries are taken from the Brazilian state</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>(e.g. <span class="in">`&quot;Bahia&quot;`</span>), from a country name in the locality (e.g. <span class="in">`&quot;Manaus, Brasil&quot;`</span>),</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>or from other records with the same state and county. Brazilian and U.S.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>state abbreviations are expanded to full names. Missing municipalities are</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>taken from the county. Words for municipality in <span class="in">`county`</span> and <span class="in">`municipality`</span>,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>e.g. <span class="in">`&quot;Manaus Mun.&quot;`</span>, <span class="in">`&quot;Mun. de Castelo&quot;`</span>, <span class="in">`&quot;Município de Mucugê&quot;`</span> or</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Arriaga Municipio&quot;`</span>, are removed, leaving just the name.</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame containing biodiversity records. <span class="pp">|</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent (default: <span class="in">`&quot;continent&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country (default: <span class="in">`&quot;country&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state or province (default: <span class="in">`&quot;stateProvince&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county (default: <span class="in">`&quot;county&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality (default: <span class="in">`&quot;municipality&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality (default: <span class="in">`&quot;locality&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, original columns are removed after cleaning (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
 <span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;herbarium_records.csv&quot;</span>)</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_place</span>(df,</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>A data frame with standardized geographic information. If</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="in">`rm_original_column = FALSE`</span>, the original columns are retained with *Original</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>suffixes.</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;herbarium_records.csv&quot;</span>)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">std_place</span>(df,</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_original_column =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

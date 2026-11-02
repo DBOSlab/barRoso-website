@@ -155,9 +155,9 @@ For each species, the file has the species name and its author, followed by a pa
 |---|---|
 | `df` or `path` | The records, as a data frame or an .xlsx/.csv file, in Darwin Core format (e.g. the output of `barroso_std()` or `barroso_dwc()`) |
 | `species` | Species to write, with or without authors (e.g. `"Luetzelburgia andina"`); `NULL` for all species |
-| `journal` | The journal whose format is followed, one of the 17 journals below |
+| `journal` | The journal whose format is followed, one of the 24 journals below |
 | `header` | Text of the header, e.g. `"Paratypes"` or `"Additional specimens examined"`; `NULL` for the header of the journal, `""` for no header |
-| `language` | `"en"` or `"pt"`, for the default header, months and countries |
+| `language` | Language of the paper: `"en"` (English), `"pt"` (Portuguese) or `"es"` (Spanish), for the header (e.g. `"Material examinado"`), months, countries (`"BRASIL"`), phenology (`"fl. e fr."`, `"est."`) and the west hemisphere in Spanish (`"O"`) |
 | `catalog_numbers` | If `TRUE`, the catalog number is written after each herbarium, e.g. `"IAC no. 14754"` in Brittonia |
 | `dir`, `filename` | Folder and name of the .docx file |
 | `font_family`, `font_size` | Font of the document |
@@ -172,11 +172,23 @@ With header in bold italics, countries in bold, states in small capitals after a
 
 > ***Representative Specimens Examined***—**Brazil.** —<span style="font-variant: small-caps;">Bahia</span>: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso 2628* (HUEFS). —<span style="font-variant: small-caps;">Ceará</span>: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan 2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 Jun 2014, *F.H.F. Nascimento 1402* (HUEFS).
 
+### Acta Amazonica
+
+With header in bold, fields separated by periods, elevation like "Elev. 140m", phenology as a field before the date (e.g. "Fl. 15 April 1987"), and collectors not in italics:
+
+> **Additional specimens examined:** BRAZIL. Bahia: Barreiras, Prainha, margem do Rio das Ondas. 12º08’48”S, 45º00’55”W. 1 May 2009, D. Cardoso 2628 (HUEFS). Ceará: Caucaia, Lagoa dos Caetanos. 3ºS, 38ºW. 21 January 2009, D. Cardoso et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas. 5º09’44”S, 40º53’18”W. 15 June 2014, F.H.F. Nascimento 1402 (HUEFS).
+
 ### Acta Botanica Brasilica
 
 With header, countries and states in bold, collectors in italics, herbaria marked as seen, and municipalities separated by periods:
 
 > **Additional specimens examined: BRAZIL. Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08’48” S, 45°00’55” W, 1 May 2009, *D. Cardoso 2628* (HUEFS!). **Ceará:** Caucaia, Lagoa dos Caetanos, 3° S, 38° W, 21 January 2009, *D. Cardoso et al. 2379* (ASE!, BOTU!, CNMT!, HDJF!, HEPH!, HUCS!, HUEFS!, HUESB!, SORO!, UB!, UESC!, VIC!). Crateús, RPPN Serra das Almas, 5°09’44” S, 40°53’18” W, 15 June 2014, *F.H.F. Nascimento 1402* (HUEFS!).
+
+### Acta Botanica Mexicana
+
+With states followed by a comma, municipalities after "municipio", elevation before the coordinates, dates with Roman numerals, two collectors joined by "and", and "loc. cit." for the same place as the previous specimen:
+
+> Specimens examined: BRAZIL. Bahia, municipio Barreiras, Prainha, margem do Rio das Ondas, 12°08'48''S, 45°00'55''W, 1.V.2009, *D. Cardoso 2628* (HUEFS). Ceará, municipio Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21.I.2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); municipio Crateús, RPPN Serra das Almas, 5°09'44''S, 40°53'18''W, 15.VI.2014, *F. H. F. Nascimento 1402* (HUEFS).
 
 ### Annals of the Missouri Botanical Garden
 
@@ -189,6 +201,12 @@ With states in bold, and collectors with spaced initials in italics:
 With header in italics, states in bold, dates like "16.vi.2007", and each municipality cited once:
 
 > *Representative specimens examined:* BRAZIL. **Bahia**: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1.v.2009, *D. Cardoso 2628* (HUEFS). **Ceará**: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21.i.2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15.vi.2014, *F.H.F. Nascimento 1402* (HUEFS).
+
+### Botany Letters
+
+With header and countries in bold, states in uppercase after an em dash, full months, and collectors in italics followed by numbers in roman:
+
+> **Representative specimens examined: BRAZIL.** — BAHIA: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *D. Cardoso* 2628 (HUEFS). — CEARÁ: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 January 2009, *D. Cardoso et al.* 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, *F.H.F. Nascimento* 1402 (HUEFS).
 
 ### Brazilian Journal of Botany
 
@@ -208,11 +226,29 @@ With countries in bold small capitals, states in bold, and dates with Roman nume
 
 > *Additional specimens examined.* – **<span style="font-variant: small-caps;">Brazil.</span>** **Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08'48"S 45°00'55"W, 1.V.2009, *Cardoso 2628* (HUEFS). **Ceará:** Caucaia, Lagoa dos Caetanos, 3°S 38°W, 21.I.2009, *Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09'44"S 40°53'18"W, 15.VI.2014, *Nascimento 1402* (HUEFS).
 
+### Darwiniana
+
+In Spanish (`language = "es"`), with header in a sans-serif font, states in bold followed by a comma, "O" (oeste) for west, elevation in "m s. m.", dates like "11-XII-1993", and "ídem" for the same place as the previous specimen:
+
+> <span style="font-family: Arial, sans-serif;">Material examinado:</span> BRASIL. **Bahia**, Barreiras, Prainha, margem do Rio das Ondas, 12º08’48” S, 45º00’55” O, 1-V-2009, *D. Cardoso 2628* (HUEFS). **Ceará**, Caucaia, Lagoa dos Caetanos, 3º S, 38º O, 21-I-2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5º09’44” S, 40º53’18” O, 15-VI-2014, *F.H.F. Nascimento 1402* (HUEFS).
+
 ### Edinburgh Journal of Botany
 
 With states in bold, just the surname of collectors in italics, and municipalities separated by periods:
 
 > *Additional specimens examined.* **BRAZIL. Bahia**: Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 v 2009, *Cardoso* 2628 (HUEFS). **Ceará**: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 i 2009, *Cardoso* et al. 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC). Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 vi 2014, *Nascimento* 1402 (HUEFS).
+
+### Feddes Repertorium
+
+With header, countries and states in bold, just the surname of collectors in italics, and catalog numbers between square brackets (with `catalog_numbers = TRUE`, e.g. "K [K002885503]"):
+
+> **Additional specimens: BRAZIL. Bahia:** Barreiras, Prainha, margem do Rio das Ondas, 12°08′48″S, 45°00′55″W, 1 May 2009, *Cardoso* 2628 (HUEFS). **Ceará:** Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21 Jan. 2009, *Cardoso et al.* 2379 (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09′44″S, 40°53′18″W, 15 June 2014, *Nascimento* 1402 (HUEFS).
+
+### Hoehnea
+
+In Portuguese (`language = "pt"`), with states in small capitals, dates like "6-VI-1984", collectors with numbers in italics, and "l.c." for the municipality of the previous specimen:
+
+> Material examinado: BRASIL. <span style="font-variant: small-caps;">Bahia</span>: Barreiras, Prainha, margem do Rio das Ondas, 12°08’48”S, 45°00’55”W, 1-V-2009, *D. Cardoso 2628* (HUEFS). <span style="font-variant: small-caps;">Ceará</span>: Caucaia, Lagoa dos Caetanos, 3°S, 38°W, 21-I-2009, *D. Cardoso et al. 2379* (ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC); Crateús, RPPN Serra das Almas, 5°09’44”S, 40°53’18”W, 15-VI-2014, *F.H.F. Nascimento 1402* (HUEFS).
 
 ### Kew Bulletin
 
@@ -246,6 +282,12 @@ With specimens separated by bullets, fields by semicolons, and herbaria without 
 
 > **Additional material examined.** BRAZIL • Bahia, Barreiras, Prainha, margem do Rio das Ondas; 12°08’48”S, 45°00’55”W; 1 May 2009; *Cardoso 2628*; HUEFS • Ceará, Caucaia, Lagoa dos Caetanos; 3°S, 38°W; 21 Jan. 2009; *Cardoso et al. 2379*; ASE, BOTU, CNMT, HDJF, HEPH, HUCS, HUEFS, HUESB, SORO, UB, UESC, VIC • Crateús, RPPN Serra das Almas; 5°09’44”S, 40°53’18”W; 15 June 2014; *Nascimento 1402*; HUEFS.
 
+### Plant Systematics and Evolution
+
+With header in italics, countries and states in bold, elevation in "m a. s. l." before the coordinates, coordinates with spaces (e.g. "8° 09′ 04″ S"), herbaria marked as seen, "et al." not in italics, and specimens of the same municipality separated by periods:
+
+> *Additional specimens examined*: **BRAZIL. Bahia**. Barreiras, Prainha, margem do Rio das Ondas, 12° 08′ 48″ S, 45° 00′ 55″ W, 1 May 2009, *D. Cardoso 2628* (HUEFS!). **Ceará**. Caucaia, Lagoa dos Caetanos, 3° S, 38° W, 21 Jan 2009, *D. Cardoso* et al. *2379* (ASE!, BOTU!, CNMT!, HDJF!, HEPH!, HUCS!, HUEFS!, HUESB!, SORO!, UB!, UESC!, VIC!); Crateús, RPPN Serra das Almas, 5° 09′ 44″ S, 40° 53′ 18″ W, 15 Jun 2014, *F.H.F. Nascimento 1402* (HUEFS!).
+
 ### Rodriguésia
 
 With specimens separated by periods, and collections without number cited with the catalog number instead of "s.n.":
@@ -274,8 +316,23 @@ With a single header before all species, countries and states in small capitals,
 
 ## How the specimens are written
 
-- **Columns.** The function uses the Darwin Core columns `species`, `country`, `stateProvince`, `municipality` (or `county`, where GBIF keeps the municipalities of Brazil), `locality`, `decimalLatitude`, `decimalLongitude`, `minimumElevationInMeters`, `maximumElevationInMeters`, `day`, `month`, `year`, `reproductiveCondition` (phenology), `recordedBy`, `addCollector`, `recordNumber`, `collectionCode`, `catalogNumber`. Missing columns are just skipped.
+- **Columns.** The function uses the Darwin Core columns `species`, `country`, `stateProvince`, `municipality` (or `county`, where GBIF keeps the municipalities of Brazil), `locality`, `decimalLatitude`, `decimalLongitude`, `minimumElevationInMeters`, `maximumElevationInMeters`, `day`, `month`, `year`, `phenology` (or `reproductiveCondition`), `recordedBy`, `addCollector`, `recordNumber`, `collectionCode`, `catalogNumber`. Missing columns are just skipped.
 - **Collectors.** The names standardized by `barroso_std()` (e.g. `D. B. O. S. Cardoso`) are written as each journal cites them. The additional collector (`addCollector`) is written as `et al.` (`& al.` in Taxon) or as the name of the second collector, e.g. `R.M. Harley & A.M. Giulietti`.
+- **Phenology.** The phenology in the column `phenology` (as in records from REFLORA and JABOT) or `reproductiveCondition`, e.g. `fl`, `fl, fr`, `flower, fruit` or `st`, is written as in each journal:
+
+  | Format | Journals |
+  |---|---|
+  | `(fl, fr)` | Systematic Botany, Phytotaxa, Edinburgh Journal of Botany, Acta Botanica Mexicana, Darwiniana (`(veg, fl)`), and journals whose papers show no phenology (Botanical Journal of the Linnean Society, Feddes Repertorium, PhytoKeys, Plant Ecology and Evolution, Systematics and Biodiversity, Willdenowia) |
+  | `(fl., fr.)` | Taxon, Kew Bulletin, Acta Botanica Brasilica (after a comma), Botany Letters, Hoehnea, Plant Systematics and Evolution |
+  | `(fl./fr.)` | Annals of the Missouri Botanical Garden |
+  | `(fl. fr.)` | Nordic Journal of Botany |
+  | `(fl and fr)` | Brazilian Journal of Botany |
+  | `[fl, fr]` | Brittonia |
+  | `fl. and fr.` | Rodriguésia, and `fl., fr.` in Candollea, without brackets |
+  | `Fl., fr.` | Acta Amazonica, before the date |
+
+  In Portuguese and Spanish, `and` becomes `e` or `y`, and sterile (`st`) becomes `est`.
+- **Repeated places.** Some journals do not repeat the place of the previous specimen: `l.c.` for the same municipality in Hoehnea, and `loc. cit.` or `ídem` for the same locality in Acta Botanica Mexicana and Darwiniana.
 - **Duplicates.** Duplicates of the same collection (same species, collector surname and number, or same collector, date and locality when there is no number) are written once, with all their herbaria in alphabetical order, including those found by [`barroso_flag_duplicates()`](/articles/detect_duplicates.qmd) (`duplicateCollectionCodes`).
 - **Types.** The type status is not written, as types are cited apart from the examined specimens.
 - **Collections without number.** The catalog number of the first herbarium is written, e.g. `R. Spruce s.n. (K000892474, LD)`, so that the specimen can be found. Use `catalog_numbers = TRUE` to write the catalog numbers of all herbaria.

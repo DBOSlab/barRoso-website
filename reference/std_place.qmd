@@ -25,8 +25,12 @@ This function is used internally by the `barRoso` package to support record
 reconciliation, duplicate detection, and label generation across different
 biodiversity databases. It ensures consistency of location fields by correcting
 common mistakes and variations. Country names are translated to English and
-harmonized using `countrycode` Brazilian and U.S. state abbreviations are
-expanded to full names. Words for municipality in `county` and `municipality`,
+harmonized using `countrycode`, and country codes like `"BR"` or `"BRA"` are
+converted into names. Missing countries are taken from the Brazilian state
+(e.g. `"Bahia"`), from a country name in the locality (e.g. `"Manaus, Brasil"`),
+or from other records with the same state and county. Brazilian and U.S.
+state abbreviations are expanded to full names. Missing municipalities are
+taken from the county. Words for municipality in `county` and `municipality`,
 e.g. `"Manaus Mun."`, `"Mun. de Castelo"`, `"Município de Mucugê"` or
 `"Arriaga Municipio"`, are removed, leaving just the name.
 

@@ -93,7 +93,7 @@ Codes of wood collections, like `INPAw`, are kept, as they are Index Herbariorum
 
 ## Places
 
-Countries, states, counties and municipalities are standardized with `std_place()`, e.g. `BRASIL` into `Brazil` and `BA` into `Bahia`. Words for municipality are removed from `county` and `municipality`, leaving just the name, e.g. `Manaus Mun.`, `Mun. de Castelo` and `Município de Mucugê` into `Manaus`, `Castelo` and `Mucugê`.
+Countries, states, counties and municipalities are standardized with `std_place()`, e.g. `BRASIL` into `Brazil` and `BA` into `Bahia`. Words for municipality are removed from `county` and `municipality`, leaving just the name, e.g. `Manaus Mun.`, `Mun. de Castelo` and `Município de Mucugê` into `Manaus`, `Castelo` and `Mucugê`. Country codes become names, e.g. `BR` and `GY` into `Brazil` and `Guyana`. Missing countries are taken from the Brazilian state (e.g. `Bahia`), from a country name at the start or end of the locality (e.g. `Rio Negro, Brasil`), or from other records with the same state and county (e.g. `Amazonas`, `Manaus`); names shared by several countries, like the state `Amazonas` alone, are left empty. Missing municipalities are taken from the county, as GBIF keeps the municipalities of Brazil in `county`.
 
 The function `barroso_std()` does not check geographic coordinates. Use [`std_coordinates()`](/articles/fix_flag_coordinates.qmd) for that.
 
