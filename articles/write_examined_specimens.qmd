@@ -159,6 +159,7 @@ For each species, the file has the species name and its author, followed by a pa
 | `header` | Text of the header, e.g. `"Paratypes"` or `"Additional specimens examined"`; `NULL` for the header of the journal, `""` for no header |
 | `language` | Language of the paper: `"en"` (English), `"pt"` (Portuguese) or `"es"` (Spanish), for the header (e.g. `"Material examinado"`), months, countries (`"BRASIL"`), phenology (`"fl. e fr."`, `"est."`) and the west hemisphere in Spanish (`"O"`) |
 | `catalog_numbers` | If `TRUE`, the catalog number is written after each herbarium, e.g. `"IAC no. 14754"` in Brittonia |
+| `one_per_municipality` | If `TRUE`, just the most complete specimen of each municipality is written for each species, i.e. the one with state, locality, coordinates, elevation, date, phenology, collector and number, and then the most herbaria. Specimens without municipality are left out |
 | `dir`, `filename` | Folder and name of the .docx file |
 | `font_family`, `font_size` | Font of the document |
 
@@ -352,6 +353,7 @@ cat(res$specimens_text)
 - Standardize the database first with [`barroso_std()`](/articles/standardize_specimens.qmd), so that collectors, herbarium acronyms and places are written consistently, and duplicates are removed.
 - Check the countries and states of the database before writing: the specimens are cited as they are in the data.
 - For the paratypes of a new species, use `species` and `header = "Paratypes"`.
+- For widespread species with many collections, use `one_per_municipality = TRUE` to cite a representative specimen of each municipality, e.g. with `header = "Representative specimens examined"`. On the *Ormosia* dataset, 7,621 specimens of 122 species become 2,055 specimens of 105 species.
 
 ## See Also
 
