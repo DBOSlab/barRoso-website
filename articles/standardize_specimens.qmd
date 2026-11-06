@@ -30,6 +30,7 @@ standardized_df <- barroso_std(df,
                                flag_missid = TRUE,
                                flag_duplicates = TRUE,
                                rm_duplicates = FALSE,
+                               index_herbariorum = TRUE,
                                colname_recordedBy = "recordedBy",
                                colname_recordNumber = "recordNumber",
                                colname_identifiedBy = "identifiedBy",
@@ -53,6 +54,7 @@ standardized_df <- barroso_std(df,
 - `unvouchered`: Remove records of wood, seed, fruit, pollen and spirit collections (e.g. `INPAw`, `INPA-Carpoteca`, `BHZBcarpo`), and observations without a specimen (`basisOfRecord` like `HUMAN_OBSERVATION`), before the herbarium codes are standardized
 - `delunkcoll`: Optionally delete records with unknown collectors
 - `flag_duplicates`, `rm_duplicates`: Detect and optionally remove duplicates
+- `index_herbariorum`: Check collection codes against the API of [Index Herbariorum](https://sweetgum.nybg.org/science/ih/), always keeping the original codes (default: `TRUE`)
 - `rm_original_column`: Remove original (uncleaned) fields after standardization
 
 ## Collector and determiner names
@@ -67,8 +69,14 @@ Collector names (`recordedBy`) are standardized with `std_recordedBy()` into ini
 | `Uribe Uribe AL` | `A. L. Uribe-Uribe` |
 | `Dusén` | `Dusén` |
 | `A. Gómez Pompa, A. J. Sharp & P. Hernández` | `A. Gómez Pompa` (`addCollector`: `et al.`) |
+| `H.C. de Lima, C.A. Cid Ferreira, J. Guedes;F. Neves` | `H. C. Lima` (`addCollector`: `et al.`) |
+| `Col. Richard Henry Beddome` | `R. H. Beddome` |
+| `Warren Douglas Stevens, B. A. Krukoff Curator of Central American Botany` | `W. D. Stevens` |
+| `236-6队` | `Dui` (`recordNumber`: `236-6`, or the number already there) |
+| `[data not captured]`, `[see remarks]`, `-`, `?`, empty cells | `NA` |
 | `Lobato, LC; Soares, CRA; Silva, CA` (determiners) | `L. C. Lobato, C. R. A. Soares & C. A. Silva` |
 | `R.Barneby (NY) 1994-06` (determiner) | `R. Barneby` |
+| `-`, `?` (determiners) | `NA` |
 
 Chinese names written in Chinese characters (e.g. 丁广奇、余莲) or as unicode escapes, as in some GBIF downloads (e.g. `<U+674E><U+5149><U+7167>`, 李光照), are converted into Latin names as Chinese authors cite themselves in publications: initials of the given name followed by the family name, e.g. `G. Z. Li`, `T. S. Yi` (易婷双) and `R. Zhang` (张荣). Family names of two characters (e.g. `Ouyang`) and family names with a special reading (e.g. 曾, `Zeng`) are also handled, and names of teams or groups (e.g. 植被组, vegetation group) are kept in full. When the name is also written in Latin, e.g. `K.C.Yang 楊國禎` or `Peng, Ching-I (彭鏡毅)`, the Latin name is kept (`K. C. Yang`, `C.-I. Peng`).
 
@@ -89,11 +97,23 @@ Herbarium acronyms (`collectionCode`) are standardized with `std_collection()` i
 | (missing) | `Instituto Florestal`, `Unicamp` | `SPSF`, `UEC` |
 | `Observations`, `Dados de Pesquisa SISBio`, `Ecopetrol S.A` | | `NA` |
 
-Codes of wood collections, like `INPAw`, are kept, as they are Index Herbariorum codes.
+Codes of wood collections, like `INPAw`, are kept.
+
+By default (`index_herbariorum = TRUE`), the standardized codes are then checked against all herbaria of Index Herbariorum, which are downloaded at once and kept during the R session:
+
+- Codes found get the spelling of Index Herbariorum, e.g. `UnB` into `UNB`.
+- Codes not found are looked for by the full name of the institution in the original `collectionCode` or `institutionCode`, when the name belongs to a single herbarium, as universities may have several.
+- The code of Index Herbariorum goes into `collectionCode`, and `institutionCode` is not changed.
+- The original code is always kept in `collectionCodeOriginal`, even with `rm_original_column = TRUE`.
+- The new column `institutionName` has the name of the institution, and the new column `indexHerbariorum` is `FALSE` for codes not found, which are left as they were for checking.
+
+The regular expressions remain the first step, as dirty codes like `F-Seedplants` or `Tropicos` are not in Index Herbariorum. The check needs internet access; if the API cannot be reached, a warning is given and the codes are not checked. Use `index_herbariorum = FALSE` to work offline.
 
 ## Places
 
-Countries, states, counties and municipalities are standardized with `std_place()`, e.g. `BRASIL` into `Brazil` and `BA` into `Bahia`. Words for municipality are removed from `county` and `municipality`, leaving just the name, e.g. `Manaus Mun.`, `Mun. de Castelo` and `Município de Mucugê` into `Manaus`, `Castelo` and `Mucugê`. Country codes become names, e.g. `BR` and `GY` into `Brazil` and `Guyana`. Missing countries are taken from the Brazilian state (e.g. `Bahia`), from a country name at the start or end of the locality (e.g. `Rio Negro, Brasil`), or from other records with the same state and county (e.g. `Amazonas`, `Manaus`); names shared by several countries, like the state `Amazonas` alone, are left empty. Missing municipalities are taken from the county, as GBIF keeps the municipalities of Brazil in `county`.
+Countries, states, counties and municipalities are standardized with `std_place()`, e.g. `BRASIL` into `Brazil` and `BA` into `Bahia`. Words for municipality are removed from `county` and `municipality`, leaving just the name, e.g. `Manaus Mun.`, `Mun. de Castelo` and `Município de Mucugê` into `Manaus`, `Castelo` and `Mucugê`. Country codes become names, e.g. `BR` and `GY` into `Brazil` and `Guyana`. Missing countries are taken from the Brazilian state (e.g. `Bahia`), from a country name at the start or end of the locality (e.g. `Rio Negro, Brasil`), or from other records with the same state and county (e.g. `Amazonas`, `Manaus`); names shared by several countries, like the state `Amazonas` alone, are left empty. Missing municipalities are taken from the county, as GBIF keeps the municipalities of Brazil in `county`. Localities all in upper case get just the first letter of each word in upper case, e.g. `ESTR. UBAITUBA / MARÁU AO KM 54 .` into `Estr. Ubaituba/Maráu ao Km 54.`, keeping prepositions in lowercase and road codes (`BR-316`), acronyms (`ESALQ`) and compass points (`10 Km NE de`) in upper case.
+
+The final data frame is sorted by species, `recordedBy` and `recordNumber`. All records of a block of duplicates stay together under the most frequent name of the block, e.g. a duplicate identified as `Ormosia ruddiana` goes with its three duplicates identified as `Ormosia amazonica`, in the place of the latter species.
 
 The function `barroso_std()` does not check geographic coordinates. Use [`std_coordinates()`](/articles/fix_flag_coordinates.qmd) for that.
 

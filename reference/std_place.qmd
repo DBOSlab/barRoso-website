@@ -33,6 +33,9 @@ state abbreviations are expanded to full names. Missing municipalities are
 taken from the county. Words for municipality in `county` and `municipality`,
 e.g. `"Manaus Mun."`, `"Mun. de Castelo"`, `"Município de Mucugê"` or
 `"Arriaga Municipio"`, are removed, leaving just the name.
+Localities all in upper case get just the first letter of each word in upper
+case, e.g. `"ESTR. UBAITUBA / MARÁU AO KM 54 ."` into `"Estr. Ubaituba/Maráu ao Km 54."`, keeping prepositions in lowercase and road codes (`"BR-316"`), acronyms
+(`"ESALQ"`) and compass points (`"10 Km NE de"`) in upper case.
 
 ### Arguments
 

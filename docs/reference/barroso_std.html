@@ -4425,6 +4425,7 @@ height: 400px;
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
 <p>This function orchestrates several std_* functions from the <code>barRoso</code> package to clean records from virtual herbaria and biodiversity portals. It handles multilingual field names, missing data, inconsistent formatting, and dataset chunking for large inputs. The function also detects and optionally removes duplicate records and specimens lacking voucher information.</p>
+<p>The final data frame is sorted by species, <code>recordedBy</code> and <code>recordNumber</code>. All records of a block of duplicates stay together under the name of the block, which is the most frequent name among its duplicates. For example, a duplicate identified as <code>&quot;Ormosia ruddiana&quot;</code> goes together with its three duplicates identified as <code>&quot;Ormosia amazonica&quot;</code>, in the place of the latter species.</p>
 </section>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
@@ -4450,7 +4451,7 @@ height: 400px;
 </tr>
 <tr class="odd">
 <td>delunkcoll</td>
-<td>Logical; if <code>TRUE</code>, removes records with unknown collectors (default: <code>FALSE</code>).</td>
+<td>Logical; if <code>TRUE</code>, removes records with unknown or missing collectors (default: <code>FALSE</code>).</td>
 </tr>
 <tr class="even">
 <td>flag_missid</td>
@@ -4465,68 +4466,72 @@ height: 400px;
 <td>Logical; if <code>TRUE</code>, removes duplicate specimens (default: <code>FALSE</code>).</td>
 </tr>
 <tr class="odd">
+<td>index_herbariorum</td>
+<td>Logical; if <code>TRUE</code>, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See <code>std_collection()</code>. Use <code>FALSE</code> to work offline (default: <code>TRUE</code>).</td>
+</tr>
+<tr class="even">
 <td>colname_recordedBy</td>
 <td>Column name for collector names.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_recordNumber</td>
 <td>Column name for collector number.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_identifiedBy</td>
 <td>Column name for determiner names. The column is standardized with <code>std_identifiedBy()</code> only when present in the data.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_continent</td>
 <td>Column name for continent.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_country</td>
 <td>Column name for country.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_stateProvince</td>
 <td>Column name for state/province.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_county</td>
 <td>Column name for county.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_municipality</td>
 <td>Column name for municipality.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_locality</td>
 <td>Column name for locality.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_collectionCode</td>
 <td>Column name for collection code.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_institutionCode</td>
 <td>Column name for institution code.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_typeStatus</td>
 <td>Column name for type status.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_family</td>
 <td>Column name for family.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_genus</td>
 <td>Column name for genus.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_specificEpithet</td>
 <td>Column name for specific epithet.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>rm_original_column</td>
-<td>Logical; if <code>TRUE</code>, remove original columns after standardization.</td>
+<td>Logical; if <code>TRUE</code>, remove original columns after standardization, except that of collection codes when <code>index_herbariorum = TRUE</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -5042,48 +5047,55 @@ height: 400px;
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>and dataset chunking for large inputs. The function also detects and optionally</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>removes duplicate records and specimens lacking voucher information.</span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ... <span class="pp">|</span> Input data frame containing raw biodiversity records. <span class="pp">|</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> unvouchered <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove records of wood, seed, fruit, pollen and spirit collections (e.g. <span class="in">`&quot;INPAw&quot;`</span>, <span class="in">`&quot;INPA-Carpoteca&quot;`</span>), and observations without a specimen (<span class="in">`basisOfRecord`</span> like <span class="in">`&quot;HUMAN_OBSERVATION&quot;`</span>) (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> delunkcoll <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes records with unknown collectors (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_missid <span class="pp">|</span> Reserved for future use. Currently not implemented. <span class="pp">|</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, flags duplicates with a logical column (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes duplicate specimens (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for collector names. <span class="pp">|</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for collector number. <span class="pp">|</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_identifiedBy <span class="pp">|</span> Column name for determiner names. The column is standardized with <span class="in">`std_identifiedBy()`</span> only when present in the data. <span class="pp">|</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent. <span class="pp">|</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country. <span class="pp">|</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state/province. <span class="pp">|</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county. <span class="pp">|</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality. <span class="pp">|</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality. <span class="pp">|</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for collection code. <span class="pp">|</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Column name for institution code. <span class="pp">|</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Column name for type status. <span class="pp">|</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_family <span class="pp">|</span> Column name for family. <span class="pp">|</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for genus. <span class="pp">|</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for specific epithet. <span class="pp">|</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove original columns after standardization. <span class="pp">|</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>A fully cleaned and standardized data frame ready for downstream reconciliation,</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>duplicate handling, and label generation.</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>The final data frame is sorted by species, <span class="in">`recordedBy`</span> and <span class="in">`recordNumber`</span>. All</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>records of a block of duplicates stay together under the name of the block, which</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>is the most frequent name among its duplicates. For example, a duplicate identified</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>as <span class="in">`&quot;Ormosia ruddiana&quot;`</span> goes together with its three duplicates identified as</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Ormosia amazonica&quot;`</span>, in the place of the latter species.</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ... <span class="pp">|</span> Input data frame containing raw biodiversity records. <span class="pp">|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> unvouchered <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove records of wood, seed, fruit, pollen and spirit collections (e.g. <span class="in">`&quot;INPAw&quot;`</span>, <span class="in">`&quot;INPA-Carpoteca&quot;`</span>), and observations without a specimen (<span class="in">`basisOfRecord`</span> like <span class="in">`&quot;HUMAN_OBSERVATION&quot;`</span>) (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> delunkcoll <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes records with unknown or missing collectors (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_missid <span class="pp">|</span> Reserved for future use. Currently not implemented. <span class="pp">|</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, flags duplicates with a logical column (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes duplicate specimens (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> index_herbariorum <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See <span class="in">`std_collection()`</span>. Use <span class="in">`FALSE`</span> to work offline (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for collector names. <span class="pp">|</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for collector number. <span class="pp">|</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_identifiedBy <span class="pp">|</span> Column name for determiner names. The column is standardized with <span class="in">`std_identifiedBy()`</span> only when present in the data. <span class="pp">|</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent. <span class="pp">|</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country. <span class="pp">|</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state/province. <span class="pp">|</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county. <span class="pp">|</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality. <span class="pp">|</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality. <span class="pp">|</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for collection code. <span class="pp">|</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Column name for institution code. <span class="pp">|</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Column name for type status. <span class="pp">|</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_family <span class="pp">|</span> Column name for family. <span class="pp">|</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for genus. <span class="pp">|</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for specific epithet. <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove original columns after standardization, except that of collection codes when <span class="in">`index_herbariorum = TRUE`</span>. <span class="pp">|</span></span>
 <span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;raw_herbarium_data.csv&quot;</span>)</span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>df_std <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(df,</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>A fully cleaned and standardized data frame ready for downstream reconciliation,</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>duplicate handling, and label generation.</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;raw_herbarium_data.csv&quot;</span>)</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>df_std <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(df,</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
