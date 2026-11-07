@@ -55,30 +55,9 @@ library(refloraR)
 library(jabotR)
 library(barRoso)
 
-# Get REFLORA data ####
-data_reflora <- reflora_records(herbarium = NULL,
-                                repatriated = TRUE,
-                                taxon = NULL,
-                                state = NULL,
-                                recordYear = NULL,
-                                indets = TRUE,
-                                reorder = c("herbarium", "taxa", "collector", "area", "year"),
-                                path = NULL,
-                                updates = TRUE,
-                                verbose = TRUE,
-                                save = FALSE)
-
-# Get JABOT data ####
-data_jabot <- jabot_records(herbarium = NULL,
-                            taxon = NULL,
-                            state = NULL,
-                            recordYear = NULL,
-                            indets = TRUE,
-                            reorder = c("herbarium", "taxa", "collector", "area", "year"),
-                            path = NULL,
-                            updates = TRUE,
-                            verbose = TRUE,
-                            save = FALSE)
+# Get all REFLORA and JABOT records (the defaults search all herbaria and taxa) ####
+data_reflora <- reflora_records(save = FALSE)
+data_jabot <- jabot_records(save = FALSE)
 
 # Merge all sources ####
 data_all <- barroso_cat(list_sources = list(REFLORA = data_reflora,
