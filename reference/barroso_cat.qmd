@@ -33,6 +33,14 @@ Each source is first formatted into Darwin Core column names and values with
 standardized. The sources are recognized by their content, so their names in
 `list_sources` can be any name.
 
+Before comparing the sources, the herbarium acronyms in `collectionCode` of each
+source are standardized with `std_collection()`, by default checking them against
+Index Herbariorum (`index_herbariorum = TRUE`), so the same herbarium is
+recognized in all sources, e.g. `"MOBOT_BR"` in speciesLink and `"MO"` in GBIF, or
+`"Herbario INPA"` and `"INPA"`. The original codes are kept in
+`collectionCodeOriginal`, so unvouchered collections like `"INPA-Carpoteca"` can
+still be removed by `barroso_std()`.
+
 Columns with different types across sources (e.g. numeric `year` in one source
 and character in another) are combined as character. A column `datasource`
 records the source of each record.
@@ -43,6 +51,7 @@ records the source of each record.
 |---|---|
 | list_sources | A named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering. |
 | keep_source | Optional character string specifying the preferred data source (e.g., "GBIF") for resolving duplicate `collectionCode` conflicts. If NULL, all records are retained. |
+| index_herbariorum | Logical; if `TRUE`, the herbarium acronyms of each source are checked against the API of Index Herbariorum after the regular expressions of `std_collection()` (default: `TRUE`). Use `FALSE` to work offline. |
 
 ### Value
 

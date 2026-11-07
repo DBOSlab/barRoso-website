@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Remove author names from scientific names">
+<meta name="description" content="Fix Species Names with Global and Brazilian Taxonomic Backbones">
 
-<title>remove_authorship – barRoso</title>
+<title>barroso_fix_names – barRoso</title>
 <style>
 
 code{white-space: pre-wrap;}
@@ -4377,6 +4377,7 @@ height: 400px;
    
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description">Description</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
@@ -4392,12 +4393,12 @@ height: 400px;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">remove_authorship</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">barroso_fix_names</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 <div>
   <div class="description">
-    Remove author names from scientific names
+    Fix Species Names with Global and Brazilian Taxonomic Backbones
   </div>
 </div>
 
@@ -4415,11 +4416,27 @@ height: 400px;
 
 
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">remove_authorship</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">barroso_fix_names</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function removes author citations from scientific names, leaving only the genus and species epithet (and optionally infraspecific ranks).</p>
+<p>Updates misspelled names and synonyms of herbarium records into accepted names, using the World Checklist of Vascular Plants (WCVP) of <a href="https://powo.science.kew.org/">Plants of the World Online</a> as a global backbone, through the package <a href="https://dboslab.github.io/expowo/">expowo</a>, and by default the <a href="https://floradobrasil.jbrj.gov.br/">Flora e Funga do Brasil</a> (FFB), through the package <a href="https://dboslab.github.io/floraR-website/">floraR</a>. It is meant to be run after <code>barroso_cat()</code> and before <code>barroso_std()</code>, so that duplicates identified with synonyms or misspelled names are recognized.</p>
+</section>
+<section id="details" class="level3">
+<h3 class="anchored" data-anchor-id="details">Details</h3>
+<p>Each unique binomial built from <code>genus</code> and <code>specificEpithet</code> is searched just once, so large datasets (e.g. all records of REFLORA and JABOT) are harmonized quickly. Names without a specific epithet (e.g. <code>&quot;Ormosia&quot;</code>, <code>&quot;Ormosia sp.&quot;</code>) are not searched.</p>
+<ul>
+<li><strong>WCVP</strong>: all names of the families in the data (and, with <code>flora_brasil = TRUE</code>, the families of their genera in FFB) are read at once with <code>expowo::powoSpecies(family, synonyms = TRUE)</code>, from the WCVP kept in the cache of expowo. Names are first matched exactly; misspelled names are matched to the closest name of the same genus, with a relative distance of the specific epithet up to <code>max_distance</code> (e.g. <code>&quot;Ormosia fastigiatta&quot;</code> to <code>&quot;Ormosia fastigiata&quot;</code>). Misspelled genera are matched in the same way. Homonyms with different accepted names (and ties between misspelled names) are left as they are, as <code>&quot;ambiguous&quot;</code>.</li>
+<li><strong>FFB</strong> (<code>flora_brasil = TRUE</code>): the names are searched at once with <code>floraR::flora_search()</code>, which also corrects misspellings of the specific epithet. Names found in FFB follow FFB, which is preferred for the Brazilian flora, while the other names follow WCVP. A misspelling found in FFB is not taken for a name found as it is in WCVP, as names of other countries are often close to Brazilian names (e.g. <code>&quot;Ormosia panamensis&quot;</code> and <code>&quot;Ormosia paraensis&quot;</code>). The FFB dataset is downloaded once into the barRoso cache folder.</li>
+</ul>
+<p>Accepted infraspecific names are reduced to the binomial (e.g. <code>&quot;Ormosia nobilis var. bolivarensis&quot;</code> as a synonym of <code>&quot;Ormosia bolivarensis&quot;</code>). When a name is updated, <code>family</code>, <code>genus</code>, <code>specificEpithet</code>, and when present <code>species</code>, <code>scientificName</code>, <code>scientificNameAuthorship</code> and <code>taxonName</code>, get the accepted name, and <code>infraspecificEpithet</code> becomes <code>NA</code>. The family is also updated for accepted names in another family (e.g. <code>&quot;Leguminosae&quot;</code> into <code>&quot;Fabaceae&quot;</code>).</p>
+<p>Three columns are added after <code>specificEpithet</code>:</p>
+<ul>
+<li><code>taxonOriginal</code>: the binomial (or genus) before the harmonization.</li>
+<li><code>taxonStatus</code>: <code>&quot;accepted&quot;</code>, <code>&quot;synonym&quot;</code>, <code>&quot;misspelled&quot;</code> (the misspelled name of an accepted name), <code>&quot;misspelled synonym&quot;</code>, <code>&quot;ambiguous&quot;</code>, <code>&quot;not found&quot;</code>, or <code>NA</code> for names without specific epithet.</li>
+<li><code>taxonSource</code>: <code>&quot;FFB&quot;</code> or <code>&quot;WCVP&quot;</code>.</li>
+</ul>
+<p>The first use downloads the WCVP (by expowo) and the FFB dataset (by floraR), which are then kept in cache folders for the next uses.</p>
 </section>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
@@ -4436,30 +4453,51 @@ height: 400px;
 </thead>
 <tbody>
 <tr class="odd">
-<td>scientific_names</td>
-<td>Character vector of scientific names with authors.</td>
+<td>df</td>
+<td>A data frame with herbarium records, e.g. from <code>barroso_cat()</code>.</td>
 </tr>
 <tr class="even">
-<td>keep_infraspecific</td>
-<td>Logical, if TRUE, keeps infraspecific epithets (subspecies, varieties, forms). Default is TRUE.</td>
+<td>flora_brasil</td>
+<td>Logical; if <code>TRUE</code>, names found in the Flora e Funga do Brasil follow FFB, and the other names follow WCVP. If <code>FALSE</code>, all names follow WCVP (default: <code>TRUE</code>).</td>
+</tr>
+<tr class="odd">
+<td>max_distance</td>
+<td>Maximum relative distance (0 to 1) between a misspelled name and an accepted or synonym name (default: <code>0.2</code>).</td>
+</tr>
+<tr class="even">
+<td>vascular_only</td>
+<td>Logical; if <code>TRUE</code>, records of families that are not in WCVP, which has only vascular plants (e.g. mosses, fungi and algae), and records without family are removed (default: <code>FALSE</code>).</td>
+</tr>
+<tr class="odd">
+<td>colname_family</td>
+<td>Column name for the family (default: <code>&quot;family&quot;</code>).</td>
+</tr>
+<tr class="even">
+<td>colname_genus</td>
+<td>Column name for the genus (default: <code>&quot;genus&quot;</code>).</td>
+</tr>
+<tr class="odd">
+<td>colname_specificEpithet</td>
+<td>Column name for the specific epithet (default: <code>&quot;specificEpithet&quot;</code>). When missing, the epithet is taken from a binomial in the column <code>species</code>, as in GBIF downloads.</td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td>Logical; if <code>TRUE</code>, prints messages about the progress and a summary (default: <code>TRUE</code>).</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character vector of scientific names without authors.</p>
+<p>The data frame with accepted names and the columns <code>taxonOriginal</code>, <code>taxonStatus</code> and <code>taxonSource</code>.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="st">&quot;Quercus alba L.&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus alba&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="st">&quot;Quercus rubra var. borealis (F.Michx.) Farw.&quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus rubra var. borealis&quot; (if keep_infraspecific = TRUE)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="fu">c</span>(<span class="st">&quot;Acer saccharum Marshall&quot;</span>, <span class="st">&quot;Pinus strobus L.&quot;</span>))</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: c(&quot;Acer saccharum&quot;, &quot;Pinus strobus&quot;)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="fu">list</span>(<span class="at">REFLORA =</span> data_reflora, <span class="at">JABOT =</span> data_jabot),</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="st">&quot;JABOT&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_fix_names</span>(data_all, <span class="at">vascular_only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_all<span class="sc">$</span>taxonStatus)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(data_all)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 <!-- -->
@@ -4932,8 +4970,8 @@ height: 400px;
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &#39;remove_authorship&#39;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> &#39;Remove author names from scientific names&#39;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &#39;barroso_fix_names&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> &#39;Fix Species Names with Global and Brazilian Taxonomic Backbones&#39;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
@@ -4941,38 +4979,73 @@ height: 400px;
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">remove_authorship</span>()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">barroso_fix_names</span>()</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">### Description</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>This function removes author citations from scientific names, leaving only</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>the genus and species epithet (and optionally infraspecific ranks).</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> scientific_names <span class="pp">|</span> Character vector of scientific names with authors. <span class="pp">|</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> keep_infraspecific <span class="pp">|</span> Logical, if TRUE, keeps infraspecific epithets (subspecies, varieties, forms). Default is TRUE. <span class="pp">|</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>Character vector of scientific names without authors.</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>Updates misspelled names and synonyms of herbarium records into accepted names,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>using the World Checklist of Vascular Plants (WCVP) of</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Plants of the World Online</span><span class="co">](https://powo.science.kew.org/)</span> as a global</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>backbone, through the package <span class="co">[</span><span class="ot">expowo</span><span class="co">](https://dboslab.github.io/expowo/)</span>, and</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>by default the <span class="co">[</span><span class="ot">Flora e Funga do Brasil</span><span class="co">](https://floradobrasil.jbrj.gov.br/)</span> (FFB),</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>through the package <span class="co">[</span><span class="ot">floraR</span><span class="co">](https://dboslab.github.io/floraR-website/)</span>. It is</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>meant to be run after <span class="in">`barroso_cat()`</span> and before <span class="in">`barroso_std()`</span>, so that</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>duplicates identified with synonyms or misspelled names are recognized.</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="fu">### Details</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>Each unique binomial built from <span class="in">`genus`</span> and <span class="in">`specificEpithet`</span> is searched just</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>once, so large datasets (e.g. all records of REFLORA and JABOT) are harmonized</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>quickly. Names without a specific epithet (e.g. <span class="in">`&quot;Ormosia&quot;`</span>, <span class="in">`&quot;Ormosia sp.&quot;`</span>) are</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>not searched.</span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="st">&quot;Quercus alba L.&quot;</span>)</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus alba&quot;</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="st">&quot;Quercus rubra var. borealis (F.Michx.) Farw.&quot;</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus rubra var. borealis&quot; (if keep_infraspecific = TRUE)</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">remove_authorship</span>(<span class="fu">c</span>(<span class="st">&quot;Acer saccharum Marshall&quot;</span>, <span class="st">&quot;Pinus strobus L.&quot;</span>))</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: c(&quot;Acer saccharum&quot;, &quot;Pinus strobus&quot;)</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**WCVP**: all names of the families in the data (and, with <span class="in">`flora_brasil = TRUE`</span>, the families of their genera in FFB) are read at once with <span class="in">`expowo::powoSpecies(family, synonyms = TRUE)`</span>, from the WCVP kept in the cache of expowo. Names are first matched exactly; misspelled names are matched to the closest name of the same genus, with a relative distance of the specific epithet up to <span class="in">`max_distance`</span> (e.g. <span class="in">`&quot;Ormosia fastigiatta&quot;`</span> to <span class="in">`&quot;Ormosia fastigiata&quot;`</span>). Misspelled genera are matched in the same way. Homonyms with different accepted names (and ties between misspelled names) are left as they are, as <span class="in">`&quot;ambiguous&quot;`</span>.</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**FFB** (<span class="in">`flora_brasil = TRUE`</span>): the names are searched at once with <span class="in">`floraR::flora_search()`</span>, which also corrects misspellings of the specific epithet. Names found in FFB follow FFB, which is preferred for the Brazilian flora, while the other names follow WCVP. A misspelling found in FFB is not taken for a name found as it is in WCVP, as names of other countries are often close to Brazilian names (e.g. <span class="in">`&quot;Ormosia panamensis&quot;`</span> and <span class="in">`&quot;Ormosia paraensis&quot;`</span>). The FFB dataset is downloaded once into the barRoso cache folder.</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>Accepted infraspecific names are reduced to the binomial (e.g. <span class="in">`&quot;Ormosia nobilis var. bolivarensis&quot;`</span> as a synonym of <span class="in">`&quot;Ormosia bolivarensis&quot;`</span>). When a name is</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>updated, <span class="in">`family`</span>, <span class="in">`genus`</span>, <span class="in">`specificEpithet`</span>, and when present <span class="in">`species`</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="in">`scientificName`</span>, <span class="in">`scientificNameAuthorship`</span> and <span class="in">`taxonName`</span>, get the accepted</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>name, and <span class="in">`infraspecificEpithet`</span> becomes <span class="in">`NA`</span>. The family is also updated for</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>accepted names in another family (e.g. <span class="in">`&quot;Leguminosae&quot;`</span> into <span class="in">`&quot;Fabaceae&quot;`</span>).</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>Three columns are added after <span class="in">`specificEpithet`</span>:</span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`taxonOriginal`</span>: the binomial (or genus) before the harmonization.</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`taxonStatus`</span>: <span class="in">`&quot;accepted&quot;`</span>, <span class="in">`&quot;synonym&quot;`</span>, <span class="in">`&quot;misspelled&quot;`</span> (the misspelled name of an accepted name), <span class="in">`&quot;misspelled synonym&quot;`</span>, <span class="in">`&quot;ambiguous&quot;`</span>, <span class="in">`&quot;not found&quot;`</span>, or <span class="in">`NA`</span> for names without specific epithet.</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`taxonSource`</span>: <span class="in">`&quot;FFB&quot;`</span> or <span class="in">`&quot;WCVP&quot;`</span>.</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>The first use downloads the WCVP (by expowo) and the FFB dataset (by floraR),</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>which are then kept in cache folders for the next uses.</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame with herbarium records, e.g. from <span class="in">`barroso_cat()`</span>. <span class="pp">|</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flora_brasil <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, names found in the Flora e Funga do Brasil follow FFB, and the other names follow WCVP. If <span class="in">`FALSE`</span>, all names follow WCVP (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> max_distance <span class="pp">|</span> Maximum relative distance (0 to 1) between a misspelled name and an accepted or synonym name (default: <span class="in">`0.2`</span>). <span class="pp">|</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> vascular_only <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, records of families that are not in WCVP, which has only vascular plants (e.g. mosses, fungi and algae), and records without family are removed (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_family <span class="pp">|</span> Column name for the family (default: <span class="in">`&quot;family&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for the genus (default: <span class="in">`&quot;genus&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for the specific epithet (default: <span class="in">`&quot;specificEpithet&quot;`</span>). When missing, the epithet is taken from a binomial in the column <span class="in">`species`</span>, as in GBIF downloads. <span class="pp">|</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> verbose <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, prints messages about the progress and a summary (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>The data frame with accepted names and the columns <span class="in">`taxonOriginal`</span>,</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="in">`taxonStatus`</span> and <span class="in">`taxonSource`</span>.</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="fu">list</span>(<span class="at">REFLORA =</span> data_reflora, <span class="at">JABOT =</span> data_jabot),</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="st">&quot;JABOT&quot;</span>)</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_fix_names</span>(data_all, <span class="at">vascular_only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_all<span class="sc">$</span>taxonStatus)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(data_all)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

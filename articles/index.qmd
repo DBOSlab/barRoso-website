@@ -29,6 +29,8 @@ These "how-to" articles walk through `barRoso`'s functions in the order you woul
 ::: {style="display: block;"}
 ### Data Standardization
 - [Format Datasets into Darwin Core](/articles/format_darwin_core.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
+- [Fix Species Names](/articles/fix_names.qmd)
 - [Standardize Specimen Records](/articles/standardize_specimens.qmd)
 - [Flexible Column Names](/articles/custom_column_names.qmd)
 :::
@@ -36,7 +38,6 @@ These "how-to" articles walk through `barRoso`'s functions in the order you woul
 ::: {style="display: block;"}
 ### Duplicate Detection
 - [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
-- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
 :::
 
 ::: {style="display: block;"}

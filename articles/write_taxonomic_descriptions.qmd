@@ -5,7 +5,7 @@ format: html
   
 ## Overview
   
-The `barroso_write_taxon_descr()` function is a powerful tool in the `barRoso` package for generating automated morphological descriptions from structured Excel data. It transforms taxonomic and morphological character data into standardized, publication-ready species descriptions in Word document format.
+The `barroso_write_descriptions()` function is a powerful tool in the `barRoso` package for generating automated morphological descriptions from structured Excel data. It transforms taxonomic and morphological character data into standardized, publication-ready species descriptions in Word document format.
 
 ## Key Features
 
@@ -13,6 +13,7 @@ The `barroso_write_taxon_descr()` function is a powerful tool in the `barRoso` p
 - Groups related characters and avoids term repetition
 - Combines measurements (length × width) with proper units and symbols
 - Formats measurement ranges with en dashes (e.g., "4.3–14.5 cm")
+- Writes rare small and large values between parentheses, as usual in taxonomic descriptions (e.g., "(2–)6–40(–55) m")
 - Handles complex hierarchical character structures
 - Merges duplicate species entries intelligently
 - Customizable text formatting (bold, italic) for different description elements
@@ -24,14 +25,14 @@ The `barroso_write_taxon_descr()` function is a powerful tool in the `barRoso` p
 library(barRoso)
 
 # Generate descriptions for all species
-descriptions <- barroso_write_taxon_descr(
+descriptions <- barroso_write_descriptions(
   xlsx_path = "morphological_data.xlsx",
   species_cols = c("Genus", "Species", "Author"),
   character_cols = 4:20
 )
 
 # Generate descriptions only for specific species
-descriptions <- barroso_write_taxon_descr(
+descriptions <- barroso_write_descriptions(
   xlsx_path = "morphological_data.xlsx",
   species_cols = c("Genus", "Species"),
   character_cols = 3:15,
@@ -39,7 +40,7 @@ descriptions <- barroso_write_taxon_descr(
 )
 
 # Customize formatting and output
-descriptions <- barroso_write_taxon_descr(
+descriptions <- barroso_write_descriptions(
   xlsx_path = "morphological_data.xlsx",
   species_cols = 1:3,
   character_cols = 4:25,
@@ -83,8 +84,48 @@ Hierarchical characters grouped logically
 # Example data structure:
 # | Genus | Species | Author | HABIT | LEAF shape | LEAF length (cm) | LEAF width (cm) |
 # |-------|---------|--------|-------|------------|------------------|-----------------|
-# | Ouratea | concinna | (Mart.) Engl. | tree | elliptic | 4.3-14.5 | 2.1-3.8 |
+# | Ouratea | concinna | (Mart.) Engl. | tree | elliptic | 14.5             | 3.8             |
 ```
+
+## Measurements
+
+Each row of the spreadsheet is one specimen, and each cell of a measurement column has the measurements of that specimen.
+
+### Several measurements of the same specimen
+
+When a specimen was measured more than once for the same character (e.g. several leaves of the same specimen), write the values in the same cell, separated by a vertical bar `|`:
+
+| Genus | Species | Collector | LEAF BLADE length (cm) | LEAF BLADE width (cm) |
+|---|---|---|---|---|
+| Ouratea | hostilis | D. Cardoso 1234 | 4.3 \| 7 \| 11 \| 14.5 | 1.2 \| 2.1 |
+| Ouratea | hostilis | A. Queiroz-Lima 56 | 6.5 \| 8 \| 9.5 | 2 \| 3.5 |
+| Ouratea | hostilis | L. P. Queiroz 789 | `13` | `4.1` |
+
+The values of all specimens of a species are pooled to build its range. Spaces around the `|` are optional, and a decimal point must be used (`4.5`, not `4,5`).
+
+### Rare values between parentheses
+
+Taxonomic descriptions usually give the common range of a measurement, with rare small and large values between parentheses, e.g. *Tree (2–)6–40 m tall*, *leaflets (7.8–)12–39.5 × (3.7–)5–13(–15.5) cm*. `barroso_write_descriptions()` writes them in two ways:
+
+- **Marked in the spreadsheet**: values written as in a description, e.g. `(5–)7–38(–45)` or `(2–)6 | 9 | 12`, are always written as rare values when they are beyond the range of the other values of the species. Use this when you know a measurement is unusual, even with few specimens.
+- **Automatic**: when a species has at least `extremes_min_n` values (default `10`), the range covers the values from the 10th to the 90th percentile (`extremes = c(0.1, 0.9)`), and the smallest and largest values outside it are written between parentheses. The limits of the range are always measured values. For example, the 11 values 2, 6, 7, 8, 9, 10, 12, 15, 20, 40 and 55 m become `(2–)6–40(–55) m`. With fewer values, the range goes from the smallest to the largest value (`2–55 m`).
+
+```r
+# Percentiles 5 and 95, from 20 values per species
+barroso_write_descriptions(xlsx_path = "morphological_data.xlsx",
+                           species_cols = c("Genus", "Species", "Author"),
+                           character_cols = 4:30,
+                           extremes = c(0.05, 0.95),
+                           extremes_min_n = 20)
+
+# Just the rare values marked in the spreadsheet
+barroso_write_descriptions(xlsx_path = "morphological_data.xlsx",
+                           species_cols = c("Genus", "Species", "Author"),
+                           character_cols = 4:30,
+                           extremes = NULL)
+```
+
+In the *Ouratea* dataset of the dry diagonal of Brazil, most species have 1 to 4 specimens, so automatic rare values appear only where at least 10 measurements were taken, e.g. the leaf blades of *Ouratea hostilis*, with 12 values: `(4.3–)4.7–13(–14.5) × 1–4.1 cm`.
 
 ## Examples
 
@@ -92,12 +133,12 @@ Hierarchical characters grouped logically
 
 ```r
 # Using included dataset
-data(morphological_dataset)
+data(chars_dataset)
 library(openxlsx)
-openxlsx::write.xlsx(morphological_dataset, "morphological_dataset.xlsx")
+openxlsx::write.xlsx(chars_dataset, "chars_dataset.xlsx")
 
-barroso_write_taxon_descr(
-  xlsx_path = "morphological_dataset.xlsx",
+barroso_write_descriptions(
+  xlsx_path = "chars_dataset.xlsx",
   species_cols = c("Genus", "Species", "Author"),
   character_cols = 19:131
 )
@@ -113,7 +154,7 @@ selected_cols <- c(
   "FLOWER SEPALS shape", "FLOWER SEPALS length (mm)", "FLOWER SEPALS width (mm)"
 )
 
-barroso_write_taxon_descr(
+barroso_write_descriptions(
   xlsx_path = "data.xlsx",
   species_cols = c("Genus", "Species"),
   character_cols = selected_cols,
@@ -125,7 +166,7 @@ barroso_write_taxon_descr(
 
 ```r
 # Use column indices instead of names
-barroso_write_taxon_descr(
+barroso_write_descriptions(
   xlsx_path = "data.xlsx",
   species_cols = 1:2,      # First two columns: Genus and Species
   character_cols = 3:18,   # Columns 3-18: morphological characters

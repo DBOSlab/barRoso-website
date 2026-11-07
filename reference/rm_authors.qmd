@@ -1,5 +1,5 @@
 ---
-title: 'remove_authorship'
+title: 'rm_authors'
 description: 'Remove author names from scientific names'
 toc: true
 toc-depth: 3
@@ -8,7 +8,7 @@ toc-depth: 3
 
 ```{r}
 #| eval: false
-barRoso::remove_authorship()
+barRoso::rm_authors()
 ```
 
 ### Description
@@ -30,13 +30,13 @@ Character vector of scientific names without authors.
 ### Examples
 
 ```r
-remove_authorship("Quercus alba L.")
+rm_authors("Quercus alba L.")
 # Returns: "Quercus alba"
 
-remove_authorship("Quercus rubra var. borealis (F.Michx.) Farw.")
+rm_authors("Quercus rubra var. borealis (F.Michx.) Farw.")
 # Returns: "Quercus rubra var. borealis" (if keep_infraspecific = TRUE)
 
-remove_authorship(c("Acer saccharum Marshall", "Pinus strobus L."))
+rm_authors(c("Acer saccharum Marshall", "Pinus strobus L."))
 # Returns: c("Acer saccharum", "Pinus strobus")
 ```
 

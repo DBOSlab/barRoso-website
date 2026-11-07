@@ -1,0 +1,154 @@
+---
+title: "Fix Species Names"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+Herbarium records of the same species often come with different names: misspellings (`Ormosia excelsea`), old spellings (`Ormosia timböensis`) and synonyms (`Ormosia glazioviana`). Before standardizing large datasets and flagging duplicates, these names should be harmonized, so that duplicates identified with different names of the same species are recognized, and the records of each species are kept together.
+
+`barroso_fix_names()` updates misspelled names and synonyms into accepted names, using:
+
+- the World Checklist of Vascular Plants (WCVP) of [Plants of the World Online](https://powo.science.kew.org/) as a global backbone, through the package [expowo](https://dboslab.github.io/expowo/);
+- by default, the [Flora e Funga do Brasil](https://floradobrasil.jbrj.gov.br/) (FFB), through the package [floraR](https://dboslab.github.io/floraR-website/), which is preferred for the names it has.
+
+It is run after [`barroso_cat()`](/articles/compare_herbarium_sources.qmd) and before [`barroso_std()`](/articles/standardize_specimens.qmd).
+
+## Installation
+
+expowo and floraR are needed only for this function:
+
+```r
+# install.packages("remotes")
+remotes::install_github("DBOSlab/expowo")
+remotes::install_github("DBOSlab/floraR")
+```
+
+The first use downloads the WCVP (by expowo) and the FFB dataset (by floraR), which are then kept in cache folders for the next uses.
+
+## Function: `barroso_fix_names()`
+
+```r
+fixed_df <- barroso_fix_names(df,
+                              flora_brasil = TRUE,
+                              max_distance = 0.2,
+                              vascular_only = FALSE)
+```
+
+## Arguments
+
+- `df`: A data frame with herbarium records, e.g. from `barroso_cat()`, with the columns `family`, `genus` and `specificEpithet` (or a binomial in `species`, as in GBIF downloads).
+- `flora_brasil`: If `TRUE` (the default), names found in the Flora e Funga do Brasil follow FFB, and the other names follow WCVP. If `FALSE`, all names follow WCVP.
+- `max_distance`: Maximum relative distance between a misspelled name and a name of the backbone (default `0.2`).
+- `vascular_only`: If `TRUE`, records of families that are not in WCVP, which has only vascular plants (e.g. mosses, fungi and algae), and records without family are removed (default `FALSE`).
+- `colname_family`, `colname_genus`, `colname_specificEpithet`: Names of the columns, when different from Darwin Core.
+
+## Example: all REFLORA and JABOT records
+
+Records of all herbaria of [REFLORA](https://dboslab.github.io/refloraR-website/) and [JABOT](https://dboslab.github.io/jabotR-website/) can be combined, harmonized and then standardized:
+
+```r
+library(refloraR)
+library(jabotR)
+library(barRoso)
+
+# Get REFLORA data ####
+data_reflora <- reflora_records(herbarium = NULL,
+                                repatriated = TRUE,
+                                taxon = NULL,
+                                state = NULL,
+                                recordYear = NULL,
+                                indets = TRUE,
+                                reorder = c("herbarium", "taxa", "collector", "area", "year"),
+                                path = NULL,
+                                updates = TRUE,
+                                verbose = TRUE,
+                                save = FALSE)
+
+# Get JABOT data ####
+data_jabot <- jabot_records(herbarium = NULL,
+                            taxon = NULL,
+                            state = NULL,
+                            recordYear = NULL,
+                            indets = TRUE,
+                            reorder = c("herbarium", "taxa", "collector", "area", "year"),
+                            path = NULL,
+                            updates = TRUE,
+                            verbose = TRUE,
+                            save = FALSE)
+
+# Merge all sources ####
+data_all <- barroso_cat(list_sources = list(REFLORA = data_reflora,
+                                            JABOT = data_jabot),
+                        keep_source = "JABOT")
+
+# Fix species names, keeping just vascular plants ####
+data_all <- barroso_fix_names(data_all,
+                              flora_brasil = TRUE,
+                              vascular_only = TRUE)
+
+table(data_all$taxonStatus)
+
+# Standardize the records and flag duplicates ####
+data_all <- barroso_std(data_all,
+                        unvouchered = TRUE,
+                        delunkcoll = TRUE,
+                        flag_duplicates = TRUE,
+                        rm_duplicates = TRUE)
+```
+
+For example, the 4,037 REFLORA and JABOT records of *Ormosia* have 90 names. In 14 seconds, 10 misspelled names, 10 synonyms and 1 misspelled synonym are updated:
+
+| Original | Status | Source | Fixed |
+|---|---|---|---|
+| `Ormosia excelsea` | misspelled | FFB | `Ormosia excelsa` |
+| `Ormosia timböensis` | misspelled | FFB | `Ormosia timboensis` |
+| `Ormosia cuatrecasii` | misspelled | WCVP | `Ormosia cuatrecasasii` |
+| `Ormosia glazioviana` | synonym | FFB | `Ormosia fastigiata` |
+| `Ormosia heterophylla` | synonym | WCVP | `Ormosia paraensis` |
+| `Ormosia favoensis` | misspelled synonym | FFB | `Ormosia santaremnensis` |
+
+## How It Works
+
+### 1. Each name is searched once
+
+Binomials are built from `genus` and `specificEpithet`, and each unique binomial is searched just once, so large datasets are fixed quickly. Names without a specific epithet (e.g. `Ormosia`, `Ormosia sp.`) are not searched.
+
+### 2. Flora e Funga do Brasil
+
+With `flora_brasil = TRUE`, all names are searched at once with `floraR::flora_search()`, which also corrects misspellings of the specific epithet. The FFB dataset is downloaded once into the barRoso cache folder, so nothing is written to your working folder.
+
+### 3. World Checklist of Vascular Plants
+
+All names of the families in the data (and of the families of their genera in FFB) are read at once with `expowo::powoSpecies(family, synonyms = TRUE)`. Names are first matched exactly, and misspelled names are matched to the closest name of the same genus, with a relative distance of the specific epithet up to `max_distance`. Misspelled genera are matched in the same way. Homonyms with different accepted names, and ties between misspelled names, are left as they are (`ambiguous`).
+
+### 4. FFB first, then WCVP
+
+Names found in FFB follow FFB, and the other names follow WCVP. A misspelling found in FFB is not taken for a name found as it is in WCVP, as names of other countries are often close to Brazilian names (e.g. `Ormosia panamensis` and `Ormosia paraensis`).
+
+### 5. The records are updated
+
+When a name is updated, `family`, `genus`, `specificEpithet`, and when present `species`, `scientificName`, `scientificNameAuthorship` and `taxonName`, get the accepted name, and `infraspecificEpithet` becomes `NA`. Accepted infraspecific names are reduced to the binomial. The family is also updated for accepted names in another family (e.g. `Leguminosae` into `Fabaceae`).
+
+Three columns are added after `specificEpithet`:
+
+| Column | Content |
+|---|---|
+| `taxonOriginal` | The binomial (or genus) before the fix |
+| `taxonStatus` | `accepted`, `synonym`, `misspelled`, `misspelled synonym`, `ambiguous`, `not found`, or `NA` for names without specific epithet |
+| `taxonSource` | `FFB` or `WCVP` |
+
+## Tips
+
+- Check the names with `taxonStatus` equal to `not found` or `ambiguous`, which are left as they are.
+- Use `flora_brasil = FALSE` for datasets of other regions, so that all names follow WCVP.
+- Use `vascular_only = TRUE` to keep just vascular plants when working with all records of a herbarium.
+
+## See Also
+
+- [`barroso_fix_names()` reference](/reference/barroso_fix_names.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)

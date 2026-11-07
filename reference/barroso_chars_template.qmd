@@ -1,5 +1,5 @@
 ---
-title: 'barroso_add_char_template'
+title: 'barroso_chars_template'
 description: 'Append a blank morphological-character template to a species table.'
 toc: true
 toc-depth: 3
@@ -8,7 +8,7 @@ toc-depth: 3
 
 ```{r}
 #| eval: false
-barRoso::barroso_add_char_template()
+barRoso::barroso_chars_template()
 ```
 
 ### Description
@@ -38,7 +38,7 @@ dorsal/lateral sepals, labellum and column. Supported groups:
 - "Orchidaceae"
 
 The resulting file is the input format expected by
-`barroso_write_taxon_descr()`: column-name conventions match
+`barroso_write_descriptions()`: column-name conventions match
 (capitalised group prefixes, lowercase subterms, "(cm)" / "(mm)" /
 "(m)" units, "length" / "width" / "height" keywords).
 
@@ -73,13 +73,13 @@ species_df <- data.frame(
   Author  = c("R.G.Chacon & K.Yamam.", "(DC.) Engl.", "(DC.) Engl.")
 )
 
-barroso_add_char_template(
+barroso_chars_template(
   species_df = species_df,
   filename   = "Ouratea_template"
 )
 
 # Using an Excel file path
-barroso_add_char_template(
+barroso_chars_template(
   species_df = "my_species_list.xlsx",
   sheet = 1,
   plant_group = "Ochnaceae",

@@ -74,6 +74,10 @@ website:
           contents:
           - text: Format Datasets into Darwin Core 
             href: articles/format_darwin_core.qmd
+          - text: Compare Herbarium Sources 
+            href: articles/compare_herbarium_sources.qmd
+          - text: Fix Species Names 
+            href: articles/fix_names.qmd
           - text: Standardize Specimen Records 
             href: articles/standardize_specimens.qmd
           - text: Flexible Column Names 
@@ -82,8 +86,6 @@ website:
           contents:
           - text: Detect and Flag Duplicates 
             href: articles/detect_duplicates.qmd
-          - text: Compare Herbarium Sources 
-            href: articles/compare_herbarium_sources.qmd
         - section: Geographic Coordinates
           contents:
           - text: Fix and Flag Coordinates 

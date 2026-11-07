@@ -1,0 +1,78 @@
+---
+title: 'barroso_fix_names'
+description: 'Fix Species Names with Global and Brazilian Taxonomic Backbones'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::barroso_fix_names()
+```
+
+### Description
+
+Updates misspelled names and synonyms of herbarium records into accepted names,
+using the World Checklist of Vascular Plants (WCVP) of
+[Plants of the World Online](https://powo.science.kew.org/) as a global
+backbone, through the package [expowo](https://dboslab.github.io/expowo/), and
+by default the [Flora e Funga do Brasil](https://floradobrasil.jbrj.gov.br/) (FFB),
+through the package [floraR](https://dboslab.github.io/floraR-website/). It is
+meant to be run after `barroso_cat()` and before `barroso_std()`, so that
+duplicates identified with synonyms or misspelled names are recognized.
+
+### Details
+
+Each unique binomial built from `genus` and `specificEpithet` is searched just
+once, so large datasets (e.g. all records of REFLORA and JABOT) are harmonized
+quickly. Names without a specific epithet (e.g. `"Ormosia"`, `"Ormosia sp."`) are
+not searched.
+
+- **WCVP**: all names of the families in the data (and, with `flora_brasil = TRUE`, the families of their genera in FFB) are read at once with `expowo::powoSpecies(family, synonyms = TRUE)`, from the WCVP kept in the cache of expowo. Names are first matched exactly; misspelled names are matched to the closest name of the same genus, with a relative distance of the specific epithet up to `max_distance` (e.g. `"Ormosia fastigiatta"` to `"Ormosia fastigiata"`). Misspelled genera are matched in the same way. Homonyms with different accepted names (and ties between misspelled names) are left as they are, as `"ambiguous"`.
+- **FFB** (`flora_brasil = TRUE`): the names are searched at once with `floraR::flora_search()`, which also corrects misspellings of the specific epithet. Names found in FFB follow FFB, which is preferred for the Brazilian flora, while the other names follow WCVP. A misspelling found in FFB is not taken for a name found as it is in WCVP, as names of other countries are often close to Brazilian names (e.g. `"Ormosia panamensis"` and `"Ormosia paraensis"`). The FFB dataset is downloaded once into the barRoso cache folder.
+
+Accepted infraspecific names are reduced to the binomial (e.g. `"Ormosia nobilis var. bolivarensis"` as a synonym of `"Ormosia bolivarensis"`). When a name is
+updated, `family`, `genus`, `specificEpithet`, and when present `species`,
+`scientificName`, `scientificNameAuthorship` and `taxonName`, get the accepted
+name, and `infraspecificEpithet` becomes `NA`. The family is also updated for
+accepted names in another family (e.g. `"Leguminosae"` into `"Fabaceae"`).
+
+Three columns are added after `specificEpithet`:
+
+- `taxonOriginal`: the binomial (or genus) before the harmonization.
+- `taxonStatus`: `"accepted"`, `"synonym"`, `"misspelled"` (the misspelled name of an accepted name), `"misspelled synonym"`, `"ambiguous"`, `"not found"`, or `NA` for names without specific epithet.
+- `taxonSource`: `"FFB"` or `"WCVP"`.
+
+The first use downloads the WCVP (by expowo) and the FFB dataset (by floraR),
+which are then kept in cache folders for the next uses.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame with herbarium records, e.g. from `barroso_cat()`. |
+| flora_brasil | Logical; if `TRUE`, names found in the Flora e Funga do Brasil follow FFB, and the other names follow WCVP. If `FALSE`, all names follow WCVP (default: `TRUE`). |
+| max_distance | Maximum relative distance (0 to 1) between a misspelled name and an accepted or synonym name (default: `0.2`). |
+| vascular_only | Logical; if `TRUE`, records of families that are not in WCVP, which has only vascular plants (e.g. mosses, fungi and algae), and records without family are removed (default: `FALSE`). |
+| colname_family | Column name for the family (default: `"family"`). |
+| colname_genus | Column name for the genus (default: `"genus"`). |
+| colname_specificEpithet | Column name for the specific epithet (default: `"specificEpithet"`). When missing, the epithet is taken from a binomial in the column `species`, as in GBIF downloads. |
+| verbose | Logical; if `TRUE`, prints messages about the progress and a summary (default: `TRUE`). |
+
+### Value
+
+The data frame with accepted names and the columns `taxonOriginal`,
+`taxonStatus` and `taxonSource`.
+
+### Examples
+
+```r
+data_all <- barroso_cat(list(REFLORA = data_reflora, JABOT = data_jabot),
+                        keep_source = "JABOT")
+data_all <- barroso_fix_names(data_all, vascular_only = TRUE)
+table(data_all$taxonStatus)
+data_all <- barroso_std(data_all)
+```
+
+

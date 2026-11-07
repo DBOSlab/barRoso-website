@@ -4422,16 +4422,17 @@ width: 400px;
 <section id="barroso" class="level2">
 <h2 class="anchored" data-anchor-id="barroso">barRoso</h2>
 <ul>
-<li><p><a href="../reference/barroso_add_char_template.html"><code>barroso_add_char_template()</code></a></p></li>
 <li><p><a href="../reference/barroso_cat.html"><code>barroso_cat()</code></a></p></li>
+<li><p><a href="../reference/barroso_chars_template.html"><code>barroso_chars_template()</code></a></p></li>
 <li><p><a href="../reference/barroso_dwc.html"><code>barroso_dwc()</code></a></p></li>
+<li><p><a href="../reference/barroso_fix_names.html"><code>barroso_fix_names()</code></a></p></li>
 <li><p><a href="../reference/barroso_flag_duplicates.html"><code>barroso_flag_duplicates()</code></a></p></li>
 <li><p><a href="../reference/barroso_labels.html"><code>barroso_labels()</code></a></p></li>
 <li><p><a href="../reference/barroso_std.html"><code>barroso_std()</code></a></p></li>
+<li><p><a href="../reference/barroso_write_descriptions.html"><code>barroso_write_descriptions()</code></a></p></li>
 <li><p><a href="../reference/barroso_write_specimens.html"><code>barroso_write_specimens()</code></a></p></li>
-<li><p><a href="../reference/barroso_write_taxon_descr.html"><code>barroso_write_taxon_descr()</code></a></p></li>
 <li><p><a href="../reference/dms_to_decimal.html"><code>dms_to_decimal()</code></a></p></li>
-<li><p><a href="../reference/remove_authorship.html"><code>remove_authorship()</code></a></p></li>
+<li><p><a href="../reference/rm_authors.html"><code>rm_authors()</code></a></p></li>
 <li><p><a href="../reference/std_collection.html"><code>std_collection()</code></a></p></li>
 <li><p><a href="../reference/std_coordinates.html"><code>std_coordinates()</code></a></p></li>
 <li><p><a href="../reference/std_identifiedBy.html"><code>std_identifiedBy()</code></a></p></li>
@@ -4937,40 +4938,42 @@ width: 400px;
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## barRoso</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_add_char_template()`</span><span class="co">](/reference/barroso_add_char_template.qmd)</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_cat()`</span><span class="co">](/reference/barroso_cat.qmd)</span></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_cat()`</span><span class="co">](/reference/barroso_cat.qmd)</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_chars_template()`</span><span class="co">](/reference/barroso_chars_template.qmd)</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_dwc()`</span><span class="co">](/reference/barroso_dwc.qmd)</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_flag_duplicates()`</span><span class="co">](/reference/barroso_flag_duplicates.qmd)</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_fix_names()`</span><span class="co">](/reference/barroso_fix_names.qmd)</span></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_labels()`</span><span class="co">](/reference/barroso_labels.qmd)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_flag_duplicates()`</span><span class="co">](/reference/barroso_flag_duplicates.qmd)</span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_std()`</span><span class="co">](/reference/barroso_std.qmd)</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_labels()`</span><span class="co">](/reference/barroso_labels.qmd)</span></span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_write_specimens()`</span><span class="co">](/reference/barroso_write_specimens.qmd)</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_std()`</span><span class="co">](/reference/barroso_std.qmd)</span></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_write_taxon_descr()`</span><span class="co">](/reference/barroso_write_taxon_descr.qmd)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_write_descriptions()`</span><span class="co">](/reference/barroso_write_descriptions.qmd)</span></span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`dms_to_decimal()`</span><span class="co">](/reference/dms_to_decimal.qmd)</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`barroso_write_specimens()`</span><span class="co">](/reference/barroso_write_specimens.qmd)</span></span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`remove_authorship()`</span><span class="co">](/reference/remove_authorship.qmd)</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`dms_to_decimal()`</span><span class="co">](/reference/dms_to_decimal.qmd)</span></span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_collection()`</span><span class="co">](/reference/std_collection.qmd)</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`rm_authors()`</span><span class="co">](/reference/rm_authors.qmd)</span></span>
 <span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_coordinates()`</span><span class="co">](/reference/std_coordinates.qmd)</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_collection()`</span><span class="co">](/reference/std_collection.qmd)</span></span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_identifiedBy()`</span><span class="co">](/reference/std_identifiedBy.qmd)</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_coordinates()`</span><span class="co">](/reference/std_coordinates.qmd)</span></span>
 <span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_place()`</span><span class="co">](/reference/std_place.qmd)</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_identifiedBy()`</span><span class="co">](/reference/std_identifiedBy.qmd)</span></span>
 <span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_recordedBy()`</span><span class="co">](/reference/std_recordedBy.qmd)</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_place()`</span><span class="co">](/reference/std_place.qmd)</span></span>
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_taxa()`</span><span class="co">](/reference/std_taxa.qmd)</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_recordedBy()`</span><span class="co">](/reference/std_recordedBy.qmd)</span></span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_types()`</span><span class="co">](/reference/std_types.qmd)</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_taxa()`</span><span class="co">](/reference/std_taxa.qmd)</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">`std_types()`</span><span class="co">](/reference/std_types.qmd)</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">

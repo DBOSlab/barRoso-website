@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Build species morphological descriptions from an Excel spreadsheet and export to Word (.docx).">
+<meta name="description" content="Remove author names from scientific names">
 
-<title>barroso_write_taxon_descr – barRoso</title>
+<title>rm_authors – barRoso</title>
 <style>
 
 code{white-space: pre-wrap;}
@@ -4377,13 +4377,9 @@ height: 400px;
    
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description">Description</a></li>
-  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
-  <li><a href="#create-a-template-for-ochnaceae" id="toc-create-a-template-for-ochnaceae" class="nav-link" data-scroll-target="#create-a-template-for-ochnaceae">Create a template for Ochnaceae</a>
-  <ul class="collapse">
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -4396,12 +4392,12 @@ height: 400px;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">barroso_write_taxon_descr</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">rm_authors</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 <div>
   <div class="description">
-    Build species morphological descriptions from an Excel spreadsheet and export to Word (.docx).
+    Remove author names from scientific names
   </div>
 </div>
 
@@ -4419,37 +4415,12 @@ height: 400px;
 
 
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">barroso_write_taxon_descr</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">rm_authors</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function reads morphological data from an Excel spreadsheet, generates standardized species descriptions in plain text and Word document formats, and exports them to a Word (.docx) file. It handles complex morphological data structures including measurements, subterms and grouping of related characters. The function automatically detects measurement ranges and formats them with en dashes (e.g., “4.3–14.5 cm”). Optionally, it can compute and print averages for user-selected measurement columns when a species has more than a threshold number of values (see <code>avg_cols</code> and <code>avg_min_n</code>).</p>
+<p>This function removes author citations from scientific names, leaving only the genus and species epithet (and optionally infraspecific ranks).</p>
 </section>
-<section id="details" class="level3">
-<h3 class="anchored" data-anchor-id="details">Details</h3>
-<p><strong>Column naming conventions</strong></p>
-<p>The function relies on a structured column naming system to parse and organize morphological traits. Columns must follow these conventions:</p>
-<p><strong>Main character groups</strong>Use ALL CAPS for the primary category: <code>HABIT</code>, <code>STIPULE</code>, <code>LEAF</code>, <code>INFLORESCENCE</code>, <code>FLOWER</code>, <code>FRUIT</code>, <code>SEED</code>. These will become section headers.</p>
-<p><strong>Simple characters</strong>Lowercase descriptive terms after the main group. Examples: <code>LEAF shape</code>, <code>LEAF margin</code>, <code>FLOWER symmetry</code>. These will be appended directly after the lowercase group name.</p>
-<p><strong>Hierarchical characters</strong>Use ALL CAPS for subgroup terms. Examples: <code>LEAF PETIOLE length (cm)</code>, <code>FLOWER SEPALS shape</code>. The capitalized term (<code>PETIOLE</code>, <code>SEPALS</code>) is extracted once and used as a subheading.</p>
-<p><strong>Measurements</strong>Include units in parentheses for automatic detection: <code>LEAF length (cm)</code>, <code>STIPULE width (mm)</code>, <code>HABIT height (m)</code>. Multiple measurements (e.g., length + width) are automatically combined with “×” and the unit is placed at the end.</p>
-<p><strong>Column name flexibility</strong>Spaces, dots, or underscores can be used as separators. All of the following are valid:</p>
-<ul>
-<li><code>STIPULE length (mm)</code></li>
-<li><code>STIPULE.length.(mm)</code></li>
-<li><code>STIPULE_length_mm</code></li>
-<li><code>LEAF PETIOLE shape</code></li>
-<li><code>LEAF.PETIOLE.shape</code></li>
-</ul>
-<p><strong>Example dataset</strong></p>
-<p>The package includes an example dataset <code>morphological_dataset</code> containing morphological data for 15 species of <em>Ouratea</em> (Ochnaceae) compiled from herbarium specimens and field observations for a taxonomic revision. This dataset demonstrates proper column naming conventions and can be used to test the function:</p>
-<p>data(morphological_dataset) head(names(morphological_dataset))</p>
-<p><strong>Creating a template</strong></p>
-<p>To create a properly formatted Excel template with all required columns for your plant group, use the companion function <code>barroso_add_char_template</code>. This function generates a ready-to-use template based on your species list and selected plant group (e.g., “Ochnaceae”, “Asteraceae”, “Orchidaceae”, “Leguminosae-Papilionoideae”), saving hours of manual column creation.</p>
-</section>
-<section id="create-a-template-for-ochnaceae" class="level1">
-<h1>Create a template for Ochnaceae</h1>
-<p>barroso_add_char_template( species_df = my_species_list, plant_group = “Ochnaceae”, filename = “Ochnaceae_template” )</p>
 <section id="arguments" class="level3">
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table class="caption-top table">
@@ -4465,149 +4436,34 @@ height: 400px;
 </thead>
 <tbody>
 <tr class="odd">
-<td>xlsx_path</td>
-<td>Character. Path to the .xlsx file containing morphological data with properly structured column names (see Details for naming conventions).</td>
+<td>scientific_names</td>
+<td>Character vector of scientific names with authors.</td>
 </tr>
 <tr class="even">
-<td>species_cols</td>
-<td>Character vector or integer indices. Column names or indices used to build the species header (e.g., c(“Genus”, “Species”, “Author”) or 1:3). These can be combined flexibly (e.g., a single “Scientific_name” column or separate Genus, Species, and Author columns).</td>
-</tr>
-<tr class="odd">
-<td>character_cols</td>
-<td>Character vector or integer indices. Column names or indices of morphological character columns (e.g., c(“HABIT”, “LEAF shape”, “LEAF length (cm)”) or 4:20). These must follow the naming conventions described in Details.</td>
-</tr>
-<tr class="even">
-<td>sheet</td>
-<td>Character string or integer. Sheet name or index passed to <code>readxl::read_excel()</code>. Default is 1.</td>
-</tr>
-<tr class="odd">
-<td>species_filter</td>
-<td>Optional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the <code>species_cols</code> columns (without authorship).</td>
-</tr>
-<tr class="even">
-<td>avg_cols</td>
-<td>Optional character vector or integer indices of columns for which an average should be reported, displayed immediately after the existing range (e.g. “3–8 × 1–2 cm, average 5.5 × 1.5 cm”). Must be a subset of <code>character_cols</code>. Default <code>NULL</code> (no averages reported).</td>
-</tr>
-<tr class="odd">
-<td>avg_min_n</td>
-<td>Integer. Minimum number of non-empty observations per species required for an average to be reported. Averages are emitted only when the number of observed values is strictly greater than <code>avg_min_n</code>. Default <code>3</code> (i.e., need at least 4 values for averaging).</td>
-</tr>
-<tr class="even">
-<td>approx_char</td>
-<td>Character string to use for approximate measurements when no variation is present (e.g., “ca.” or “c.”). Default is “ca.”. Set to <code>NULL</code> to disable adding approximation. Examples: <code>&quot;ca. 0.1 × 0.1 cm&quot;</code> (no variation) vs <code>&quot;1.3–2.5 × 0.6–1.1 cm&quot;</code> (variation present, no “ca.”).</td>
-</tr>
-<tr class="odd">
-<td>font_family</td>
-<td>Character string. Font family for the Word document. Default is “Times New Roman”. Common options include “Arial”, “Calibri”, “Cambria”.</td>
-</tr>
-<tr class="even">
-<td>font_size</td>
-<td>Numeric. Font size in points. Default is 12.</td>
-</tr>
-<tr class="odd">
-<td>species_bold</td>
-<td>Logical. Whether to make species names bold. Default is TRUE.</td>
-</tr>
-<tr class="even">
-<td>species_italic</td>
-<td>Logical. Whether to make species names italic. Default is TRUE (following botanical conventions).</td>
-</tr>
-<tr class="odd">
-<td>group_bold</td>
-<td>Logical. Whether to make group names (e.g., “Habit”, “Leaf”) bold. Default is TRUE.</td>
-</tr>
-<tr class="even">
-<td>group_italic</td>
-<td>Logical. Whether to make group names italic. Default is FALSE.</td>
-</tr>
-<tr class="odd">
-<td>description_bold</td>
-<td>Logical. Whether to make description text bold. Default is FALSE.</td>
-</tr>
-<tr class="even">
-<td>description_italic</td>
-<td>Logical. Whether to make description text italic. Default is FALSE.</td>
-</tr>
-<tr class="odd">
-<td>verbose</td>
-<td>Logical. Print progress messages. Default TRUE.</td>
-</tr>
-<tr class="even">
-<td>filename</td>
-<td>Output file base name (without extension). Default NULL (uses Excel filename with “_descriptions” suffix).</td>
-</tr>
-<tr class="odd">
-<td>dir</td>
-<td>Output directory. Default NULL (uses Excel filename as directory name).</td>
+<td>keep_infraspecific</td>
+<td>Logical, if TRUE, keeps infraspecific epithets (subspecies, varieties, forms). Default is TRUE.</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Invisibly returns a data.frame with two columns:</p>
-<ul>
-<li><code>species_name</code>: Full species name with authorship</li>
-<li><code>description_plain</code>: Plain text description</li>
-</ul>
-<p>The main output is a Word document (.docx) saved to the specified directory.</p>
+<p>Character vector of scientific names without authors.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic usage with example dataset</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(morphological_dataset)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="st">&quot;Quercus alba L.&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus alba&quot;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># First, save the example dataset to Excel</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(openxlsx)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write.xlsx</span>(morphological_dataset, <span class="st">&quot;morphological_dataset.xlsx&quot;</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate descriptions using proper column selection</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_dataset.xlsx&quot;</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="st">&quot;Author&quot;</span>),  <span class="co"># Taxonomic identification</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">19</span><span class="sc">:</span><span class="dv">131</span>,  <span class="co"># Morphological character columns</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">approx_char =</span> <span class="st">&quot;ca.&quot;</span>  <span class="co"># Add &quot;ca.&quot; to measurements without variation</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate descriptions with average calculation</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="st">&quot;Author&quot;</span>),</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">20</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_cols =</span> <span class="fu">c</span>(<span class="st">&quot;LEAF length (cm)&quot;</span>, <span class="st">&quot;FRUIT length (cm)&quot;</span>),</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_min_n =</span> <span class="dv">3</span>,  <span class="co"># Calculate averages when n &gt; 3 observations</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">approx_char =</span> <span class="st">&quot;ca.&quot;</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to specific species only</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>),</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">15</span>,</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_filter =</span> <span class="fu">c</span>(<span class="st">&quot;Ouratea concinna&quot;</span>, <span class="st">&quot;Ouratea coarctata&quot;</span>)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Customize text formatting in Word output</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">25</span>,</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">font_family =</span> <span class="st">&quot;Arial&quot;</span>,</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">font_size =</span> <span class="dv">11</span>,</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_bold =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_italic =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_bold =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_italic =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">description_bold =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">description_italic =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename =</span> <span class="st">&quot;MySpeciesDescriptions&quot;</span>,</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">dir =</span> <span class="st">&quot;Output&quot;</span></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="st">&quot;Quercus rubra var. borealis (F.Michx.) Farw.&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus rubra var. borealis&quot; (if keep_infraspecific = TRUE)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="fu">c</span>(<span class="st">&quot;Acer saccharum Marshall&quot;</span>, <span class="st">&quot;Pinus strobus L.&quot;</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: c(&quot;Acer saccharum&quot;, &quot;Pinus strobus&quot;)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -5076,8 +4932,8 @@ height: 400px;
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &#39;barroso_write_taxon_descr&#39;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> &#39;Build species morphological descriptions from an Excel spreadsheet and export to Word (.docx).&#39;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &#39;rm_authors&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> &#39;Remove author names from scientific names&#39;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
@@ -5085,166 +4941,38 @@ height: 400px;
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">barroso_write_taxon_descr</span>()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>barRoso<span class="sc">::</span><span class="fu">rm_authors</span>()</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">### Description</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>This function reads morphological data from an Excel spreadsheet,</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>generates standardized species descriptions in plain text and Word document formats,</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>and exports them to a Word (.docx) file. It handles complex morphological data</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>structures including measurements, subterms and grouping of related characters.</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>The function automatically detects measurement ranges and formats them with</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>en dashes (e.g., &quot;4.3–14.5 cm&quot;). Optionally, it can compute and print averages</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>for user-selected measurement columns when a species has more than a threshold</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>number of values (see <span class="in">`avg_cols`</span> and <span class="in">`avg_min_n`</span>).</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="fu">### Details</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>**Column naming conventions**</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>The function relies on a structured column naming system to parse and organize</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>morphological traits. Columns must follow these conventions:</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>This function removes author citations from scientific names, leaving only</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>the genus and species epithet (and optionally infraspecific ranks).</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> scientific_names <span class="pp">|</span> Character vector of scientific names with authors. <span class="pp">|</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> keep_infraspecific <span class="pp">|</span> Logical, if TRUE, keeps infraspecific epithets (subspecies, varieties, forms). Default is TRUE. <span class="pp">|</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>Character vector of scientific names without authors.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>**Main character groups**Use ALL CAPS for the primary category:</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="in">`HABIT`</span>, <span class="in">`STIPULE`</span>, <span class="in">`LEAF`</span>, <span class="in">`INFLORESCENCE`</span>,</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="in">`FLOWER`</span>, <span class="in">`FRUIT`</span>, <span class="in">`SEED`</span>. These will become section headers.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="st">&quot;Quercus alba L.&quot;</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus alba&quot;</span></span>
 <span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>**Simple characters**Lowercase descriptive terms after the main group.</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>Examples: <span class="in">`LEAF shape`</span>, <span class="in">`LEAF margin`</span>, <span class="in">`FLOWER symmetry`</span>.</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>These will be appended directly after the lowercase group name.</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>**Hierarchical characters**Use ALL CAPS for subgroup terms.</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>Examples: <span class="in">`LEAF PETIOLE length (cm)`</span>, <span class="in">`FLOWER SEPALS shape`</span>.</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>The capitalized term (<span class="in">`PETIOLE`</span>, <span class="in">`SEPALS`</span>) is extracted once</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>and used as a subheading.</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>**Measurements**Include units in parentheses for automatic detection:</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="in">`LEAF length (cm)`</span>, <span class="in">`STIPULE width (mm)`</span>, <span class="in">`HABIT height (m)`</span>.</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>Multiple measurements (e.g., length + width) are automatically combined</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>with &quot;×&quot; and the unit is placed at the end.</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>**Column name flexibility**Spaces, dots, or underscores can be used</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>as separators. All of the following are valid:</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`STIPULE length (mm)`</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`STIPULE.length.(mm)`</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`STIPULE_length_mm`</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`LEAF PETIOLE shape`</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`LEAF.PETIOLE.shape`</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>**Example dataset**</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>The package includes an example dataset <span class="in">`morphological_dataset`</span> containing</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>morphological data for 15 species of *Ouratea* (Ochnaceae) compiled from</span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>herbarium specimens and field observations for a taxonomic revision. This dataset</span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>demonstrates proper column naming conventions and can be used to test the function:</span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>data(morphological_dataset)</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>head(names(morphological_dataset))</span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>**Creating a template**</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>To create a properly formatted Excel template with all required columns for your</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>plant group, use the companion function <span class="in">`barroso_add_char_template`</span>.</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>This function generates a ready-to-use template based on your species list and</span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>selected plant group (e.g., &quot;Ochnaceae&quot;, &quot;Asteraceae&quot;, &quot;Orchidaceae&quot;,</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>&quot;Leguminosae-Papilionoideae&quot;), saving hours of manual column creation.</span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="fu"># Create a template for Ochnaceae</span></span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>barroso_add_char_template(</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  species_df = my_species_list,</span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  plant_group = &quot;Ochnaceae&quot;,</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  filename = &quot;Ochnaceae_template&quot;</span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> xlsx_path <span class="pp">|</span> Character. Path to the .xlsx file containing morphological data with properly structured column names (see Details for naming conventions). <span class="pp">|</span></span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_cols <span class="pp">|</span> Character vector or integer indices. Column names or indices used to build the species header (e.g., c(&quot;Genus&quot;, &quot;Species&quot;, &quot;Author&quot;) or 1:3). These can be combined flexibly (e.g., a single &quot;Scientific_name&quot; column or separate Genus, Species, and Author columns). <span class="pp">|</span></span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> character_cols <span class="pp">|</span> Character vector or integer indices. Column names or indices of morphological character columns (e.g., c(&quot;HABIT&quot;, &quot;LEAF shape&quot;, &quot;LEAF length (cm)&quot;) or 4:20). These must follow the naming conventions described in Details. <span class="pp">|</span></span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> sheet <span class="pp">|</span> Character string or integer. Sheet name or index passed to <span class="in">`readxl::read_excel()`</span>. Default is 1. <span class="pp">|</span></span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_filter <span class="pp">|</span> Optional character vector of species names to filter. Only species matching these names will have descriptions generated. The names should match the species name as it appears when concatenating the <span class="in">`species_cols`</span> columns (without authorship). <span class="pp">|</span></span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> avg_cols <span class="pp">|</span> Optional character vector or integer indices of columns for which an average should be reported, displayed immediately after the existing range (e.g. &quot;3–8 × 1–2 cm, average 5.5 × 1.5 cm&quot;). Must be a subset of <span class="in">`character_cols`</span>. Default <span class="in">`NULL`</span> (no averages reported). <span class="pp">|</span></span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> avg_min_n <span class="pp">|</span> Integer. Minimum number of non-empty observations per species required for an average to be reported. Averages are emitted only when the number of observed values is strictly greater than <span class="in">`avg_min_n`</span>. Default <span class="in">`3`</span> (i.e., need at least 4 values for averaging). <span class="pp">|</span></span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> approx_char <span class="pp">|</span> Character string to use for approximate measurements when no variation is present (e.g., &quot;ca.&quot; or &quot;c.&quot;). Default is &quot;ca.&quot;. Set to <span class="in">`NULL`</span> to disable adding approximation. Examples: <span class="in">`&quot;ca. 0.1 × 0.1 cm&quot;`</span> (no variation) vs <span class="in">`&quot;1.3–2.5 × 0.6–1.1 cm&quot;`</span> (variation present, no &quot;ca.&quot;). <span class="pp">|</span></span>
-<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> font_family <span class="pp">|</span> Character string. Font family for the Word document. Default is &quot;Times New Roman&quot;. Common options include &quot;Arial&quot;, &quot;Calibri&quot;, &quot;Cambria&quot;. <span class="pp">|</span></span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> font_size <span class="pp">|</span> Numeric. Font size in points. Default is 12. <span class="pp">|</span></span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_bold <span class="pp">|</span> Logical. Whether to make species names bold. Default is TRUE. <span class="pp">|</span></span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_italic <span class="pp">|</span> Logical. Whether to make species names italic. Default is TRUE (following botanical conventions). <span class="pp">|</span></span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> group_bold <span class="pp">|</span> Logical. Whether to make group names (e.g., &quot;Habit&quot;, &quot;Leaf&quot;) bold. Default is TRUE. <span class="pp">|</span></span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> group_italic <span class="pp">|</span> Logical. Whether to make group names italic. Default is FALSE. <span class="pp">|</span></span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> description_bold <span class="pp">|</span> Logical. Whether to make description text bold. Default is FALSE. <span class="pp">|</span></span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> description_italic <span class="pp">|</span> Logical. Whether to make description text italic. Default is FALSE. <span class="pp">|</span></span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> verbose <span class="pp">|</span> Logical. Print progress messages. Default TRUE. <span class="pp">|</span></span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> filename <span class="pp">|</span> Output file base name (without extension). Default NULL (uses Excel filename with &quot;_descriptions&quot; suffix). <span class="pp">|</span></span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> dir <span class="pp">|</span> Output directory. Default NULL (uses Excel filename as directory name). <span class="pp">|</span></span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>Invisibly returns a data.frame with two columns:</span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`species_name`</span>: Full species name with authorship</span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`description_plain`</span>: Plain text description</span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>The main output is a Word document (.docx) saved to the specified directory.</span>
-<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic usage with example dataset</span></span>
-<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(morphological_dataset)</span>
-<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="co"># First, save the example dataset to Excel</span></span>
-<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(openxlsx)</span>
-<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="fu">write.xlsx</span>(morphological_dataset, <span class="st">&quot;morphological_dataset.xlsx&quot;</span>)</span>
-<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate descriptions using proper column selection</span></span>
-<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_dataset.xlsx&quot;</span>,</span>
-<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="st">&quot;Author&quot;</span>),  <span class="co"># Taxonomic identification</span></span>
-<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">19</span><span class="sc">:</span><span class="dv">131</span>,  <span class="co"># Morphological character columns</span></span>
-<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>  <span class="at">approx_char =</span> <span class="st">&quot;ca.&quot;</span>  <span class="co"># Add &quot;ca.&quot; to measurements without variation</span></span>
-<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate descriptions with average calculation</span></span>
-<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="st">&quot;Author&quot;</span>),</span>
-<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">20</span>,</span>
-<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_cols =</span> <span class="fu">c</span>(<span class="st">&quot;LEAF length (cm)&quot;</span>, <span class="st">&quot;FRUIT length (cm)&quot;</span>),</span>
-<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_min_n =</span> <span class="dv">3</span>,  <span class="co"># Calculate averages when n &gt; 3 observations</span></span>
-<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>  <span class="at">approx_char =</span> <span class="st">&quot;ca.&quot;</span></span>
-<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to specific species only</span></span>
-<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Genus&quot;</span>, <span class="st">&quot;Species&quot;</span>),</span>
-<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">15</span>,</span>
-<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_filter =</span> <span class="fu">c</span>(<span class="st">&quot;Ouratea concinna&quot;</span>, <span class="st">&quot;Ouratea coarctata&quot;</span>)</span>
-<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="co"># Customize text formatting in Word output</span></span>
-<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_write_taxon_descr</span>(</span>
-<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlsx_path =</span> <span class="st">&quot;morphological_data.xlsx&quot;</span>,</span>
-<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">25</span>,</span>
-<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>  <span class="at">font_family =</span> <span class="st">&quot;Arial&quot;</span>,</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>  <span class="at">font_size =</span> <span class="dv">11</span>,</span>
-<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_bold =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_italic =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_bold =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_italic =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>  <span class="at">description_bold =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>  <span class="at">description_italic =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename =</span> <span class="st">&quot;MySpeciesDescriptions&quot;</span>,</span>
-<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>  <span class="at">dir =</span> <span class="st">&quot;Output&quot;</span></span>
-<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="st">&quot;Quercus rubra var. borealis (F.Michx.) Farw.&quot;</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;Quercus rubra var. borealis&quot; (if keep_infraspecific = TRUE)</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">rm_authors</span>(<span class="fu">c</span>(<span class="st">&quot;Acer saccharum Marshall&quot;</span>, <span class="st">&quot;Pinus strobus L.&quot;</span>))</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: c(&quot;Acer saccharum&quot;, &quot;Pinus strobus&quot;)</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
