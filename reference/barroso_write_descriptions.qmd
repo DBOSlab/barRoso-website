@@ -44,6 +44,16 @@ at least `extremes_min_n` values, the range covers the values from the
 are written between parentheses. The range limits are always measured values.
 With fewer values, the range goes from the smallest to the largest value.
 
+**Counts**
+
+Columns with just numbers, e.g. `LEAF SECONDARY-VENATION pairs` with
+`"6 | 8 | 12"`, or `FLOWER STAMEN number` with `"10"`, are counts:
+their values are pooled into ranges, with rare values between parentheses, as
+the measurements. The last word of the column name is written after the range,
+e.g. "6–12 pairs", except "number" and "count", e.g. "stamen 8–10". Write counts in
+their own columns, and any text in another column, e.g. "curved distally
+towards the marginal vein" in `LEAF SECONDARY-VENATION`.
+
 **Column naming conventions**
 
 The function relies on a structured column naming system to parse and organize

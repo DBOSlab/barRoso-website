@@ -97,11 +97,12 @@ When a specimen was measured more than once for the same character (e.g. several
 
 | Genus | Species | Collector | LEAF BLADE length (cm) | LEAF BLADE width (cm) |
 |---|---|---|---|---|
-| Ouratea | hostilis | D. Cardoso 1234 | 4.3 \| 7 \| 11 \| 14.5 | 1.2 \| 2.1 |
-| Ouratea | hostilis | A. Queiroz-Lima 56 | 6.5 \| 8 \| 9.5 | 2 \| 3.5 |
-| Ouratea | hostilis | L. P. Queiroz 789 | `13` | `4.1` |
+| Ouratea | hostilis | C. Aquino & A.P. Teixeira | 4.3 \| 5 \| 6.5 \| 10.5 | 1 \| 3.5 |
+| Ouratea | hostilis | I. Cordeiro | 4.7 \| 6 \| 9.5 | 2.3 \| 3.4 |
+| Ouratea | hostilis | C.V. Vidal | 4.8 \| 8 \| 13 | 1 \| 2 |
+| Ouratea | hostilis | M.G.Carvalho & S.T.Silva | 9.7 \| 14.5 | 2.6 \| 4.1 |
 
-The values of all specimens of a species are pooled to build its range. Spaces around the `|` are optional, and a decimal point must be used (`4.5`, not `4,5`).
+These are the four specimens of *Ouratea hostilis* in the example dataset `chars_dataset`. The values of all specimens of a species are pooled to build its range. Spaces around the `|` are optional, and a decimal point must be used (`4.5`, not `4,5`).
 
 ### Rare values between parentheses
 
@@ -125,6 +126,17 @@ barroso_write_descriptions(xlsx_path = "morphological_data.xlsx",
                            extremes = NULL)
 ```
 
+### Counts
+
+Counts, like the pairs of secondary veins, the stamens or the flowers of an inflorescence, are also pooled into ranges, with rare values between parentheses, when they are in their own columns with just numbers. Any text goes in another column:
+
+| LEAF SECONDARY-VENATION pairs | LEAF SECONDARY-VENATION | FLOWER STAMEN number | INFLORESCENCE flowers |
+|---|---|---|---|
+| 6 \| 12 | curved distally towards the marginal vein | 10 | 10 \| 25 |
+| 7 \| 9 | curved distally towards the marginal vein | 10 | 15 |
+
+The last word of the column name is written after the range, e.g. *secondary-venation 6–12 pairs, curved distally towards the marginal vein* and *10–25 flowers*, except `number` and `count`, e.g. *stamen 10*. A column of text with numbers, like `6 - 12 pairs, curved distally towards the marginal vein`, is written as it is, and the phrases of the specimens are listed one after the other.
+
 In the *Ouratea* dataset of the dry diagonal of Brazil, most species have 1 to 4 specimens, so automatic rare values appear only where at least 10 measurements were taken, e.g. the leaf blades of *Ouratea hostilis*, with 12 values: `(4.3–)4.7–13(–14.5) × 1–4.1 cm`.
 
 ## Examples
@@ -140,9 +152,27 @@ openxlsx::write.xlsx(chars_dataset, "chars_dataset.xlsx")
 barroso_write_descriptions(
   xlsx_path = "chars_dataset.xlsx",
   species_cols = c("Genus", "Species", "Author"),
-  character_cols = 19:131
+  character_cols = which(names(chars_dataset) == "HABIT"):ncol(chars_dataset)
 )
 ```
+
+# Rare Measurements Between Parentheses
+
+The 12 leaf blade lengths of the four specimens of *Ouratea hostilis* in `chars_dataset` are enough for automatic rare values (`extremes_min_n = 10`), while its leaf blade widths (8 values) and the other measurements keep the full range:
+
+```r
+barroso_write_descriptions(
+  xlsx_path = "chars_dataset.xlsx",
+  species_cols = c("Genus", "Species", "Author"),
+  character_cols = which(names(chars_dataset) == "HABIT"):ncol(chars_dataset),
+  species_filter = "Ouratea hostilis"
+)
+```
+
+_**Ouratea hostilis**_ A.Queiroz-Lima & D.B.O.S.Cardoso  
+**Shrub or tree** ca. 1.8 m tall; erect; branched; stem striated, scaly, gray, glabrous. **Stipule** 1 pair; lateral to petiole; usually persistent along the branches; 11–16 × 2–3 mm; lanceolate; base truncate; margin entire; apex acute or aristate; glabrous. **Leaf** dispersed; well distributed along the branches; petiole grooved, transverse, glabrous, 0.3–0.5 × 0.1–0.2 cm; blade flat, shiny, membranous, elliptic, lanceolate, **(4.3–)4.7–13(–14.5) × 1–4.1 cm**, apex acute, acuminate, base rounded; …
+
+The leaf blades are 4.7–13 cm long in most measurements, rarely 4.3 or 14.5 cm long.
 
 # Custom Column Selection
 
@@ -170,7 +200,7 @@ barroso_write_descriptions(
   xlsx_path = "data.xlsx",
   species_cols = 1:2,      # First two columns: Genus and Species
   character_cols = 3:18,   # Columns 3-18: morphological characters
-  font_family = "Times New Rowman",
+  font_family = "Times New Roman",
   font_size = 12
 )
 ```
