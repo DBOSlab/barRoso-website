@@ -4430,6 +4430,7 @@ height: 400px;
 <li><code>duplicate</code>: <code>TRUE</code> for records belonging to a block of duplicates.</li>
 <li><code>duplicateGroup</code>: an identifier of each block of duplicates.</li>
 <li><code>identificationConflict</code>: <code>TRUE</code> when the duplicates of a block are identified as different species (e.g. <code>&quot;Ormosia arborea&quot;</code> and <code>&quot;Ormosia fastigiata&quot;</code>) or genera. A duplicate identified just to genus (e.g. <code>&quot;Ormosia&quot;</code>) does not conflict with a complete name of the same genus. Names are compared exactly, so spelling variants (e.g. <code>&quot;Ormosia trifoliata&quot;</code> and <code>&quot;Ormosia trifoliolata&quot;</code>) are also flagged as conflicts, which helps finding misspelled names.</li>
+<li><code>identificationUnresolved</code>: <code>TRUE</code> for the records of blocks with conflicting identifications whose name cannot be chosen by the rules below, as their names are equally frequent (e.g. two duplicates as <code>&quot;Ormosia arborea&quot;</code> and two as <code>&quot;Ormosia fastigiata&quot;</code>), even after <code>specialists</code>. These blocks need checking: with <code>rm_duplicates = TRUE</code> and <code>rm_tied_conflicts = FALSE</code>, all their records are kept. <code>FALSE</code> for the other duplicates, and <code>NA</code> for records that are not duplicates.</li>
 <li><code>duplicateIdentifications</code>: all names found in the block, e.g. <code>&quot;Ormosia arborea | Ormosia fastigiata&quot;</code>.</li>
 <li><code>duplicateCollectionCodes</code>: all herbaria of the block, e.g. <code>&quot;MO | JBB&quot;</code>.</li>
 <li><code>duplicateCatalogNumbers</code>: all catalog numbers of the block with their herbarium, e.g. <code>&quot;MO 2839102 | JBB 13548&quot;</code>.</li>
@@ -4438,8 +4439,10 @@ height: 400px;
 <p>When <code>rm_duplicates = TRUE</code>, one record per block is kept, chosen as follows:</p>
 <ol type="1">
 <li>Records identified to species are preferred over those identified just to genus.</li>
-<li>Among them, records with the most frequent identification in the block are preferred (e.g. the name given by two duplicates rather than by one). When names are equally frequent, all of them go to the next rule.</li>
-<li>Among them, records with latitude and longitude, and then records with more filled columns, are preferred. If records are still tied, the first one in the data is kept.</li>
+<li>In blocks with conflicting identifications, the records identified by one of the <code>specialists</code> are preferred, whatever the number of duplicates with other names. A record without determiner (<code>identifiedBy</code>) that was collected by a specialist counts as identified by the specialist.</li>
+<li>Among them, records with the most frequent identification in the block are preferred (e.g. the name given by two duplicates rather than by one).</li>
+<li>When two or more names are still equally frequent (e.g. two duplicates as <code>&quot;Ormosia arborea&quot;</code> and two as <code>&quot;Ormosia fastigiata&quot;</code>), it is not possible to know which name is correct, so the block is not reduced: all its records are kept, to be checked, as needed in taxonomic revisions and checklists. With <code>rm_tied_conflicts = TRUE</code>, as may suit macroecological analyses, the whole block is removed instead, and a message tells how many records and blocks were removed and why.</li>
+<li>Among the records with the chosen name, records with latitude and longitude, and then records with more filled columns, are preferred. If records are still tied, the first one in the data is kept.</li>
 </ol>
 <p>The kept record still has <code>identificationConflict</code> and all the names, herbaria and catalog numbers of its block, so conflicting identifications remain visible after removing the duplicates.</p>
 </section>
@@ -4466,6 +4469,14 @@ height: 400px;
 <td>Logical; if <code>TRUE</code>, keeps just one record per block of duplicates (default: <code>FALSE</code>).</td>
 </tr>
 <tr class="odd">
+<td>specialists</td>
+<td>Optional character vector of names of specialists, e.g. <code>c(&quot;D. B. O. S. Cardoso&quot;, &quot;H. C. Lima&quot;)</code>. With <code>rm_duplicates = TRUE</code>, in blocks with conflicting identifications, the records identified by them (or collected by them, when without determiner) are preferred. Names are compared by surname and first initial, so <code>&quot;D. B. O. S. Cardoso&quot;</code> matches <code>&quot;D. Cardoso&quot;</code> (default: <code>NULL</code>).</td>
+</tr>
+<tr class="even">
+<td>rm_tied_conflicts</td>
+<td>Logical; with <code>rm_duplicates = TRUE</code>, if <code>TRUE</code>, blocks whose conflicting names are equally frequent, even after <code>specialists</code>, are removed entirely. If <code>FALSE</code>, all their records are kept (default: <code>FALSE</code>).</td>
+</tr>
+<tr class="odd">
 <td>colname_recordedBy</td>
 <td>Column name for the collector (default: <code>&quot;recordedBy&quot;</code>).</td>
 </tr>
@@ -4482,18 +4493,22 @@ height: 400px;
 <td>Column name for the specific epithet (default: <code>&quot;specificEpithet&quot;</code>).</td>
 </tr>
 <tr class="odd">
+<td>colname_identifiedBy</td>
+<td>Column name for the determiner (default: <code>&quot;identifiedBy&quot;</code>).</td>
+</tr>
+<tr class="even">
 <td>colname_collectionCode</td>
 <td>Column name for the herbarium acronym (default: <code>&quot;collectionCode&quot;</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_catalogNumber</td>
 <td>Column name for the catalog number (default: <code>&quot;catalogNumber&quot;</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_decimalLatitude</td>
 <td>Column name for latitude (default: <code>&quot;decimalLatitude&quot;</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_decimalLongitude</td>
 <td>Column name for longitude (default: <code>&quot;decimalLongitude&quot;</code>).</td>
 </tr>
@@ -4512,7 +4527,12 @@ height: 400px;
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Blocks of duplicates with conflicting identifications</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df_flagged[df_flagged<span class="sc">$</span>identificationConflict <span class="sc">%in%</span> <span class="cn">TRUE</span>, ]</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Identifications of specialists first, and tied conflicts removed</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">specialists =</span> <span class="fu">c</span>(<span class="st">&quot;D. B. O. S. Cardoso&quot;</span>, <span class="st">&quot;H. C. Lima&quot;</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">rm_tied_conflicts =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 <!-- -->
@@ -5020,55 +5040,66 @@ height: 400px;
 <span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicate`</span>: <span class="in">`TRUE`</span> for records belonging to a block of duplicates.</span>
 <span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateGroup`</span>: an identifier of each block of duplicates.</span>
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`identificationConflict`</span>: <span class="in">`TRUE`</span> when the duplicates of a block are identified as different species (e.g. <span class="in">`&quot;Ormosia arborea&quot;`</span> and <span class="in">`&quot;Ormosia fastigiata&quot;`</span>) or genera. A duplicate identified just to genus (e.g. <span class="in">`&quot;Ormosia&quot;`</span>) does not conflict with a complete name of the same genus. Names are compared exactly, so spelling variants (e.g. <span class="in">`&quot;Ormosia trifoliata&quot;`</span> and <span class="in">`&quot;Ormosia trifoliolata&quot;`</span>) are also flagged as conflicts, which helps finding misspelled names.</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateIdentifications`</span>: all names found in the block, e.g. <span class="in">`&quot;Ormosia arborea | Ormosia fastigiata&quot;`</span>.</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateCollectionCodes`</span>: all herbaria of the block, e.g. <span class="in">`&quot;MO | JBB&quot;`</span>.</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateCatalogNumbers`</span>: all catalog numbers of the block with their herbarium, e.g. <span class="in">`&quot;MO 2839102 | JBB 13548&quot;`</span>.</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>The specific epithet is taken from <span class="in">`specificEpithet`</span> or, when missing, from a</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>binomial in the column <span class="in">`species`</span> (as in GBIF downloads).</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>When <span class="in">`rm_duplicates = TRUE`</span>, one record per block is kept, chosen as follows:</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Records identified to species are preferred over those identified just to genus.</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Among them, records with the most frequent identification in the block are preferred (e.g. the name given by two duplicates rather than by one). When names are equally frequent, all of them go to the next rule.</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Among them, records with latitude and longitude, and then records with more filled columns, are preferred. If records are still tied, the first one in the data is kept.</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The kept record still has <span class="in">`identificationConflict`</span> and all the names, herbaria and</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>catalog numbers of its block, so conflicting identifications remain visible</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>after removing the duplicates.</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame with biodiversity specimen records. <span class="pp">|</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, keeps just one record per block of duplicates (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for the collector (default: <span class="in">`&quot;recordedBy&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for the collector number (default: <span class="in">`&quot;recordNumber&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for the genus (default: <span class="in">`&quot;genus&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for the specific epithet (default: <span class="in">`&quot;specificEpithet&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for the herbarium acronym (default: <span class="in">`&quot;collectionCode&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_catalogNumber <span class="pp">|</span> Column name for the catalog number (default: <span class="in">`&quot;catalogNumber&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_decimalLatitude <span class="pp">|</span> Column name for latitude (default: <span class="in">`&quot;decimalLatitude&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_decimalLongitude <span class="pp">|</span> Column name for longitude (default: <span class="in">`&quot;decimalLongitude&quot;`</span>). <span class="pp">|</span></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>A data frame with the duplicate columns described above. If</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="in">`rm_duplicates = TRUE`</span>, only one record per block of duplicates is kept.</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;herbarium_data.csv&quot;</span>)</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>df_flagged <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`identificationUnresolved`</span>: <span class="in">`TRUE`</span> for the records of blocks with conflicting identifications whose name cannot be chosen by the rules below, as their names are equally frequent (e.g. two duplicates as <span class="in">`&quot;Ormosia arborea&quot;`</span> and two as <span class="in">`&quot;Ormosia fastigiata&quot;`</span>), even after <span class="in">`specialists`</span>. These blocks need checking: with <span class="in">`rm_duplicates = TRUE`</span> and <span class="in">`rm_tied_conflicts = FALSE`</span>, all their records are kept. <span class="in">`FALSE`</span> for the other duplicates, and <span class="in">`NA`</span> for records that are not duplicates.</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateIdentifications`</span>: all names found in the block, e.g. <span class="in">`&quot;Ormosia arborea | Ormosia fastigiata&quot;`</span>.</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateCollectionCodes`</span>: all herbaria of the block, e.g. <span class="in">`&quot;MO | JBB&quot;`</span>.</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duplicateCatalogNumbers`</span>: all catalog numbers of the block with their herbarium, e.g. <span class="in">`&quot;MO 2839102 | JBB 13548&quot;`</span>.</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>The specific epithet is taken from <span class="in">`specificEpithet`</span> or, when missing, from a</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>binomial in the column <span class="in">`species`</span> (as in GBIF downloads).</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>When <span class="in">`rm_duplicates = TRUE`</span>, one record per block is kept, chosen as follows:</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Records identified to species are preferred over those identified just to genus.</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>In blocks with conflicting identifications, the records identified by one of the <span class="in">`specialists`</span> are preferred, whatever the number of duplicates with other names. A record without determiner (<span class="in">`identifiedBy`</span>) that was collected by a specialist counts as identified by the specialist.</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Among them, records with the most frequent identification in the block are preferred (e.g. the name given by two duplicates rather than by one).</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>When two or more names are still equally frequent (e.g. two duplicates as <span class="in">`&quot;Ormosia arborea&quot;`</span> and two as <span class="in">`&quot;Ormosia fastigiata&quot;`</span>), it is not possible to know which name is correct, so the block is not reduced: all its records are kept, to be checked, as needed in taxonomic revisions and checklists. With <span class="in">`rm_tied_conflicts = TRUE`</span>, as may suit macroecological analyses, the whole block is removed instead, and a message tells how many records and blocks were removed and why.</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Among the records with the chosen name, records with latitude and longitude, and then records with more filled columns, are preferred. If records are still tied, the first one in the data is kept.</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>The kept record still has <span class="in">`identificationConflict`</span> and all the names, herbaria and</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>catalog numbers of its block, so conflicting identifications remain visible</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>after removing the duplicates.</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> df <span class="pp">|</span> A data frame with biodiversity specimen records. <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, keeps just one record per block of duplicates (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> specialists <span class="pp">|</span> Optional character vector of names of specialists, e.g. <span class="in">`c(&quot;D. B. O. S. Cardoso&quot;, &quot;H. C. Lima&quot;)`</span>. With <span class="in">`rm_duplicates = TRUE`</span>, in blocks with conflicting identifications, the records identified by them (or collected by them, when without determiner) are preferred. Names are compared by surname and first initial, so <span class="in">`&quot;D. B. O. S. Cardoso&quot;`</span> matches <span class="in">`&quot;D. Cardoso&quot;`</span> (default: <span class="in">`NULL`</span>). <span class="pp">|</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_tied_conflicts <span class="pp">|</span> Logical; with <span class="in">`rm_duplicates = TRUE`</span>, if <span class="in">`TRUE`</span>, blocks whose conflicting names are equally frequent, even after <span class="in">`specialists`</span>, are removed entirely. If <span class="in">`FALSE`</span>, all their records are kept (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for the collector (default: <span class="in">`&quot;recordedBy&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for the collector number (default: <span class="in">`&quot;recordNumber&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for the genus (default: <span class="in">`&quot;genus&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for the specific epithet (default: <span class="in">`&quot;specificEpithet&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_identifiedBy <span class="pp">|</span> Column name for the determiner (default: <span class="in">`&quot;identifiedBy&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for the herbarium acronym (default: <span class="in">`&quot;collectionCode&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_catalogNumber <span class="pp">|</span> Column name for the catalog number (default: <span class="in">`&quot;catalogNumber&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_decimalLatitude <span class="pp">|</span> Column name for latitude (default: <span class="in">`&quot;decimalLatitude&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_decimalLongitude <span class="pp">|</span> Column name for longitude (default: <span class="in">`&quot;decimalLongitude&quot;`</span>). <span class="pp">|</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>A data frame with the duplicate columns described above. If</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="in">`rm_duplicates = TRUE`</span>, only one record per block of duplicates is kept.</span>
 <span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="co"># Blocks of duplicates with conflicting identifications</span></span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>df_flagged[df_flagged<span class="sc">$</span>identificationConflict <span class="sc">%in%</span> <span class="cn">TRUE</span>, ]</span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;herbarium_data.csv&quot;</span>)</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>df_flagged <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df)</span>
 <span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="co"># Blocks of duplicates with conflicting identifications</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>df_flagged[df_flagged<span class="sc">$</span>identificationConflict <span class="sc">%in%</span> <span class="cn">TRUE</span>, ]</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="co"># Identifications of specialists first, and tied conflicts removed</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> <span class="fu">barroso_flag_duplicates</span>(df, <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">specialists =</span> <span class="fu">c</span>(<span class="st">&quot;D. B. O. S. Cardoso&quot;</span>, <span class="st">&quot;H. C. Lima&quot;</span>),</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">rm_tied_conflicts =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

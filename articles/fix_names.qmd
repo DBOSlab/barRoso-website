@@ -15,7 +15,7 @@ Herbarium records of the same species often come with different names: misspelli
 - the World Checklist of Vascular Plants (WCVP) of [Plants of the World Online](https://powo.science.kew.org/) as a global backbone, through the package [expowo](https://dboslab.github.io/expowo/);
 - by default, the [Flora e Funga do Brasil](https://floradobrasil.jbrj.gov.br/) (FFB), through the package [floraR](https://dboslab.github.io/floraR-website/), which is preferred for the names it has.
 
-It is run after [`barroso_cat()`](/articles/compare_herbarium_sources.qmd) and before [`barroso_std()`](/articles/standardize_specimens.qmd).
+It is run after [`barroso_cat()`](/articles/compare_herbarium_sources.qmd) and before [`barroso_std()`](/articles/standardize_specimens.qmd). This order matters when removing duplicates: duplicates of the same specimen identified with a synonym and its accepted name, or with a misspelled name, would otherwise be taken as conflicting identifications, and could even create false ties of names that cannot be resolved (see [Detect and Flag Duplicates](/articles/detect_duplicates.qmd#fix-species-names-first)).
 
 ## Installation
 

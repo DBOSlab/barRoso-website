@@ -74,6 +74,10 @@ subset(df_flagged, duplicate == TRUE)
 
 # View blocks of duplicates with conflicting identifications
 subset(df_flagged, identificationConflict %in% TRUE)
+
+# Go directly to the conflicts that need checking: the blocks whose name
+# cannot be chosen, as their names are equally frequent
+subset(df_flagged, identificationUnresolved %in% TRUE)
 ```
 
 The following columns are added after `recordNumber`:
@@ -83,16 +87,17 @@ The following columns are added after `recordNumber`:
 | `duplicate` | `TRUE` for records belonging to a block of duplicates |
 | `duplicateGroup` | Identifier of each block of duplicates |
 | `identificationConflict` | `TRUE` when the block has different species or genera (see below) |
+| `identificationUnresolved` | `TRUE` when the conflict cannot be resolved, as the names are equally frequent (see [Rule 4](#rule-4-equally-frequent-names-are-never-chosen-at-random)) |
 | `duplicateIdentifications` | All names found in the block |
 | `duplicateCollectionCodes` | All herbaria of the block, separated by `" | "` |
 | `duplicateCatalogNumbers` | All catalog numbers of the block with their herbarium acronym, separated by `" | "` |
 
 For the example dataset:
 
-| recordedBy | recordNumber | duplicateGroup | identificationConflict | duplicateIdentifications |
-|---|---|---|---|---|
-| D. Cardoso | 1350 | 1 | `TRUE` | Ormosia arborea \| Ormosia \| Swartzia apetala |
-| L. P. Queiroz | 4021 | 2 | `FALSE` | Ormosia \| Ormosia nitida |
+| recordedBy | recordNumber | duplicateGroup | identificationConflict | identificationUnresolved | duplicateIdentifications |
+|---|---|---|---|---|---|
+| D. Cardoso | 1350 | 1 | `TRUE` | `FALSE` | Ormosia arborea \| Ormosia \| Swartzia apetala |
+| L. P. Queiroz | 4021 | 2 | `FALSE` | `FALSE` | Ormosia \| Ormosia nitida |
 
 | duplicateGroup | duplicateCollectionCodes | duplicateCatalogNumbers |
 |---|---|---|
@@ -112,12 +117,65 @@ A duplicate identified **just to genus** does not conflict with a complete name 
 
 Names are compared exactly, so spelling variants (e.g. *Ormosia trifoliata* and *Ormosia trifoliolata*) are also flagged. This helps finding misspelled names, besides misidentifications.
 
-## Removing duplicates
+### Conflicts that need checking
 
-With `rm_duplicates = TRUE`, only one record per block is kept. The record is chosen by three rules, applied in this order. Each rule only chooses among the records that passed the previous one.
+Not every conflict needs your attention. In block 1, *Ormosia arborea* is given by three duplicates and *Swartzia apetala* by one, so the rules below can choose *Ormosia arborea*. But when the names are **equally frequent**, e.g. two duplicates as *Ormosia arborea* and two as *Ormosia fastigiata*, no rule can tell which name is correct.
+
+`barroso_flag_duplicates()` marks these blocks with **`identificationUnresolved = TRUE`**, in all their records, whether or not duplicates are removed. So you can go directly to them with a single filter:
 
 ```r
-df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE)
+to_check <- subset(df_flagged, identificationUnresolved %in% TRUE)
+to_check[order(to_check$duplicateGroup), ]
+```
+
+The column is `FALSE` for the other duplicates, including those with conflicts that the rules can resolve, and `NA` for records that are not duplicates. When you give `specialists`, their identifications resolve the ties, so only the blocks still unresolved after them are marked. A message also tells how many blocks are unresolved, e.g.:
+
+```
+barroso_flag_duplicates: 14 records in 5 blocks of duplicates, 3 blocks with conflicting identifications, 2 of them unresolved (identificationUnresolved == TRUE)
+```
+
+### Fix species names first
+
+Duplicates are compared by their names exactly as written. So two duplicates of the same specimen, one identified with an old name and one with its accepted name, or one with a misspelled name, are taken as a **conflict**, although both mean the same species:
+
+| Duplicate | Name in the data | Accepted name |
+|---|---|---|
+| RB | *Ormosia glazioviana* | *Ormosia fastigiata* (a synonym) |
+| HUEFS | *Ormosia fastigiata* | *Ormosia fastigiata* |
+| MO | *Ormosia excelsea* | *Ormosia excelsa* (misspelled) |
+| K | *Ormosia excelsa* | *Ormosia excelsa* |
+
+These false conflicts are a problem when removing duplicates. Two names that are just a synonym and its accepted name are **equally frequent**, so the block becomes a **false tie**: it is marked with `identificationUnresolved = TRUE`, and all its records are kept, or the whole block is removed with `rm_tied_conflicts = TRUE`, although there is nothing to resolve.
+
+So, run [`barroso_fix_names()`](/articles/fix_names.qmd) **before** [`barroso_std()`](/articles/standardize_specimens.qmd) or `barroso_flag_duplicates()`. It updates synonyms and misspelled names into accepted names, with the World Checklist of Vascular Plants and the Flora e Funga do Brasil. Then, RB and HUEFS above are both *Ormosia fastigiata*, MO and K are both *Ormosia excelsa*, and only real conflicts of identification are left: those that need checking by a taxonomist.
+
+```r
+data_all <- barroso_cat(list(REFLORA = data_reflora, JABOT = data_jabot),
+                        keep_source = "JABOT")
+
+# 1. Fix synonyms and misspelled names
+data_all <- barroso_fix_names(data_all)
+
+# 2. Standardize and remove duplicates, with only real conflicts left
+data_all <- barroso_std(data_all,
+                        rm_duplicates = TRUE,
+                        specialists = c("D. B. O. S. Cardoso", "H. C. Lima"))
+
+# Real conflicts that need checking
+subset(data_all, identificationUnresolved %in% TRUE)
+```
+
+The original names are kept in the column `taxonOriginal` of `barroso_fix_names()`, so you still know how each duplicate was identified.
+
+## Removing duplicates
+
+With `rm_duplicates = TRUE`, only one record per block is kept. The record is chosen by the rules below, applied in this order. Each rule only chooses among the records that passed the previous one.
+
+```r
+df_clean <- barroso_flag_duplicates(df,
+                                    rm_duplicates = TRUE,
+                                    specialists = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                                    rm_tied_conflicts = FALSE)
 ```
 
 ### Rule 1: identified to species
@@ -129,15 +187,36 @@ Records with a complete species name (genus and specific epithet) are preferred 
 
 If all duplicates of a block are identified just to genus, all of them go to rule 2.
 
-### Rule 2: most frequent identification
+### Rule 2: identified by a specialist
+
+In blocks with conflicting identifications, the records identified by one of the `specialists` you give are preferred, **whatever the number of duplicates with other names**. A specialist's identification is more reliable than any number of identifications by others, e.g. a name repeated in the duplicates sent to several herbaria before the specimens were studied.
+
+- A record counts as identified by a specialist when the specialist is in `identifiedBy`, also among several determiners (e.g. `D. Cardoso & L. P. Queiroz`).
+- A record **without determiner** (`identifiedBy` empty) that was **collected by a specialist** also counts, as specialists usually identify their own collections.
+- Names are compared by surname and first initial, so `D. B. O. S. Cardoso` matches `D. Cardoso`.
+
+For example, if two duplicates of *A. Silva 1* are identified as *Ormosia arborea* and two as *Ormosia fastigiata*, one of them by H. C. Lima, then with `specialists = "H. C. Lima"` the record of *Ormosia fastigiata* identified by H. C. Lima is kept. Without specialists, or when the specialists disagree, the next rule applies.
+
+### Rule 3: most frequent identification
 
 Among the remaining records, those with the name given by most duplicates are preferred.
 
-- Block 1: *Ormosia arborea* is given by three duplicates (MO, JBB, HUEFS) and *Swartzia apetala* by one (K), so K is discarded; MO, JBB and HUEFS go to rule 3.
+- Block 1: *Ormosia arborea* is given by three duplicates (MO, JBB, HUEFS) and *Swartzia apetala* by one (K), so K is discarded; MO, JBB and HUEFS go to rule 5.
 
-When two or more names are equally frequent (e.g. one duplicate as *Ormosia arborea* and one as *Ormosia nitida*), all of them go to rule 3.
+### Rule 4: equally frequent names are never chosen at random
 
-### Rule 3: most complete record
+When two or more names are still **equally frequent**, e.g. one duplicate as *Ormosia arborea* and one as *Ormosia nitida*, or two and two, there is no way to know which name is correct. Choosing one of them by the completeness of the records would be choosing at random, and the other identification would disappear from the data. So:
+
+- **By default** (`rm_tied_conflicts = FALSE`), the block is **not reduced**: all its records are kept, so you can check them, filtering them by `identificationUnresolved = TRUE`. This matters in **taxonomic revisions and checklists**, where every specimen must be included or checked, and never removed or combined at random.
+- With **`rm_tied_conflicts = TRUE`**, the **whole block is removed**. This may suit **macroecological analyses** of many species, where a record of uncertain identity is worse than a missing record.
+
+In both cases, a message tells how many records and blocks were kept or removed, and why, e.g.:
+
+```
+barroso_flag_duplicates: 6 records of 2 blocks removed, as their duplicates are identified as different species, equally frequent, so the correct name cannot be chosen (rm_tied_conflicts = TRUE)
+```
+
+### Rule 5: most complete record
 
 Among the remaining records, the one with the most complete information is kept:
 
@@ -163,14 +242,19 @@ The kept record still has `identificationConflict`, `duplicateIdentifications`, 
 | Grouping | Same collector and collector number; or same species, collector and full date when the number is missing. Unknown collectors are never grouped. |
 | Conflict | Different species or genera in the same block. Genus-only records do not conflict with species of the same genus. |
 | Rule 1 | Keep records identified to species rather than just to genus. |
-| Rule 2 | Keep records with the most frequent identification of the block (ties go to rule 3). |
-| Rule 3 | Keep the record with coordinates, then with more filled columns, then the first one. |
+| Rule 2 | In conflicting blocks, keep records identified (or collected, when without determiner) by the `specialists`, whatever the number of other names. |
+| Rule 3 | Keep records with the most frequent identification of the block. |
+| Rule 4 | When names are still equally frequent, the block is marked with `identificationUnresolved = TRUE`, and all its records are kept (default), or the whole block is removed with `rm_tied_conflicts = TRUE`. |
+| Rule 5 | Keep the record with coordinates, then with more filled columns, then the first one. |
 
 ## Best Practices
 
 - Run this step **after** standardizing fields with `barroso_std()`.
 - Inspect the blocks with `identificationConflict == TRUE` before removing duplicates, as they may reveal misidentified or misspelled names.
 - Keep `rm_duplicates = FALSE` when you want to review the blocks first; the columns `duplicateGroup` and `duplicateIdentifications` make it easy to sort and filter them.
+- Give the `specialists` of your group, so their identifications are kept in conflicting blocks.
+- Run [`barroso_fix_names()`](/articles/fix_names.qmd) before, so that synonyms and misspelled names are not taken as conflicts.
+- For taxonomic revisions and checklists, keep `rm_tied_conflicts = FALSE`, and check the blocks with `identificationUnresolved == TRUE`, which were kept with all their records.
 
 ## See Also
 
