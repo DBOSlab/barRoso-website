@@ -1,0 +1,95 @@
+---
+title: "Flag Identifications by Specialists"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+Not all identifications of herbarium specimens are equally reliable. A name given by a specialist of the group is much more likely to be right than a name given when the specimen was collected, or copied to the duplicates sent to other herbaria. For distribution maps, niche models, conservation assessments or checklists, you may want to know which records were identified by specialists, or to use just those.
+
+`barroso_flag_specialists()` flags all records identified by the specialists you give, each one within their taxa of expertise, or keeps just these records:
+
+```r
+specialists <- data.frame(
+  specialist = c("D. B. O. S. Cardoso", "D. B. O. S. Cardoso", "H. C. Lima"),
+  taxon = c("Ormosia", "Swartzia", "Leguminosae"))
+
+df <- barroso_flag_specialists(df, specialists)
+
+# Just the records identified by the specialists
+reliable <- barroso_flag_specialists(df, specialists, filter = TRUE)
+```
+
+It works with any data frame, but works best with records standardized with [`barroso_std()`](/articles/standardize_specimens.qmd), where the names of collectors and determiners, the additional collectors and the families are already standardized, e.g. `Lima, H.C.` and `H.C. de Lima` are both `H. C. Lima`.
+
+
+## The specialists
+
+The specialists are given in a data frame with the columns `specialist` and `taxon`, one row for each taxon of expertise, the same used to resolve conflicting duplicates in [`barroso_flag_duplicates()`](/articles/detect_duplicates.qmd#rule-2-identified-by-a-specialist):
+
+| specialist | taxon | Records flagged |
+|---|---|---|
+| `D. B. O. S. Cardoso` | `Ormosia` | of *Ormosia* |
+| `D. B. O. S. Cardoso` | `Swartzia` | of *Swartzia* |
+| `H. C. Lima` | `Leguminosae` | of the family, also written `Fabaceae` in `family` |
+| `W. A. Rodrigues` | `Myristicaceae` | of the family, e.g. *Virola* and *Iryanthera* |
+| `J. Silva` | `Ormosia arborea` | of *Ormosia arborea* |
+
+A record identified by a specialist outside their taxa is not flagged, e.g. a *Virola* identified by a specialist of *Ormosia*. Names of people are compared by surname and first initial, so `D. B. O. S. Cardoso` matches `D. Cardoso`, and families also by their alternative names (Leguminosae and Fabaceae, Compositae and Asteraceae, Gramineae and Poaceae, Palmae and Arecaceae, Cruciferae and Brassicaceae, Guttiferae and Clusiaceae, Labiatae and Lamiaceae, Umbelliferae and Apiaceae).
+
+
+## What is flagged
+
+Three new columns are added after `identifiedBy`:
+
+- `specialistIdentification`: `TRUE` for the records identified by the specialists.
+- `specialistName`: the specialist, as written in `specialists`, e.g. `H. C. Lima`, or several separated by `|`, e.g. `D. B. O. S. Cardoso | H. C. Lima` for `D. Cardoso & H. C. Lima`.
+- `specialistEvidence`: how the record was identified by the specialist:
+
+| `specialistEvidence` | Records |
+|---|---|
+| `identifiedBy` | The specialist is in `identifiedBy`, also among several determiners, e.g. `D. Cardoso & L. P. Queiroz` |
+| `recordedBy` | Without determiner, collected by the specialist, as main (`recordedBy`) or additional collector (`addCollector`), as specialists usually identify their own collections |
+| `duplicate` | A duplicate of the same specimen, with the same name, was identified or collected by the specialist, e.g. the duplicate at MO of a specimen identified by the specialist at RB |
+
+The duplicates are found with the columns of [`barroso_flag_duplicates()`](/articles/detect_duplicates.qmd) (`duplicateGroup`), so run it before. A duplicate with another name is not flagged, as the specialist did not agree with it.
+
+
+## Inside `barroso_std()`
+
+With `flag_specialists = TRUE`, `barroso_std()` flags the identifications of the `specialists` after flagging the duplicates and **before removing them**. So a record kept from a block of duplicates is flagged when one of its removed duplicates, with the same name, was identified by a specialist:
+
+```r
+data_all <- barroso_std(data_all,
+                        rm_duplicates = TRUE,
+                        specialists = specialists,
+                        flag_specialists = TRUE)
+
+table(data_all$specialistEvidence)
+```
+
+The same `specialists` are used to resolve conflicting duplicates, as described in [Detect and Flag Duplicates](/articles/detect_duplicates.qmd#rule-2-identified-by-a-specialist).
+
+For example, for 10,294 records of *Ormosia* from GBIF, speciesLink, REFLORA and JABOT, with D. B. O. S. Cardoso as a specialist of *Ormosia* and H. C. Lima of Leguminosae:
+
+```
+barroso_flag_specialists: 1072 of 10294 records identified by the specialists (595 as determiners, 226 as collectors without determiner, 251 by a duplicate)
+```
+
+After removing the duplicates, 514 of the 6,769 records kept are flagged: 367 identified by the specialists, 95 collected by them, and 52 whose identification comes from a removed duplicate.
+
+
+## Tips
+
+- Give each specialist with all their taxa of expertise, in several rows.
+- Determiners written with the surname alone, e.g. `Stirton`, are not matched, as the first initial is needed to tell apart people with the same surname. Check the most frequent determiners of your data with `sort(table(df$identifiedBy), decreasing = TRUE)`.
+- Records identified by specialists can also be selected after `barroso_std()` with `subset(df, specialistIdentification)`.
+
+## See Also
+
+- [`barroso_flag_specialists()` reference](/reference/barroso_flag_specialists.qmd)
+- [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
+- [Standardize Specimen Records](/articles/standardize_specimens.qmd)

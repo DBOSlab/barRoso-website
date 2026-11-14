@@ -45,7 +45,7 @@ binomial in the column `species` (as in GBIF downloads).
 When `rm_duplicates = TRUE`, one record per block is kept, chosen as follows:
 
 1. Records identified to species are preferred over those identified just to genus.
-2. In blocks with conflicting identifications, the records identified by one of the `specialists` are preferred, whatever the number of duplicates with other names. A record without determiner (`identifiedBy`) that was collected by a specialist counts as identified by the specialist.
+2. In blocks with conflicting identifications, the records identified by one of the `specialists` are preferred, whatever the number of duplicates with other names, when the taxon of expertise of the specialist includes one of the names of the block. A record without determiner (`identifiedBy`) that was collected by a specialist, as main (`recordedBy`) or additional collector (`addCollector`), counts as identified by the specialist.
 3. Among them, records with the most frequent identification in the block are preferred (e.g. the name given by two duplicates rather than by one).
 4. When two or more names are still equally frequent (e.g. two duplicates as `"Ormosia arborea"` and two as `"Ormosia fastigiata"`), it is not possible to know which name is correct, so the block is not reduced: all its records are kept, to be checked, as needed in taxonomic revisions and checklists. With `rm_tied_conflicts = TRUE`, as may suit macroecological analyses, the whole block is removed instead, and a message tells how many records and blocks were removed and why.
 5. Among the records with the chosen name, records with latitude and longitude, and then records with more filled columns, are preferred. If records are still tied, the first one in the data is kept.
@@ -60,13 +60,15 @@ after removing the duplicates.
 |---|---|
 | df | A data frame with biodiversity specimen records. |
 | rm_duplicates | Logical; if `TRUE`, keeps just one record per block of duplicates (default: `FALSE`). |
-| specialists | Optional character vector of names of specialists, e.g. `c("D. B. O. S. Cardoso", "H. C. Lima")`. With `rm_duplicates = TRUE`, in blocks with conflicting identifications, the records identified by them (or collected by them, when without determiner) are preferred. Names are compared by surname and first initial, so `"D. B. O. S. Cardoso"` matches `"D. Cardoso"` (default: `NULL`). |
+| specialists | Optional data frame with the columns `specialist` and `taxon`, one row for each specialist and taxon of expertise, which can be a family (e.g. `"Myristicaceae"`, all genera and species of the family), a genus (e.g. `"Ormosia"`) or a species (e.g. `"Ormosia arborea"`), e.g. `data.frame(specialist = c("D. B. O. S. Cardoso", "D. B. O. S. Cardoso", "H. C. Lima"), taxon = c("Ormosia", "Swartzia", "Leguminosae"))`. With `rm_duplicates = TRUE`, in blocks with conflicting identifications that include a name of their taxa, the records identified by them (or collected by them, also as additional collectors, when without determiner) are preferred. Names are compared by surname and first initial, so `"D. B. O. S. Cardoso"` matches `"D. Cardoso"`, and families by their alternative names too, e.g. `"Leguminosae"` and `"Fabaceae"` (default: `NULL`). |
 | rm_tied_conflicts | Logical; with `rm_duplicates = TRUE`, if `TRUE`, blocks whose conflicting names are equally frequent, even after `specialists`, are removed entirely. If `FALSE`, all their records are kept (default: `FALSE`). |
 | colname_recordedBy | Column name for the collector (default: `"recordedBy"`). |
 | colname_recordNumber | Column name for the collector number (default: `"recordNumber"`). |
 | colname_genus | Column name for the genus (default: `"genus"`). |
 | colname_specificEpithet | Column name for the specific epithet (default: `"specificEpithet"`). |
 | colname_identifiedBy | Column name for the determiner (default: `"identifiedBy"`). |
+| colname_addCollector | Column name for the additional collectors (default: `"addCollector"`). |
+| colname_family | Column name for the family, compared with the families in `specialists` (default: `"family"`). |
 | colname_collectionCode | Column name for the herbarium acronym (default: `"collectionCode"`). |
 | colname_catalogNumber | Column name for the catalog number (default: `"catalogNumber"`). |
 | colname_decimalLatitude | Column name for latitude (default: `"decimalLatitude"`). |
@@ -90,7 +92,9 @@ df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE)
 
 # Identifications of specialists first, and tied conflicts removed
 df_clean <- barroso_flag_duplicates(df, rm_duplicates = TRUE,
-                                    specialists = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                                    specialists = data.frame(
+                                      specialist = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                                      taxon = c("Ormosia", "Leguminosae")),
                                     rm_tied_conflicts = TRUE)
 ```
 

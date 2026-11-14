@@ -4420,12 +4420,13 @@ height: 400px;
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>Given a <code>data.frame</code> of species (one row per species, or per specimen) OR a path to an Excel file containing such data, this function writes an <code>.xlsx</code> file whose columns begin with whatever identification columns are in <code>species_df</code> — Genus/Species/Author, Family/Taxon, etc. — and continue with a standard morphological-character template (HABIT, STIPULE, LEAF, INFLORESCENCE, FLOWER, FRUIT, SEED) left empty for the user to fill in.</p>
-<p>When <code>plant_group</code> is specified, INFLORESCENCE/FLOWER/FRUIT blocks are replaced with the morphology that group actually has — e.g. Leguminosae-Papilionoideae swaps generic petals for STANDARD / WING / KEEL and adds stamen arrangement and fruit dehiscence; Asteraceae replaces the inflorescence with capitulum + involucre and the flower block with RAY / DISC florets + pappus; Ochnaceae uses the full carpophore/mericarp fruit and seed-apical-hook block; Orchidaceae uses dorsal/lateral sepals, labellum and column. Supported groups:</p>
+<p>When <code>plant_group</code> is specified, INFLORESCENCE/FLOWER/FRUIT blocks are replaced with the morphology that group actually has — e.g. Leguminosae-Papilionoideae swaps generic petals for STANDARD / WING / KEEL and adds stamen arrangement and fruit dehiscence; Asteraceae replaces the inflorescence with capitulum + involucre and the flower block with RAY / DISC florets + pappus; Ochnaceae uses the full carpophore/mericarp fruit and seed-apical-hook block; Myristicaceae has one sentence for each organ (Petiole, Leaf blade, Staminate and Pistillate inflorescences, Androecium, Ovary, Infructescence), with the exudate, the leaf trichomes, the anthers and the aril; Orchidaceae uses dorsal/lateral sepals, labellum and column. Supported groups:</p>
 <ul>
 <li>“Leguminosae-Papilionoideae”</li>
 <li>“Leguminosae-Caesalpinioideae”</li>
 <li>“Leguminosae-Mimosoideae”</li>
 <li>“Asteraceae”</li>
+<li>“Myristicaceae”</li>
 <li>“Ochnaceae”</li>
 <li>“Orchidaceae”</li>
 </ul>
@@ -5021,66 +5022,70 @@ height: 400px;
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>KEEL and adds stamen arrangement and fruit dehiscence; Asteraceae</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>replaces the inflorescence with capitulum + involucre and the flower</span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>block with RAY / DISC florets + pappus; Ochnaceae uses the full</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>carpophore/mericarp fruit and seed-apical-hook block; Orchidaceae uses</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>dorsal/lateral sepals, labellum and column. Supported groups:</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Papilionoideae&quot;</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Caesalpinioideae&quot;</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Mimosoideae&quot;</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Asteraceae&quot;</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Ochnaceae&quot;</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Orchidaceae&quot;</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>The resulting file is the input format expected by</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="in">`barroso_write_descriptions()`</span>: column-name conventions match</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>(capitalised group prefixes, lowercase subterms, &quot;(cm)&quot; / &quot;(mm)&quot; /</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>&quot;(m)&quot; units, &quot;length&quot; / &quot;width&quot; / &quot;height&quot; keywords).</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_df <span class="pp">|</span> Either a <span class="in">`data.frame`</span> containing the species-identification columns you want preserved (e.g. Genus, Species, Author), OR a character string path to an Excel file (.xlsx) containing such data. Every column in <span class="in">`species_df`</span> is copied into the output as-is; template columns are appended after them and written empty. Any template column whose name already exists in <span class="in">`species_df`</span> is skipped, so user data is never overwritten. <span class="pp">|</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> sheet <span class="pp">|</span> Character string or integer. Sheet name or index to read when <span class="in">`species_df`</span> is a path to an Excel file. Default is 1. <span class="pp">|</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> plant_group <span class="pp">|</span> Optional character. One of the supported profiles listed above. <span class="in">`NULL`</span> (default) uses the generic flowering-plant profile. <span class="pp">|</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_cols <span class="pp">|</span> Character vector or integer indices. Column names or indices used to build the species header (e.g., c(&quot;Genus&quot;, &quot;Species&quot;, &quot;Author&quot;) or 1:3). These can be combined flexibly (e.g., a single &quot;Scientific_name&quot; column or separate Genus, Species, and Author columns). <span class="pp">|</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> overwrite <span class="pp">|</span> Logical. If TRUE (default), an existing file at the target path is overwritten; if FALSE, the function errors out. <span class="pp">|</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> format_excel <span class="pp">|</span> Logical. If TRUE (default), the function will use more user-friendly format for the spreadsheet. <span class="pp">|</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> sheet_name <span class="pp">|</span> Character. Name of the worksheet. Default &quot;described_specimens&quot;. <span class="pp">|</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> base_font_size <span class="pp">|</span> Numeric. Base font size. Default 10. <span class="pp">|</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> base_font_name <span class="pp">|</span> Character. Base font name. Default &quot;Calibri Light&quot;. <span class="pp">|</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> verbose <span class="pp">|</span> Logical. Print progress messages. Default TRUE. <span class="pp">|</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> filename <span class="pp">|</span> Output file base name (with or without &quot;.xlsx&quot;). If NULL, uses &quot;taxon_template&quot; or &quot;<span class="dt">&lt;</span><span class="kw">plant_group</span><span class="dt">&gt;</span>_template&quot; when a group is given. <span class="pp">|</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> dir <span class="pp">|</span> Output directory. If NULL, a directory named after <span class="in">`filename`</span> (without extension) is created in the working directory. A date-stamped subfolder is created inside. <span class="pp">|</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>Invisibly returns the absolute path to the written .xlsx file.</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>carpophore/mericarp fruit and seed-apical-hook block; Myristicaceae has</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>one sentence for each organ (Petiole, Leaf blade, Staminate and Pistillate</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>inflorescences, Androecium, Ovary, Infructescence), with the exudate, the</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>leaf trichomes, the anthers and the aril; Orchidaceae uses</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>dorsal/lateral sepals, labellum and column. Supported groups:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Papilionoideae&quot;</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Caesalpinioideae&quot;</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Leguminosae-Mimosoideae&quot;</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Asteraceae&quot;</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Myristicaceae&quot;</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Ochnaceae&quot;</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>&quot;Orchidaceae&quot;</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>The resulting file is the input format expected by</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="in">`barroso_write_descriptions()`</span>: column-name conventions match</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>(capitalised group prefixes, lowercase subterms, &quot;(cm)&quot; / &quot;(mm)&quot; /</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>&quot;(m)&quot; units, &quot;length&quot; / &quot;width&quot; / &quot;height&quot; keywords).</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_df <span class="pp">|</span> Either a <span class="in">`data.frame`</span> containing the species-identification columns you want preserved (e.g. Genus, Species, Author), OR a character string path to an Excel file (.xlsx) containing such data. Every column in <span class="in">`species_df`</span> is copied into the output as-is; template columns are appended after them and written empty. Any template column whose name already exists in <span class="in">`species_df`</span> is skipped, so user data is never overwritten. <span class="pp">|</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> sheet <span class="pp">|</span> Character string or integer. Sheet name or index to read when <span class="in">`species_df`</span> is a path to an Excel file. Default is 1. <span class="pp">|</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> plant_group <span class="pp">|</span> Optional character. One of the supported profiles listed above. <span class="in">`NULL`</span> (default) uses the generic flowering-plant profile. <span class="pp">|</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> species_cols <span class="pp">|</span> Character vector or integer indices. Column names or indices used to build the species header (e.g., c(&quot;Genus&quot;, &quot;Species&quot;, &quot;Author&quot;) or 1:3). These can be combined flexibly (e.g., a single &quot;Scientific_name&quot; column or separate Genus, Species, and Author columns). <span class="pp">|</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> overwrite <span class="pp">|</span> Logical. If TRUE (default), an existing file at the target path is overwritten; if FALSE, the function errors out. <span class="pp">|</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> format_excel <span class="pp">|</span> Logical. If TRUE (default), the function will use more user-friendly format for the spreadsheet. <span class="pp">|</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> sheet_name <span class="pp">|</span> Character. Name of the worksheet. Default &quot;described_specimens&quot;. <span class="pp">|</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> base_font_size <span class="pp">|</span> Numeric. Base font size. Default 10. <span class="pp">|</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> base_font_name <span class="pp">|</span> Character. Base font name. Default &quot;Calibri Light&quot;. <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> verbose <span class="pp">|</span> Logical. Print progress messages. Default TRUE. <span class="pp">|</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> filename <span class="pp">|</span> Output file base name (with or without &quot;.xlsx&quot;). If NULL, uses &quot;taxon_template&quot; or &quot;<span class="dt">&lt;</span><span class="kw">plant_group</span><span class="dt">&gt;</span>_template&quot; when a group is given. <span class="pp">|</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> dir <span class="pp">|</span> Output directory. If NULL, a directory named after <span class="in">`filename`</span> (without extension) is created in the working directory. A date-stamped subfolder is created inside. <span class="pp">|</span></span>
 <span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
 <span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="co"># Using a data frame</span></span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>species_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>  <span class="at">Genus   =</span> <span class="fu">c</span>(<span class="st">&quot;Ouratea&quot;</span>, <span class="st">&quot;Ouratea&quot;</span>, <span class="st">&quot;Ouratea&quot;</span>),</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>  <span class="at">Species =</span> <span class="fu">c</span>(<span class="st">&quot;acicularis&quot;</span>, <span class="st">&quot;acuminata&quot;</span>, <span class="st">&quot;cassinefolia&quot;</span>),</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>  <span class="at">Author  =</span> <span class="fu">c</span>(<span class="st">&quot;R.G.Chacon &amp; K.Yamam.&quot;</span>, <span class="st">&quot;(DC.) Engl.&quot;</span>, <span class="st">&quot;(DC.) Engl.&quot;</span>)</span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_chars_template</span>(</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_df =</span> species_df,</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename   =</span> <span class="st">&quot;Ouratea_template&quot;</span></span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Using an Excel file path</span></span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_chars_template</span>(</span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_df =</span> <span class="st">&quot;my_species_list.xlsx&quot;</span>,</span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>  <span class="at">sheet =</span> <span class="dv">1</span>,</span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>  <span class="at">plant_group =</span> <span class="st">&quot;Ochnaceae&quot;</span>,</span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename =</span> <span class="st">&quot;Ouratea_Ochnaceae_template&quot;</span></span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>Invisibly returns the absolute path to the written .xlsx file.</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="co"># Using a data frame</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>species_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  <span class="at">Genus   =</span> <span class="fu">c</span>(<span class="st">&quot;Ouratea&quot;</span>, <span class="st">&quot;Ouratea&quot;</span>, <span class="st">&quot;Ouratea&quot;</span>),</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>  <span class="at">Species =</span> <span class="fu">c</span>(<span class="st">&quot;acicularis&quot;</span>, <span class="st">&quot;acuminata&quot;</span>, <span class="st">&quot;cassinefolia&quot;</span>),</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  <span class="at">Author  =</span> <span class="fu">c</span>(<span class="st">&quot;R.G.Chacon &amp; K.Yamam.&quot;</span>, <span class="st">&quot;(DC.) Engl.&quot;</span>, <span class="st">&quot;(DC.) Engl.&quot;</span>)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_chars_template</span>(</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_df =</span> species_df,</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename   =</span> <span class="st">&quot;Ouratea_template&quot;</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="co"># Using an Excel file path</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="fu">barroso_chars_template</span>(</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_df =</span> <span class="st">&quot;my_species_list.xlsx&quot;</span>,</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>  <span class="at">sheet =</span> <span class="dv">1</span>,</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>  <span class="at">plant_group =</span> <span class="st">&quot;Ochnaceae&quot;</span>,</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename =</span> <span class="st">&quot;Ouratea_Ochnaceae_template&quot;</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

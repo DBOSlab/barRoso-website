@@ -1,0 +1,77 @@
+---
+title: 'barroso_flag_specialists'
+description: 'Flag Records Identified by Specialists'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::barroso_flag_specialists()
+```
+
+### Description
+
+Flags the herbarium records whose identifications were given by specialists of
+their taxa, and so are probably accurate, or keeps just these records, e.g. to
+build a dataset of reliable identifications for distribution maps, niche models
+or checklists. The specialists are given in a data frame with their taxa of
+expertise, as in `barroso_flag_duplicates()`.
+
+### Details
+
+A record is flagged when the name of a specialist is in `identifiedBy` (also
+among several determiners, e.g. `"D. Cardoso & L. P. Queiroz"`), and the family,
+genus or species of the record is among the taxa of expertise of the specialist.
+Names of people are compared by surname and first initial, so
+`"D. B. O. S. Cardoso"` matches `"D. Cardoso"`, and families also by their
+alternative names, e.g. Leguminosae and Fabaceae.
+
+Two more kinds of records are flagged, as told in `specialistEvidence`:
+
+- `"identifiedBy"`: identified by the specialist.
+- `"recordedBy"`: without determiner, but collected by the specialist, as main (`recordedBy`) or additional collector (`addCollector`), as specialists usually identify their own collections.
+- `"duplicate"`: a duplicate of the same specimen (same `duplicateGroup` of `barroso_flag_duplicates()`) with the same name was identified or collected by the specialist, e.g. the duplicate at MO of a specimen identified by the specialist at RB. This needs the columns of `barroso_flag_duplicates()`, so flag the duplicates before removing them, as done by `barroso_std()` with `flag_specialists = TRUE`.
+
+The best results come from a database standardized with `barroso_std()`, where the
+names of collectors and determiners, and the families, are already standardized.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame with herbarium records, preferably standardized with `barroso_std()`. |
+| specialists | A data frame with the columns `specialist` and `taxon`, one row for each specialist and taxon of expertise, which can be a family (e.g. `"Myristicaceae"`), a genus (e.g. `"Ormosia"`) or a species (e.g. `"Ormosia arborea"`). |
+| filter | Logical; if `TRUE`, only the records identified by the specialists are returned (default: `FALSE`). |
+| colname_identifiedBy | Column name for the determiner (default: `"identifiedBy"`). |
+| colname_recordedBy | Column name for the collector (default: `"recordedBy"`). |
+| colname_addCollector | Column name for the additional collectors (default: `"addCollector"`). |
+| colname_family | Column name for the family (default: `"family"`). |
+| colname_genus | Column name for the genus (default: `"genus"`). |
+| colname_specificEpithet | Column name for the specific epithet (default: `"specificEpithet"`). |
+
+### Value
+
+The data frame with three new columns: `specialistIdentification`
+(`TRUE` for the records identified by the specialists), `specialistName` (the
+specialist, as written in `specialists`, or several separated by `" | "`) and
+`specialistEvidence` (`"identifiedBy"`, `"recordedBy"` or `"duplicate"`). With
+`filter = TRUE`, only the records with `specialistIdentification = TRUE`.
+
+### Examples
+
+```r
+specialists <- data.frame(
+  specialist = c("D. B. O. S. Cardoso", "D. B. O. S. Cardoso", "H. C. Lima"),
+  taxon = c("Ormosia", "Swartzia", "Leguminosae"))
+
+# Flag the records identified by the specialists
+df <- barroso_flag_specialists(df, specialists)
+table(df$specialistEvidence)
+
+# Keep just these records
+reliable <- barroso_flag_specialists(df, specialists, filter = TRUE)
+```
+
+

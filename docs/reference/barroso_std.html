@@ -4425,6 +4425,23 @@ height: 400px;
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
 <p>This function orchestrates several std_* functions from the <code>barRoso</code> package to clean records from virtual herbaria and biodiversity portals. It handles multilingual field names, missing data, inconsistent formatting, and dataset chunking for large inputs. The function also detects and optionally removes duplicate records and specimens lacking voucher information.</p>
+<p><strong>The same collector written in other ways</strong></p>
+<p>After standardizing, the same collector can still be written in other ways, e.g. <code>&quot;L. Queiroz&quot;</code> and <code>&quot;L. P. Queiroz&quot;</code>, which may be two people with the same collector number by chance, e.g. Luis Queiroz and Luciano Paganucci de Queiroz. So, with <code>match_collectors = TRUE</code>, a deep search is made across the whole data (not in chunks) for records with the same first initial, surname and collector number, but written in other ways. Compound surnames are compared in the same form, e.g. <code>&quot;A. Delgado-Salinas&quot;</code>, <code>&quot;A. Delgado Salinas&quot;</code> and <code>&quot;A. D. Salinas&quot;</code> all as initials A D and surname <code>Salinas</code>. A record gets the most complete name (with more initials, then the longest, e.g. <code>&quot;A. Delgado-Salinas&quot;</code>) only when:</p>
+<ul>
+<li>its initials are among those of the complete name, with the same first initial, e.g. <code>&quot;L.&quot;</code> in <code>&quot;L. P.&quot;</code>, but not <code>&quot;L. M.&quot;</code> in <code>&quot;L. P.&quot;</code>;</li>
+<li>it has the same date (day, month and year) or the same municipality of a record with the complete name, which shows that they are the same collection;</li>
+<li>when several complete names fit, the one that agrees the most with the record is chosen, with 4 points for the same full date, 2 for the same year and month, 1 for the same year and 1 for the same municipality, e.g. <code>&quot;E. H. A. Rodrigues&quot;</code> of the same date and municipality rather than <code>&quot;E. M. A. Rodrigues&quot;</code> of the same municipality, for <code>&quot;E. A. Rodrigues&quot;</code>. When different people agree as much, e.g. <code>&quot;L. Queiroz&quot;</code> with <code>&quot;L. P. Queiroz&quot;</code> and <code>&quot;L. M. Queiroz&quot;</code>, the record is kept.</li>
+</ul>
+<p><strong>Updating a database</strong></p>
+<p>With <code>database</code>, new downloads are added to a database already standardized by <code>barroso_std()</code>, e.g. after duplicates were removed and records were corrected by hand, without standardizing it again and without losing the corrections:</p>
+<ol type="1">
+<li>New records already in the database are removed by their identifiers, the same <code>occurrenceID</code> (or <code>gbifID</code>, when present) of the same <code>datasource</code>.</li>
+<li>The other new records are standardized as usual.</li>
+<li>New records whose herbarium and catalog number, e.g. <code>&quot;MO 2839102&quot;</code>, are in the database, in <code>catalogNumber</code> or among the duplicates of its records (<code>duplicateCatalogNumbers</code>), are removed, as they are the same herbarium sheet.</li>
+<li>Duplicates are flagged (and removed, with <code>rm_duplicates = TRUE</code>) among the new records.</li>
+<li>New records that are duplicates of a record of the database (same collector and number) are added to its duplicate columns, e.g. their herbaria and catalog numbers to <code>duplicateCollectionCodes</code> and <code>duplicateCatalogNumbers</code>, and, with <code>rm_duplicates = TRUE</code>, removed. A different name sets <code>identificationConflict</code>, but the name of the database is kept.</li>
+</ol>
+<p>The records of the database are not changed, except their duplicate columns in step 5. The result has the records of the database and the new records, with the column <code>newRecord</code> (<code>TRUE</code> for the new records), so that they can be checked.</p>
 <p>The final data frame is sorted by species, <code>recordedBy</code> and <code>recordNumber</code>. All records of a block of duplicates stay together under the name of the block, which is the most frequent name among its duplicates. For example, a duplicate identified as <code>&quot;Ormosia ruddiana&quot;</code> goes together with its three duplicates identified as <code>&quot;Ormosia amazonica&quot;</code>, in the place of the latter species.</p>
 </section>
 <section id="arguments" class="level3">
@@ -4467,79 +4484,95 @@ height: 400px;
 </tr>
 <tr class="odd">
 <td>specialists</td>
-<td>Optional character vector of names of specialists, whose identifications are preferred when removing duplicates with conflicting identifications. See <code>barroso_flag_duplicates()</code> (default: <code>NULL</code>).</td>
+<td>Optional data frame with the columns <code>specialist</code> and <code>taxon</code> (a family, genus or species of expertise), e.g. <code>data.frame(specialist = &quot;D. B. O. S. Cardoso&quot;, taxon = &quot;Leguminosae&quot;)</code>, whose identifications are preferred when removing duplicates with conflicting identifications. See <code>barroso_flag_duplicates()</code> (default: <code>NULL</code>).</td>
 </tr>
 <tr class="even">
+<td>flag_specialists</td>
+<td>Logical; if <code>TRUE</code>, the records identified by the <code>specialists</code> are flagged in the columns <code>specialistIdentification</code>, <code>specialistName</code> and <code>specialistEvidence</code>, before duplicates are removed, so that a record kept from a block of duplicates is flagged when one of its duplicates with the same name was identified by a specialist. See <code>barroso_flag_specialists()</code> (default: <code>FALSE</code>).</td>
+</tr>
+<tr class="odd">
 <td>rm_tied_conflicts</td>
 <td>Logical; with <code>rm_duplicates = TRUE</code>, if <code>TRUE</code>, blocks of duplicates whose conflicting names are equally frequent are removed entirely; if <code>FALSE</code>, all their records are kept. See <code>barroso_flag_duplicates()</code> (default: <code>FALSE</code>).</td>
 </tr>
+<tr class="even">
+<td>database</td>
+<td>Optional data frame, or path to an .xlsx, .csv or .rds file, with records already standardized by <code>barroso_std()</code>, to which the new records are added. See Details (default: <code>NULL</code>).</td>
+</tr>
 <tr class="odd">
+<td>match_collectors</td>
+<td>Logical; if <code>TRUE</code>, the same collector written in other ways across the whole data, e.g. <code>&quot;L. Queiroz&quot;</code> and <code>&quot;L. P. Queiroz&quot;</code>, or <code>&quot;A. D. Salinas&quot;</code>, <code>&quot;A. Delgado Salinas&quot;</code> and <code>&quot;A. Delgado-Salinas&quot;</code>, gets the most complete name, before duplicates are found. See Details (default: <code>TRUE</code>).</td>
+</tr>
+<tr class="even">
 <td>index_herbariorum</td>
 <td>Logical; if <code>TRUE</code>, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See <code>std_collection()</code>. Use <code>FALSE</code> to work offline (default: <code>TRUE</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_recordedBy</td>
 <td>Column name for collector names.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_recordNumber</td>
 <td>Column name for collector number.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_identifiedBy</td>
 <td>Column name for determiner names. The column is standardized with <code>std_identifiedBy()</code> only when present in the data.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_continent</td>
 <td>Column name for continent.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_country</td>
 <td>Column name for country.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_stateProvince</td>
 <td>Column name for state/province.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_county</td>
 <td>Column name for county.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_municipality</td>
 <td>Column name for municipality.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_locality</td>
 <td>Column name for locality.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_collectionCode</td>
 <td>Column name for collection code.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_institutionCode</td>
 <td>Column name for institution code.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_typeStatus</td>
 <td>Column name for type status.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_family</td>
 <td>Column name for family.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>colname_genus</td>
 <td>Column name for genus.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>colname_specificEpithet</td>
 <td>Column name for specific epithet.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>rm_original_column</td>
 <td>Logical; if <code>TRUE</code>, remove original columns after standardization, except that of collection codes when <code>index_herbariorum = TRUE</code>.</td>
+</tr>
+<tr class="odd">
+<td>std_collection</td>
+<td>Logical; if <code>FALSE</code>, the function will not standardize the collection codes according to Index Herbariorum.</td>
 </tr>
 </tbody>
 </table>
@@ -5055,57 +5088,93 @@ height: 400px;
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>and dataset chunking for large inputs. The function also detects and optionally</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>removes duplicate records and specimens lacking voucher information.</span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>The final data frame is sorted by species, <span class="in">`recordedBy`</span> and <span class="in">`recordNumber`</span>. All</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>records of a block of duplicates stay together under the name of the block, which</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>is the most frequent name among its duplicates. For example, a duplicate identified</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>as <span class="in">`&quot;Ormosia ruddiana&quot;`</span> goes together with its three duplicates identified as</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Ormosia amazonica&quot;`</span>, in the place of the latter species.</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ... <span class="pp">|</span> Input data frame containing raw biodiversity records. <span class="pp">|</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> unvouchered <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove records of wood, seed, fruit, pollen and spirit collections (e.g. <span class="in">`&quot;INPAw&quot;`</span>, <span class="in">`&quot;INPA-Carpoteca&quot;`</span>), and observations without a specimen (<span class="in">`basisOfRecord`</span> like <span class="in">`&quot;HUMAN_OBSERVATION&quot;`</span>) (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> delunkcoll <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes records with unknown or missing collectors (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_missid <span class="pp">|</span> Reserved for future use. Currently not implemented. <span class="pp">|</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, flags duplicates with a logical column (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes duplicate specimens (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> specialists <span class="pp">|</span> Optional character vector of names of specialists, whose identifications are preferred when removing duplicates with conflicting identifications. See <span class="in">`barroso_flag_duplicates()`</span> (default: <span class="in">`NULL`</span>). <span class="pp">|</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_tied_conflicts <span class="pp">|</span> Logical; with <span class="in">`rm_duplicates = TRUE`</span>, if <span class="in">`TRUE`</span>, blocks of duplicates whose conflicting names are equally frequent are removed entirely; if <span class="in">`FALSE`</span>, all their records are kept. See <span class="in">`barroso_flag_duplicates()`</span> (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> index_herbariorum <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See <span class="in">`std_collection()`</span>. Use <span class="in">`FALSE`</span> to work offline (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for collector names. <span class="pp">|</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for collector number. <span class="pp">|</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_identifiedBy <span class="pp">|</span> Column name for determiner names. The column is standardized with <span class="in">`std_identifiedBy()`</span> only when present in the data. <span class="pp">|</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent. <span class="pp">|</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country. <span class="pp">|</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state/province. <span class="pp">|</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county. <span class="pp">|</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality. <span class="pp">|</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality. <span class="pp">|</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for collection code. <span class="pp">|</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Column name for institution code. <span class="pp">|</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Column name for type status. <span class="pp">|</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_family <span class="pp">|</span> Column name for family. <span class="pp">|</span></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for genus. <span class="pp">|</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for specific epithet. <span class="pp">|</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove original columns after standardization, except that of collection codes when <span class="in">`index_herbariorum = TRUE`</span>. <span class="pp">|</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>**The same collector written in other ways**</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>After standardizing, the same collector can still be written in other ways, e.g.</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;L. Queiroz&quot;`</span> and <span class="in">`&quot;L. P. Queiroz&quot;`</span>, which may be two people with the same</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>collector number by chance, e.g. Luis Queiroz and Luciano Paganucci de Queiroz. So,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>with <span class="in">`match_collectors = TRUE`</span>, a deep search is made across the whole data (not in</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>chunks) for records with the same first initial, surname and collector number, but</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>written in other ways. Compound surnames are compared in the same form, e.g.</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;A. Delgado-Salinas&quot;`</span>, <span class="in">`&quot;A. Delgado Salinas&quot;`</span> and <span class="in">`&quot;A. D. Salinas&quot;`</span> all as initials</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>A D and surname <span class="in">`Salinas`</span>. A record gets the most complete name (with more</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>initials, then the longest, e.g. <span class="in">`&quot;A. Delgado-Salinas&quot;`</span>) only when:</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>its initials are among those of the complete name, with the same first initial, e.g. <span class="in">`&quot;L.&quot;`</span> in <span class="in">`&quot;L. P.&quot;`</span>, but not <span class="in">`&quot;L. M.&quot;`</span> in <span class="in">`&quot;L. P.&quot;`</span>;</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>it has the same date (day, month and year) or the same municipality of a record with the complete name, which shows that they are the same collection;</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>when several complete names fit, the one that agrees the most with the record is chosen, with 4 points for the same full date, 2 for the same year and month, 1 for the same year and 1 for the same municipality, e.g. <span class="in">`&quot;E. H. A. Rodrigues&quot;`</span> of the same date and municipality rather than <span class="in">`&quot;E. M. A. Rodrigues&quot;`</span> of the same municipality, for <span class="in">`&quot;E. A. Rodrigues&quot;`</span>. When different people agree as much, e.g. <span class="in">`&quot;L. Queiroz&quot;`</span> with <span class="in">`&quot;L. P. Queiroz&quot;`</span> and <span class="in">`&quot;L. M. Queiroz&quot;`</span>, the record is kept.</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>**Updating a database**</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>With <span class="in">`database`</span>, new downloads are added to a database already standardized by</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="in">`barroso_std()`</span>, e.g. after duplicates were removed and records were corrected by</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>hand, without standardizing it again and without losing the corrections:</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>New records already in the database are removed by their identifiers, the same <span class="in">`occurrenceID`</span> (or <span class="in">`gbifID`</span>, when present) of the same <span class="in">`datasource`</span>.</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>The other new records are standardized as usual.</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>New records whose herbarium and catalog number, e.g. <span class="in">`&quot;MO 2839102&quot;`</span>, are in the database, in <span class="in">`catalogNumber`</span> or among the duplicates of its records (<span class="in">`duplicateCatalogNumbers`</span>), are removed, as they are the same herbarium sheet.</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Duplicates are flagged (and removed, with <span class="in">`rm_duplicates = TRUE`</span>) among the new records.</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>New records that are duplicates of a record of the database (same collector and number) are added to its duplicate columns, e.g. their herbaria and catalog numbers to <span class="in">`duplicateCollectionCodes`</span> and <span class="in">`duplicateCatalogNumbers`</span>, and, with <span class="in">`rm_duplicates = TRUE`</span>, removed. A different name sets <span class="in">`identificationConflict`</span>, but the name of the database is kept.</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>The records of the database are not changed, except their duplicate columns in</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>step 5. The result has the records of the database and the new records, with the</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>column <span class="in">`newRecord`</span> (<span class="in">`TRUE`</span> for the new records), so that they can be checked.</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>The final data frame is sorted by species, <span class="in">`recordedBy`</span> and <span class="in">`recordNumber`</span>. All</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>records of a block of duplicates stay together under the name of the block, which</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>is the most frequent name among its duplicates. For example, a duplicate identified</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>as <span class="in">`&quot;Ormosia ruddiana&quot;`</span> goes together with its three duplicates identified as</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Ormosia amazonica&quot;`</span>, in the place of the latter species.</span>
 <span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>A fully cleaned and standardized data frame ready for downstream reconciliation,</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>duplicate handling, and label generation.</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;raw_herbarium_data.csv&quot;</span>)</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>df_std <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(df,</span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ... <span class="pp">|</span> Input data frame containing raw biodiversity records. <span class="pp">|</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> unvouchered <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove records of wood, seed, fruit, pollen and spirit collections (e.g. <span class="in">`&quot;INPAw&quot;`</span>, <span class="in">`&quot;INPA-Carpoteca&quot;`</span>), and observations without a specimen (<span class="in">`basisOfRecord`</span> like <span class="in">`&quot;HUMAN_OBSERVATION&quot;`</span>) (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> delunkcoll <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes records with unknown or missing collectors (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_missid <span class="pp">|</span> Reserved for future use. Currently not implemented. <span class="pp">|</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, flags duplicates with a logical column (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_duplicates <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, removes duplicate specimens (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> specialists <span class="pp">|</span> Optional data frame with the columns <span class="in">`specialist`</span> and <span class="in">`taxon`</span> (a family, genus or species of expertise), e.g. <span class="in">`data.frame(specialist = &quot;D. B. O. S. Cardoso&quot;, taxon = &quot;Leguminosae&quot;)`</span>, whose identifications are preferred when removing duplicates with conflicting identifications. See <span class="in">`barroso_flag_duplicates()`</span> (default: <span class="in">`NULL`</span>). <span class="pp">|</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> flag_specialists <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the records identified by the <span class="in">`specialists`</span> are flagged in the columns <span class="in">`specialistIdentification`</span>, <span class="in">`specialistName`</span> and <span class="in">`specialistEvidence`</span>, before duplicates are removed, so that a record kept from a block of duplicates is flagged when one of its duplicates with the same name was identified by a specialist. See <span class="in">`barroso_flag_specialists()`</span> (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_tied_conflicts <span class="pp">|</span> Logical; with <span class="in">`rm_duplicates = TRUE`</span>, if <span class="in">`TRUE`</span>, blocks of duplicates whose conflicting names are equally frequent are removed entirely; if <span class="in">`FALSE`</span>, all their records are kept. See <span class="in">`barroso_flag_duplicates()`</span> (default: <span class="in">`FALSE`</span>). <span class="pp">|</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> database <span class="pp">|</span> Optional data frame, or path to an .xlsx, .csv or .rds file, with records already standardized by <span class="in">`barroso_std()`</span>, to which the new records are added. See Details (default: <span class="in">`NULL`</span>). <span class="pp">|</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> match_collectors <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the same collector written in other ways across the whole data, e.g. <span class="in">`&quot;L. Queiroz&quot;`</span> and <span class="in">`&quot;L. P. Queiroz&quot;`</span>, or <span class="in">`&quot;A. D. Salinas&quot;`</span>, <span class="in">`&quot;A. Delgado Salinas&quot;`</span> and <span class="in">`&quot;A. Delgado-Salinas&quot;`</span>, gets the most complete name, before duplicates are found. See Details (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> index_herbariorum <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See <span class="in">`std_collection()`</span>. Use <span class="in">`FALSE`</span> to work offline (default: <span class="in">`TRUE`</span>). <span class="pp">|</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordedBy <span class="pp">|</span> Column name for collector names. <span class="pp">|</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_recordNumber <span class="pp">|</span> Column name for collector number. <span class="pp">|</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_identifiedBy <span class="pp">|</span> Column name for determiner names. The column is standardized with <span class="in">`std_identifiedBy()`</span> only when present in the data. <span class="pp">|</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_continent <span class="pp">|</span> Column name for continent. <span class="pp">|</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_country <span class="pp">|</span> Column name for country. <span class="pp">|</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_stateProvince <span class="pp">|</span> Column name for state/province. <span class="pp">|</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_county <span class="pp">|</span> Column name for county. <span class="pp">|</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_municipality <span class="pp">|</span> Column name for municipality. <span class="pp">|</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_locality <span class="pp">|</span> Column name for locality. <span class="pp">|</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_collectionCode <span class="pp">|</span> Column name for collection code. <span class="pp">|</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_institutionCode <span class="pp">|</span> Column name for institution code. <span class="pp">|</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_typeStatus <span class="pp">|</span> Column name for type status. <span class="pp">|</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_family <span class="pp">|</span> Column name for family. <span class="pp">|</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_genus <span class="pp">|</span> Column name for genus. <span class="pp">|</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> colname_specificEpithet <span class="pp">|</span> Column name for specific epithet. <span class="pp">|</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> rm_original_column <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, remove original columns after standardization, except that of collection codes when <span class="in">`index_herbariorum = TRUE`</span>. <span class="pp">|</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> std_collection <span class="pp">|</span> Logical; if <span class="in">`FALSE`</span>, the function will not standardize the collection codes according to Index Herbariorum. <span class="pp">|</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>A fully cleaned and standardized data frame ready for downstream reconciliation,</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>duplicate handling, and label generation.</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;raw_herbarium_data.csv&quot;</span>)</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>df_std <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(df,</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_country =</span> <span class="st">&quot;pais&quot;</span>,</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>                      <span class="at">colname_stateProvince =</span> <span class="st">&quot;estado&quot;</span>,</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>                      <span class="at">rm_duplicates =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -35,6 +35,30 @@ You can run it as a standalone function or as part of `barroso_std()`. Run it **
 - Without collector number, the full date is required, because the same collector may have collected the same species in different days.
 - The specific epithet is taken from `specificEpithet` or, when missing, from a binomial in the column `species`, as in GBIF downloads, which have no `specificEpithet` column.
 
+### The same collector written in other ways
+
+Even after standardizing, the same collector can be written in other ways in different herbaria, e.g. `L. Queiroz` and `L. P. Queiroz`, or `A. D. Salinas`, `A. Delgado Salinas` and `A. Delgado-Salinas`, so their duplicates would not be found. They cannot simply be taken as the same person: `L. Queiroz 12456` may be a collection of Luis Queiroz, and `L. P. Queiroz 12456` of Luciano Paganucci de Queiroz, with the same number by chance.
+
+So, before finding duplicates, `barroso_std()` makes a **deep search across the whole data** (not in chunks) for the same collector written in other ways (`match_collectors = TRUE`, the default):
+
+1. Each name is temporarily written in the same form: its initials and last surname. The first surnames of compound surnames become initials, so `A. Delgado-Salinas`, `A. Delgado Salinas` and `A. D. Salinas` are all `A D` + `Salinas`, while `L. P. Queiroz` is `L P` + `Queiroz`.
+2. Records with the **same first initial, last surname and collector number**, but written in other ways, are compared.
+3. A record gets the **most complete name** only when it has the **same date** (day, month and year) **or the same municipality** of a record with that name, which shows that they are the same collection.
+4. When several complete names fit, e.g. `E. H. A. Rodrigues` and `E. M. A. Rodrigues` for `E. A. Rodrigues`, the one that **agrees the most** with the record is chosen, scored with 4 points for the same full date, 2 for the same year and month, 1 for the same year, and 1 for the same municipality. Only when different people agree as much, the record is kept as it is.
+
+| Records | Result |
+|---|---|
+| `L. Queiroz 12456`, 3 May 2001 and `L. P. Queiroz 12456`, 3 May 2001 | Both `L. P. Queiroz`, and duplicates |
+| `L. Queiroz 12456`, Lençóis, 1990 and `L. P. Queiroz 12456`, Mucugê, 2001 | Kept as they are: probably two people |
+| `A. D. Salinas 500` and `A. Delgado-Salinas 500`, both in Oaxaca | Both `A. Delgado-Salinas`, the most frequent form in the data |
+| `E. A. Rodrigues 341`, 15 Sep 1995, Jaboticabal; `E. H. A. Rodrigues 341`, 15 Sep 1995, Jaboticabal; `E. M. A. Rodrigues 341`, 25 Sep 1995, Jaboticabal | `E. H. A. Rodrigues`, with the same date and municipality (5 points), rather than `E. M. A. Rodrigues`, with the same month and municipality (3 points) |
+| `L. Queiroz 1`, with the same date and municipality of both `L. P. Queiroz 1` and `L. M. Queiroz 1` | Kept as it is: the collector cannot be known |
+| `D. Cardoso 2344` and `D. Queiroz Cardoso 2344`, same date | Kept as they are: `Queiroz` is a surname, not an initial |
+
+The most complete name has more initials, e.g. `L. P. Queiroz` rather than `L. Queiroz`, but a name only gets initials written as such, not surnames turned into initials, as in `D. Queiroz Cardoso`. For the same initials written in other ways, e.g. `B. M. T. Walter` and `B. M. Teles Walter`, the name most frequent in the whole data is kept, with accents when they differ just by them (`F. Falcón` rather than `F. Falcon`).
+
+For 10,294 records of *Ormosia* from GBIF, speciesLink, REFLORA and JABOT, 205 records of 82 names got a more complete name, e.g. `R. Fróes` into `R. L. Fróes` (33 records), `C. Dick` into `C. W. Dick` and `A. A. Santos` into `A. Amaral-Santos`, and 183 more records were found in blocks of duplicates. A message tells how many records got another name, with examples. Use `match_collectors = FALSE` to skip this step.
+
 ## Example dataset
 
 The examples below use two blocks of duplicates. Collection *D. Cardoso 1350* was distributed to five herbaria and identified with three different names; collection *L. P. Queiroz 4021* has two duplicates, one identified just to genus.
@@ -151,15 +175,17 @@ So, run [`barroso_fix_names()`](/articles/fix_names.qmd) **before** [`barroso_st
 
 ```r
 data_all <- barroso_cat(list(REFLORA = data_reflora, JABOT = data_jabot),
-                        keep_source = "JABOT")
+                        keep_source = c("JABOT", "REFLORA"))
 
 # 1. Fix synonyms and misspelled names
 data_all <- barroso_fix_names(data_all)
 
 # 2. Standardize and remove duplicates, with only real conflicts left
+specialists <- data.frame(specialist = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                          taxon = c("Ormosia", "Leguminosae"))
 data_all <- barroso_std(data_all,
                         rm_duplicates = TRUE,
-                        specialists = c("D. B. O. S. Cardoso", "H. C. Lima"))
+                        specialists = specialists)
 
 # Real conflicts that need checking
 subset(data_all, identificationUnresolved %in% TRUE)
@@ -172,9 +198,12 @@ The original names are kept in the column `taxonOriginal` of `barroso_fix_names(
 With `rm_duplicates = TRUE`, only one record per block is kept. The record is chosen by the rules below, applied in this order. Each rule only chooses among the records that passed the previous one.
 
 ```r
+specialists <- data.frame(specialist = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                          taxon = c("Ormosia", "Leguminosae"))
+
 df_clean <- barroso_flag_duplicates(df,
                                     rm_duplicates = TRUE,
-                                    specialists = c("D. B. O. S. Cardoso", "H. C. Lima"),
+                                    specialists = specialists,
                                     rm_tied_conflicts = FALSE)
 ```
 
@@ -191,11 +220,29 @@ If all duplicates of a block are identified just to genus, all of them go to rul
 
 In blocks with conflicting identifications, the records identified by one of the `specialists` you give are preferred, **whatever the number of duplicates with other names**. A specialist's identification is more reliable than any number of identifications by others, e.g. a name repeated in the duplicates sent to several herbaria before the specimens were studied.
 
+The specialists are given in a data frame with the columns `specialist` and `taxon`, with one row for each taxon of expertise, which can be a family, a genus or a species:
+
+| specialist | taxon | Blocks where the specialist counts |
+|---|---|---|
+| `D. B. O. S. Cardoso` | `Ormosia` | names of *Ormosia* |
+| `D. B. O. S. Cardoso` | `Swartzia` | names of *Swartzia* |
+| `H. C. Lima` | `Leguminosae` | names of the family (in `family`), also written `Fabaceae` |
+| `W. A. Rodrigues` | `Myristicaceae` | names of the family, e.g. *Virola* and *Iryanthera* |
+| `J. Silva` | `Ormosia arborea` | blocks with *Ormosia arborea* |
+
+```r
+specialists <- data.frame(
+  specialist = c("D. B. O. S. Cardoso", "D. B. O. S. Cardoso", "H. C. Lima", "W. A. Rodrigues"),
+  taxon = c("Ormosia", "Swartzia", "Leguminosae", "Myristicaceae"))
+```
+
+- A specialist counts only in blocks with a name of their taxa, so a specialist of *Swartzia* does not decide between names of *Ormosia*. When a duplicate was identified as another genus (e.g. *Ormosia* and *Swartzia* in the same block), a specialist of any of them counts.
+- Families are compared with the column `family` (set `colname_family` if it has another name), also by their alternative names: Leguminosae and Fabaceae, Compositae and Asteraceae, Gramineae and Poaceae, Palmae and Arecaceae, Cruciferae and Brassicaceae, Guttiferae and Clusiaceae, Labiatae and Lamiaceae, Umbelliferae and Apiaceae.
 - A record counts as identified by a specialist when the specialist is in `identifiedBy`, also among several determiners (e.g. `D. Cardoso & L. P. Queiroz`).
-- A record **without determiner** (`identifiedBy` empty) that was **collected by a specialist** also counts, as specialists usually identify their own collections.
+- A record **without determiner** (`identifiedBy` empty) that was **collected by a specialist** also counts, as specialists usually identify their own collections. The specialist can be the main collector (`recordedBy`) or one of the additional collectors (`addCollector`), e.g. `A. Alves, D. Cardoso & K. Paixão`, as `barroso_std()` keeps all additional collectors.
 - Names are compared by surname and first initial, so `D. B. O. S. Cardoso` matches `D. Cardoso`.
 
-For example, if two duplicates of *A. Silva 1* are identified as *Ormosia arborea* and two as *Ormosia fastigiata*, one of them by H. C. Lima, then with `specialists = "H. C. Lima"` the record of *Ormosia fastigiata* identified by H. C. Lima is kept. Without specialists, or when the specialists disagree, the next rule applies.
+For example, if two duplicates of *A. Silva 1* are identified as *Ormosia arborea* and two as *Ormosia fastigiata*, one of them by H. C. Lima, then with H. C. Lima as a specialist of Leguminosae or *Ormosia*, the record of *Ormosia fastigiata* identified by H. C. Lima is kept. Without specialists, or when the specialists disagree, the next rule applies.
 
 ### Rule 3: most frequent identification
 
@@ -242,7 +289,7 @@ The kept record still has `identificationConflict`, `duplicateIdentifications`, 
 | Grouping | Same collector and collector number; or same species, collector and full date when the number is missing. Unknown collectors are never grouped. |
 | Conflict | Different species or genera in the same block. Genus-only records do not conflict with species of the same genus. |
 | Rule 1 | Keep records identified to species rather than just to genus. |
-| Rule 2 | In conflicting blocks, keep records identified (or collected, when without determiner) by the `specialists`, whatever the number of other names. |
+| Rule 2 | In conflicting blocks, keep records identified (or collected, also as additional collector, when without determiner) by the `specialists` of the taxa of the block, whatever the number of other names. |
 | Rule 3 | Keep records with the most frequent identification of the block. |
 | Rule 4 | When names are still equally frequent, the block is marked with `identificationUnresolved = TRUE`, and all its records are kept (default), or the whole block is removed with `rm_tied_conflicts = TRUE`. |
 | Rule 5 | Keep the record with coordinates, then with more filled columns, then the first one. |
@@ -252,7 +299,7 @@ The kept record still has `identificationConflict`, `duplicateIdentifications`, 
 - Run this step **after** standardizing fields with `barroso_std()`.
 - Inspect the blocks with `identificationConflict == TRUE` before removing duplicates, as they may reveal misidentified or misspelled names.
 - Keep `rm_duplicates = FALSE` when you want to review the blocks first; the columns `duplicateGroup` and `duplicateIdentifications` make it easy to sort and filter them.
-- Give the `specialists` of your group, so their identifications are kept in conflicting blocks.
+- Give the `specialists` of your group, with their taxa of expertise, so their identifications are kept in conflicting blocks.
 - Run [`barroso_fix_names()`](/articles/fix_names.qmd) before, so that synonyms and misspelled names are not taken as conflicts.
 - For taxonomic revisions and checklists, keep `rm_tied_conflicts = FALSE`, and check the blocks with `identificationUnresolved == TRUE`, which were kept with all their records.
 

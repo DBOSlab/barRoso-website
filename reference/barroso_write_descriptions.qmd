@@ -49,10 +49,20 @@ With fewer values, the range goes from the smallest to the largest value.
 Columns with just numbers, e.g. `LEAF SECONDARY-VENATION pairs` with
 `"6 | 8 | 12"`, or `FLOWER STAMEN number` with `"10"`, are counts:
 their values are pooled into ranges, with rare values between parentheses, as
-the measurements. The last word of the column name is written after the range,
-e.g. "6–12 pairs", except "number" and "count", e.g. "stamen 8–10". Write counts in
+the measurements. The lowercase words at the end of the column name are written
+after the range, e.g. "6–12 pairs", or "fascicles 5–15 per axis" for
+`STAMINATE-INFLORESCENCE FASCICLES per axis`, except "number" and
+"count", e.g. "stamen 8–10". Write counts in
 their own columns, and any text in another column, e.g. "curved distally
 towards the marginal vein" in `LEAF SECONDARY-VENATION`.
+
+**Maximum values, thickness and diameter**
+
+Measurements known only by their maximum are written as `"up to 5"` (or
+`"to 5"`) in all specimens of a species, and become e.g. "axis up to 5 cm
+long". Columns of thickness and diameter, e.g. `FRUIT PERICARP thickness (mm)`
+and `INFLORESCENCE CAPITULUM diameter (mm)`, are written as "1–2 mm thick" and
+"3–4 mm in diam.".
 
 **Punctuation**
 
@@ -70,7 +80,9 @@ morphological traits. Columns must follow these conventions:
 
 **Main character groups**Use ALL CAPS for the primary category:
 `HABIT`, `STIPULE`, `LEAF`, `INFLORESCENCE`,
-`FLOWER`, `FRUIT`, `SEED`. These will become section headers.
+`FLOWER`, `FRUIT`, `SEED`. These will become section headers. Organs of two words are joined by a hyphen,
+e.g. `LEAF-BLADE` and `STAMINATE-INFLORESCENCE` for "Leaf blade" and
+"Staminate inflorescence", as are terms like `SECONDARY-VEINS`.
 
 **Simple characters**Lowercase descriptive terms after the main group.
 Examples: `LEAF shape`, `LEAF margin`, `FLOWER symmetry`.
@@ -79,7 +91,8 @@ These will be appended directly after the lowercase group name.
 **Hierarchical characters**Use ALL CAPS for subgroup terms.
 Examples: `LEAF PETIOLE length (cm)`, `FLOWER SEPALS shape`.
 The capitalized term (`PETIOLE`, `SEPALS`) is extracted once
-and used as a subheading.
+and used as a subheading, followed by its traits in the order of the columns,
+e.g. "stamen 10, sessile, anthers brownish, glabrous, 5–6 × 1 mm".
 
 **Measurements**Include units in parentheses for automatic detection:
 `LEAF length (cm)`, `STIPULE width (mm)`, `HABIT height (m)`.

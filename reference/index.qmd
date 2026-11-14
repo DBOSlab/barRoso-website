@@ -34,6 +34,8 @@ format:
 
 - [`barroso_flag_duplicates()`](/reference/barroso_flag_duplicates.qmd)
 
+- [`barroso_flag_specialists()`](/reference/barroso_flag_specialists.qmd)
+
 - [`barroso_labels()`](/reference/barroso_labels.qmd)
 
 - [`barroso_std()`](/reference/barroso_std.qmd)
@@ -49,6 +51,8 @@ format:
 - [`std_collection()`](/reference/std_collection.qmd)
 
 - [`std_coordinates()`](/reference/std_coordinates.qmd)
+
+- [`std_dates()`](/reference/std_dates.qmd)
 
 - [`std_identifiedBy()`](/reference/std_identifiedBy.qmd)
 

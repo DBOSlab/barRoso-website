@@ -4420,13 +4420,20 @@ height: 400px;
 </div>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Merges herbarium records from two or more biodiversity data sources into a single harmonized data frame. Optionally prioritizes specific sources when duplicates are detected across herbaria, retaining records based on a flexible exclusion strategy.</p>
+<p>Merges herbarium records from two or more biodiversity data sources into a single harmonized data frame, keeping the records of each herbarium from a single source, chosen by an order of priority of the sources.</p>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>This function aligns column structures, removes redundant records from overlapping herbaria, and merges all sources into a single output. Duplicate filtering is based on matching <code>collectionCode</code> across sources: when <code>keep_source</code> is given, the records of any herbarium that is also present in <code>keep_source</code> are removed from the other sources. Herbaria shared only among the other sources are kept.</p>
+<p>This function aligns column structures, removes redundant records from overlapping herbaria, and merges all sources into a single output. The same herbarium is often in several sources, e.g. the RB collection in JABOT, REFLORA and GBIF, so its records would be repeated. Overlapping herbaria are found by their <code>collectionCode</code> and kept from a single source, following the order of priority in <code>keep_source</code>, e.g. with <code>keep_source = c(&quot;JABOT&quot;, &quot;speciesLink&quot;, &quot;REFLORA&quot;, &quot;GBIF&quot;)</code>:</p>
+<ol type="1">
+<li>the herbaria of JABOT are removed from speciesLink, REFLORA and GBIF;</li>
+<li>the remaining herbaria of speciesLink are removed from REFLORA and GBIF;</li>
+<li>the remaining herbaria of REFLORA are removed from GBIF.</li>
+</ol>
+<p>So each herbarium comes from the first source that has it, and GBIF adds only the herbaria that are in none of the other sources.</p>
 <p>Each source is first formatted into Darwin Core column names and values with <code>barroso_dwc()</code>, e.g. the columns of speciesLink downloads (<code>collector</code>, <code>collectornumber</code>, <code>recordedby</code>) are renamed into <code>recordedBy</code> and <code>recordNumber</code>, and the dates and type status of REFLORA and JABOT records are standardized. The sources are recognized by their content, so their names in <code>list_sources</code> can be any name.</p>
 <p>Before comparing the sources, the herbarium acronyms in <code>collectionCode</code> of each source are standardized with <code>std_collection()</code>, by default checking them against Index Herbariorum (<code>index_herbariorum = TRUE</code>), so the same herbarium is recognized in all sources, e.g. <code>&quot;MOBOT_BR&quot;</code> in speciesLink and <code>&quot;MO&quot;</code> in GBIF, or <code>&quot;Herbario INPA&quot;</code> and <code>&quot;INPA&quot;</code>. The original codes are kept in <code>collectionCodeOriginal</code>, so unvouchered collections like <code>&quot;INPA-Carpoteca&quot;</code> can still be removed by <code>barroso_std()</code>.</p>
+<p>The identifiers of the records in their sources, <code>occurrenceID</code> in GBIF, REFLORA and JABOT (and <code>gbifID</code> in GBIF), are kept as they are, with the source of each record in <code>datasource</code>, so that the records already in a database can be found when it is updated with new downloads (see the argument <code>database</code> of <code>barroso_std()</code>). Records without a unique identifier, from any source (e.g. speciesLink downloads made with plantR, or some GBIF records without <code>gbifID</code>), are compared with the database by their catalog numbers instead, and a message tells how many there are.</p>
 <p>Columns with different types across sources (e.g. numeric <code>year</code> in one source and character in another) are combined as character. A column <code>datasource</code> records the source of each record.</p>
 </section>
 <section id="arguments" class="level3">
@@ -4449,7 +4456,7 @@ height: 400px;
 </tr>
 <tr class="even">
 <td>keep_source</td>
-<td>Optional character string specifying the preferred data source (e.g., “GBIF”) for resolving duplicate <code>collectionCode</code> conflicts. If NULL, all records are retained.</td>
+<td>Character vector with the names of all sources of <code>list_sources</code>, in order of priority, e.g. <code>c(&quot;JABOT&quot;, &quot;speciesLink&quot;, &quot;REFLORA&quot;, &quot;GBIF&quot;)</code>. The herbaria of each source are removed from the sources after it, so each herbarium is kept from the first source that has it.</td>
 </tr>
 <tr class="odd">
 <td>index_herbariorum</td>
@@ -4471,7 +4478,7 @@ height: 400px;
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">speciesLink =</span> splink_data,</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">REFLORA =</span> reflora,</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">JABOT =</span> jabot),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">keep_source =</span> <span class="st">&quot;GBIF&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">keep_source =</span> <span class="fu">c</span>(<span class="st">&quot;JABOT&quot;</span>, <span class="st">&quot;speciesLink&quot;</span>, <span class="st">&quot;REFLORA&quot;</span>, <span class="st">&quot;GBIF&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 <!-- -->
@@ -4959,64 +4966,79 @@ height: 400px;
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">### Description</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>Merges herbarium records from two or more biodiversity data sources into a single</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>harmonized data frame. Optionally prioritizes specific sources when duplicates</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>are detected across herbaria, retaining records based on a flexible exclusion</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>strategy.</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Details</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>This function aligns column structures, removes redundant records from overlapping</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>herbaria, and merges all sources into a single output. Duplicate filtering is</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>based on matching <span class="in">`collectionCode`</span> across sources: when <span class="in">`keep_source`</span> is given,</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>the records of any herbarium that is also present in <span class="in">`keep_source`</span> are removed</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>from the other sources. Herbaria shared only among the other sources are kept.</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>harmonized data frame, keeping the records of each herbarium from a single source,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>chosen by an order of priority of the sources.</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="fu">### Details</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>This function aligns column structures, removes redundant records from overlapping</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>herbaria, and merges all sources into a single output. The same herbarium is often</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>in several sources, e.g. the RB collection in JABOT, REFLORA and GBIF, so its</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>records would be repeated. Overlapping herbaria are found by their <span class="in">`collectionCode`</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>and kept from a single source, following the order of priority in <span class="in">`keep_source`</span>,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>e.g. with <span class="in">`keep_source = c(&quot;JABOT&quot;, &quot;speciesLink&quot;, &quot;REFLORA&quot;, &quot;GBIF&quot;)`</span>:</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>Each source is first formatted into Darwin Core column names and values with</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="in">`barroso_dwc()`</span>, e.g. the columns of speciesLink downloads (<span class="in">`collector`</span>,</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="in">`collectornumber`</span>, <span class="in">`recordedby`</span>) are renamed into <span class="in">`recordedBy`</span> and</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="in">`recordNumber`</span>, and the dates and type status of REFLORA and JABOT records are</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>standardized. The sources are recognized by their content, so their names in</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="in">`list_sources`</span> can be any name.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>the herbaria of JABOT are removed from speciesLink, REFLORA and GBIF;</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>the remaining herbaria of speciesLink are removed from REFLORA and GBIF;</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>the remaining herbaria of REFLORA are removed from GBIF.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>So each herbarium comes from the first source that has it, and GBIF adds only the</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>herbaria that are in none of the other sources.</span>
 <span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>Before comparing the sources, the herbarium acronyms in <span class="in">`collectionCode`</span> of each</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>source are standardized with <span class="in">`std_collection()`</span>, by default checking them against</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>Index Herbariorum (<span class="in">`index_herbariorum = TRUE`</span>), so the same herbarium is</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>recognized in all sources, e.g. <span class="in">`&quot;MOBOT_BR&quot;`</span> in speciesLink and <span class="in">`&quot;MO&quot;`</span> in GBIF, or</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Herbario INPA&quot;`</span> and <span class="in">`&quot;INPA&quot;`</span>. The original codes are kept in</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="in">`collectionCodeOriginal`</span>, so unvouchered collections like <span class="in">`&quot;INPA-Carpoteca&quot;`</span> can</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>still be removed by <span class="in">`barroso_std()`</span>.</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>Columns with different types across sources (e.g. numeric <span class="in">`year`</span> in one source</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>and character in another) are combined as character. A column <span class="in">`datasource`</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>records the source of each record.</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> list_sources <span class="pp">|</span> A named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering. <span class="pp">|</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> keep_source <span class="pp">|</span> Optional character string specifying the preferred data source (e.g., &quot;GBIF&quot;) for resolving duplicate <span class="in">`collectionCode`</span> conflicts. If NULL, all records are retained. <span class="pp">|</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> index_herbariorum <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the herbarium acronyms of each source are checked against the API of Index Herbariorum after the regular expressions of <span class="in">`std_collection()`</span> (default: <span class="in">`TRUE`</span>). Use <span class="in">`FALSE`</span> to work offline. <span class="pp">|</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>A harmonized data frame combining all provided herbarium sources, with</span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>columns aligned, a <span class="in">`datasource`</span> column, and optionally filtered to resolve</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>duplicate collections.</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>reflora <span class="ot">&lt;-</span> refloraR<span class="sc">::</span><span class="fu">reflora_records</span>(<span class="at">herbarium =</span> <span class="st">&quot;RB&quot;</span>, <span class="at">taxon =</span> <span class="st">&quot;Ormosia&quot;</span>, <span class="at">save =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>jabot <span class="ot">&lt;-</span> jabotR<span class="sc">::</span><span class="fu">jabot_records</span>(<span class="at">herbarium =</span> <span class="st">&quot;MBM&quot;</span>, <span class="at">taxon =</span> <span class="st">&quot;Ormosia&quot;</span>, <span class="at">save =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>combined_df <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="at">list_sources =</span> <span class="fu">list</span>(<span class="at">GBIF =</span> gbif_data,</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">speciesLink =</span> splink_data,</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">REFLORA =</span> reflora,</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">JABOT =</span> jabot),</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>                           <span class="at">keep_source =</span> <span class="st">&quot;GBIF&quot;</span>)</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>Each source is first formatted into Darwin Core column names and values with</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="in">`barroso_dwc()`</span>, e.g. the columns of speciesLink downloads (<span class="in">`collector`</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="in">`collectornumber`</span>, <span class="in">`recordedby`</span>) are renamed into <span class="in">`recordedBy`</span> and</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="in">`recordNumber`</span>, and the dates and type status of REFLORA and JABOT records are</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>standardized. The sources are recognized by their content, so their names in</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="in">`list_sources`</span> can be any name.</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>Before comparing the sources, the herbarium acronyms in <span class="in">`collectionCode`</span> of each</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>source are standardized with <span class="in">`std_collection()`</span>, by default checking them against</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>Index Herbariorum (<span class="in">`index_herbariorum = TRUE`</span>), so the same herbarium is</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>recognized in all sources, e.g. <span class="in">`&quot;MOBOT_BR&quot;`</span> in speciesLink and <span class="in">`&quot;MO&quot;`</span> in GBIF, or</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="in">`&quot;Herbario INPA&quot;`</span> and <span class="in">`&quot;INPA&quot;`</span>. The original codes are kept in</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="in">`collectionCodeOriginal`</span>, so unvouchered collections like <span class="in">`&quot;INPA-Carpoteca&quot;`</span> can</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>still be removed by <span class="in">`barroso_std()`</span>.</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>The identifiers of the records in their sources, <span class="in">`occurrenceID`</span> in GBIF, REFLORA</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>and JABOT (and <span class="in">`gbifID`</span> in GBIF), are kept as they are, with the source of each</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>record in <span class="in">`datasource`</span>, so that the records already in a database can be found when</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>it is updated with new downloads (see the argument <span class="in">`database`</span> of <span class="in">`barroso_std()`</span>).</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>Records without a unique identifier, from any source (e.g. speciesLink downloads</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>made with plantR, or some GBIF records without <span class="in">`gbifID`</span>), are compared with the</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>database by their catalog numbers instead, and a message tells how many there are.</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>Columns with different types across sources (e.g. numeric <span class="in">`year`</span> in one source</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>and character in another) are combined as character. A column <span class="in">`datasource`</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>records the source of each record.</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arguments</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Argument <span class="pp">|</span> Description <span class="pp">|</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> list_sources <span class="pp">|</span> A named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering. <span class="pp">|</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> keep_source <span class="pp">|</span> Character vector with the names of all sources of <span class="in">`list_sources`</span>, in order of priority, e.g. <span class="in">`c(&quot;JABOT&quot;, &quot;speciesLink&quot;, &quot;REFLORA&quot;, &quot;GBIF&quot;)`</span>. The herbaria of each source are removed from the sources after it, so each herbarium is kept from the first source that has it. <span class="pp">|</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> index_herbariorum <span class="pp">|</span> Logical; if <span class="in">`TRUE`</span>, the herbarium acronyms of each source are checked against the API of Index Herbariorum after the regular expressions of <span class="in">`std_collection()`</span> (default: <span class="in">`TRUE`</span>). Use <span class="in">`FALSE`</span> to work offline. <span class="pp">|</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="fu">### Value</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>A harmonized data frame combining all provided herbarium sources, with</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>columns aligned, a <span class="in">`datasource`</span> column, and optionally filtered to resolve</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>duplicate collections.</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="fu">### Examples</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>reflora <span class="ot">&lt;-</span> refloraR<span class="sc">::</span><span class="fu">reflora_records</span>(<span class="at">herbarium =</span> <span class="st">&quot;RB&quot;</span>, <span class="at">taxon =</span> <span class="st">&quot;Ormosia&quot;</span>, <span class="at">save =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>jabot <span class="ot">&lt;-</span> jabotR<span class="sc">::</span><span class="fu">jabot_records</span>(<span class="at">herbarium =</span> <span class="st">&quot;MBM&quot;</span>, <span class="at">taxon =</span> <span class="st">&quot;Ormosia&quot;</span>, <span class="at">save =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>combined_df <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="at">list_sources =</span> <span class="fu">list</span>(<span class="at">GBIF =</span> gbif_data,</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">speciesLink =</span> splink_data,</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">REFLORA =</span> reflora,</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">JABOT =</span> jabot),</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>                           <span class="at">keep_source =</span> <span class="fu">c</span>(<span class="st">&quot;JABOT&quot;</span>, <span class="st">&quot;speciesLink&quot;</span>, <span class="st">&quot;REFLORA&quot;</span>, <span class="st">&quot;GBIF&quot;</span>))</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -14,6 +14,7 @@ The `barroso_std()` function is the primary tool in the `barRoso` package for pe
 - Standardize geographic fields like country, state, and locality
 - Harmonize taxonomic names including family, genus, and species
 - Clean and normalize type status
+- Fix the day, month and year of collection, e.g. days and months in the wrong columns
 - Optionally remove unvouchered or duplicate records
 - Support for multilingual column names (e.g., Portuguese, Spanish)
 
@@ -55,12 +56,15 @@ standardized_df <- barroso_std(df,
 - `delunkcoll`: Optionally delete records with unknown collectors
 - `flag_duplicates`, `rm_duplicates`: Detect and optionally remove duplicates
 - `specialists`, `rm_tied_conflicts`: How duplicates with conflicting identifications are kept, see [Detect and Flag Duplicates](/articles/detect_duplicates.qmd#removing-duplicates)
+- `flag_specialists`: Flag the records identified by the `specialists`, see [Flag Identifications by Specialists](/articles/flag_specialists.qmd)
+- `match_collectors`: Deep search across the whole data for the same collector written in other ways, e.g. `L. Queiroz` and `L. P. Queiroz` with the same number and date or municipality, see [Detect and Flag Duplicates](/articles/detect_duplicates.qmd#the-same-collector-written-in-other-ways) (default: `TRUE`)
+- `database`: A database already standardized, to which the new records are added, see [Update a Database with New Downloads](/articles/update_database.qmd)
 - `index_herbariorum`: Check collection codes against the API of [Index Herbariorum](https://sweetgum.nybg.org/science/ih/), always keeping the original codes (default: `TRUE`)
 - `rm_original_column`: Remove original (uncleaned) fields after standardization
 
 ## Collector and determiner names
 
-Collector names (`recordedBy`) are standardized with `std_recordedBy()` into initials followed by the surname, and additional collectors are moved to a new column `addCollector` (or stored as `"et al."` when there are more than two collectors). Determiner names (`identifiedBy`) are standardized with `std_identifiedBy()`, using the same rules, but all determiners are kept in the same cell. The original columns are kept with the suffix `Original`.
+Collector names (`recordedBy`) are standardized with `std_recordedBy()` into initials followed by the surname, and all additional collectors are moved to a new column `addCollector`, each one standardized with the same rules and written as `A. Alves, K. Paixão & E. Consuelo`. `"et al."` is written only when it is in the original names, e.g. `H. Lorenzi & R. Tsuji et al.`, or when the other names are not given. Determiner names (`identifiedBy`) are standardized with `std_identifiedBy()`, using the same rules, but all determiners are kept in the same cell. The original columns are kept with the suffix `Original`.
 
 | Original | Standardized |
 |---|---|
@@ -69,8 +73,14 @@ Collector names (`recordedBy`) are standardized with `std_recordedBy()` into ini
 | `Martius, CFP von` | `C. F. P. von Martius` |
 | `Uribe Uribe AL` | `A. L. Uribe-Uribe` |
 | `Dusén` | `Dusén` |
-| `A. Gómez Pompa, A. J. Sharp & P. Hernández` | `A. Gómez Pompa` (`addCollector`: `et al.`) |
-| `H.C. de Lima, C.A. Cid Ferreira, J. Guedes;F. Neves` | `H. C. Lima` (`addCollector`: `et al.`) |
+| `A. Gómez Pompa, A. J. Sharp & P. Hernández` | `A. Gómez Pompa` (`addCollector`: `A. J. Sharp & P. Hernández`) |
+| `H.C. de Lima, C.A. Cid Ferreira, J. Guedes;F. Neves` | `H. C. Lima` (`addCollector`: `C. A. Cid-Ferreira, J. Guedes & F. Neves`) |
+| `Daly, DC; Silveira, M; Torezan, JMD; Saraiva, M; Oliveira, ARS; Lima, L` | `D. C. Daly` (`addCollector`: `M. Silveira, J. M. D. Torezan, M. Saraiva, A. R. S. Oliveira & L. Lima`) |
+| `Berg, C. C.  (Berg, Cornelis Christiaan);J.F. Lima,O.P. Monteiro,W.A. Rodrigues,J.F. Ramos` | `C. C. Berg` (`addCollector`: `J. F. Lima, O. P. Monteiro, W. A. Rodrigues & J. F. Ramos`) |
+| `J.A. Lombardi, H. Lorenzi, R. Tsuji et al.` | `J. A. Lombardi` (`addCollector`: `H. Lorenzi & R. Tsuji et al.`) |
+| `Ordones, J. et al.` | `J. Ordones` (`addCollector`: `et al.`) |
+| `A. A. dso Santos` (misspelled particle) | `A. A. Santos`, as `A. A. dos Santos` |
+| `Cardoso, D.Queiroz, L.P.; Jardim, J.G.` (initials glued to the next name) | `D. Cardoso` (`addCollector`: `L. P. Queiroz & J. G. Jardim`) |
 | `Col. Richard Henry Beddome` | `R. H. Beddome` |
 | `Warren Douglas Stevens, B. A. Krukoff Curator of Central American Botany` | `W. D. Stevens` |
 | `236-6队` | `Dui` (`recordNumber`: `236-6`, or the number already there) |
@@ -122,6 +132,19 @@ By default (`index_herbariorum = TRUE`), the standardized codes are then checked
 - The new column `institutionName` has the name of the institution, and the new column `indexHerbariorum` is `FALSE` for codes not found, which are left as they were for checking.
 
 The regular expressions remain the first step, as dirty codes like `F-Seedplants` or `Tropicos` are not in Index Herbariorum. The check needs internet access; if the API cannot be reached, a warning is given and the codes are not checked. Use `index_herbariorum = FALSE` to work offline.
+
+## Dates
+
+The day, month and year of collection are standardized with `std_dates()` into whole numbers, before the duplicates are found by their dates. Days and months in the wrong columns are swapped when the month is greater than 12, and values that are not possible dates become `NA`, as told in the new column `dateIssues`:
+
+| day | month | year | Standardized | `dateIssues` |
+|---|---|---|---|---|
+| `07` | `06` | `1995` | 7, 6, 1995 | |
+| `00` | `Jun` | `1987.0` | NA, 6, 1987 | |
+| `4` | `16` | `2003` (REFLORA `4/16/2003`) | 16, 4, 2003 | `day and month swapped` |
+| `18` | `18` | `2011` | 18, NA, 2011 | `invalid month` |
+| `31` | `IV` | `2010` | NA, 4, 2010 | `invalid day` |
+| | | | from `eventDate` `1995-07-23` | `date from eventDate` |
 
 ## Places
 

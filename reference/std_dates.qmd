@@ -1,0 +1,61 @@
+---
+title: 'std_dates'
+description: 'Standardize the Day, Month and Year of Collection'
+toc: true
+toc-depth: 3
+---
+
+
+```{r}
+#| eval: false
+barRoso::std_dates()
+```
+
+### Description
+
+Cleans the `day`, `month` and `year` columns of herbarium records into whole
+numbers, fixing the most common errors of these columns, and flags the dates
+that could not be fixed.
+
+### Details
+
+The following changes are made:
+
+- Numbers written with zeros or decimals become whole numbers, e.g. `"06"` and `"6.0"` into `6`, and zeros like `"0"` or `"00"`, used for unknown days and months, become `NA`.
+- Months written as names or Roman numerals in English, Portuguese, Spanish or Latin become numbers, e.g. `"Jun"`, `"junho"`, `"junio"` and `"VI"` into `6`.
+- Days and months in the wrong columns are swapped, which can only be known when the month is greater than 12 and the day is not, e.g. month `23` and day `7` into day `23` and month `7`.
+- Missing days, months and years are taken from `eventDate`, e.g. `"1995-07-23"` or `"23/7/1995"`, when present.
+- Values that are not possible dates become `NA`, e.g. month `14` with day `15`, day `31` in April, day `29` in February of a year that is not a leap year, or years before 1700 or after the current year.
+
+The column `dateIssues` tells what was changed in each record, e.g.
+`"day and month swapped"`, `"invalid month"`, `"invalid day"`, `"invalid year"`
+or `"date from eventDate"`, and is `NA` for records without changes beyond the
+number format.
+
+### Arguments
+
+| Argument | Description |
+|---|---|
+| df | A data frame with herbarium records. |
+| colname_day | Column name for the day of collection (default: `"day"`). |
+| colname_month | Column name for the month of collection (default: `"month"`). |
+| colname_year | Column name for the year of collection (default: `"year"`). |
+| colname_eventDate | Column name for the date of collection, used to fill in missing days, months and years. Ignored when not in `df` (default: `"eventDate"`). |
+| rm_original_column | Logical; if `FALSE`, the original columns are kept with the suffix `Original`, e.g. `monthOriginal` (default: `TRUE`). |
+
+### Value
+
+The data frame with the day, month and year as whole numbers, and the
+column `dateIssues` after them.
+
+### Examples
+
+```r
+df <- data.frame(day = c("07", "23", "00", "31", NA),
+                 month = c("06", "7", "Jun", "IV", NA),
+                 year = c("1995", "2001", "1987.0", "2010", NA),
+                 eventDate = c(NA, NA, NA, NA, "1995-07-23"))
+std_dates(df)
+```
+
+

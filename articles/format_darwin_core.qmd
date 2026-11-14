@@ -38,7 +38,7 @@ splink <- barroso_dwc(splink, source = "speciesLink")   # also "REFLORA", "JABOT
 You don't need to call `barroso_dwc()` before [`barroso_cat()`](/articles/compare_herbarium_sources.qmd): it formats each source by itself before combining them.
 
 ```r
-combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = "GBIF")
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = c("GBIF", "speciesLink"))
 ```
 
 All columns are returned as character, so the outputs of different downloads can always be combined. For example, when querying several species with `plantR::rspeciesLink()`, a column like `coordinatePrecision` may come as integer for one species and as character for another, and `dplyr::bind_rows()` would fail:
@@ -130,7 +130,7 @@ The eleven speciesLink downloads of the municipalities around the Chapada Diaman
 After formatting, the records can be combined and standardized:
 
 ```r
-combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink))
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = c("GBIF", "speciesLink"))
 cleaned <- barroso_std(combined)
 ```
 

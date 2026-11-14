@@ -4494,7 +4494,7 @@ height: 400px;
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="fu">list</span>(<span class="at">REFLORA =</span> data_reflora, <span class="at">JABOT =</span> data_jabot),</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="st">&quot;JABOT&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="fu">c</span>(<span class="st">&quot;JABOT&quot;</span>, <span class="st">&quot;REFLORA&quot;</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_fix_names</span>(data_all, <span class="at">vascular_only =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_all<span class="sc">$</span>taxonStatus)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(data_all)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -5040,7 +5040,7 @@ height: 400px;
 <span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
 <span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_cat</span>(<span class="fu">list</span>(<span class="at">REFLORA =</span> data_reflora, <span class="at">JABOT =</span> data_jabot),</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="st">&quot;JABOT&quot;</span>)</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>                        <span class="at">keep_source =</span> <span class="fu">c</span>(<span class="st">&quot;JABOT&quot;</span>, <span class="st">&quot;REFLORA&quot;</span>))</span>
 <span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_fix_names</span>(data_all, <span class="at">vascular_only =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_all<span class="sc">$</span>taxonStatus)</span>
 <span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>data_all <span class="ot">&lt;-</span> <span class="fu">barroso_std</span>(data_all)</span>

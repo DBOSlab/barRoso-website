@@ -8,13 +8,13 @@ format:
 
 ## Overview
 
-When working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. `barRoso` offers the `barroso_cat()` function to merge, harmonize, and optionally deduplicate these datasets based on collection codes.
+When working with plant specimen data from multiple biodiversity repositories (e.g., GBIF, JABOT, speciesLink), users often encounter overlapping records across sources. `barRoso` offers the `barroso_cat()` function to merge and harmonize these datasets, keeping the records of each herbarium from a single source, chosen by an order of priority of the sources.
 
 This article demonstrates how to:
 
 - Merge multiple data sources into a unified data frame
 - Combine raw speciesLink downloads with GBIF downloads
-- Prioritize a preferred source when herbaria overlap
+- Keep each herbarium from the first source that has it, in your order of priority
 
 
 ## Function: `barroso_cat()`
@@ -26,7 +26,7 @@ combined_df <- barroso_cat(
     speciesLink = splink_data,
     JABOT = jabot_data
   ),
-  keep_source = "GBIF",
+  keep_source = c("JABOT", "speciesLink", "GBIF"),
   index_herbariorum = TRUE
 )
 ```
@@ -34,10 +34,9 @@ combined_df <- barroso_cat(
 ## Arguments
 
 - `list_sources`: A named list of data frames, one per biodiversity source. The names (e.g. `GBIF`, `speciesLink`) must be unique, as they are used to identify the source of each record.
-- `keep_source`: Optionally, the name of the preferred source (e.g. `"GBIF"`). The records of any herbarium also present in the preferred source are removed from the other sources.
+- `keep_source`: The names of all sources of `list_sources`, in order of priority, e.g. `c("JABOT", "speciesLink", "GBIF")`. It is required, as the same herbarium is often in several sources. The herbaria of each source are removed from the sources after it, so each herbarium is kept from the first source that has it (see [below](#overlapping-herbaria-are-kept-from-a-single-source)).
 - `index_herbariorum`: If `TRUE` (the default), the herbarium acronyms of each source are checked against the API of [Index Herbariorum](https://sweetgum.nybg.org/science/ih/) before comparing the sources. Use `FALSE` to work offline.
 
-If no source is specified, the function merges all sources, retaining potential duplicates for further reconciliation with `barroso_flag_duplicates()`.
 
 
 ## Example
@@ -49,19 +48,26 @@ library(barRoso)
 gbif <- read.csv("gbif.csv")
 splink <- read.csv("speciesLink.csv", fileEncoding = "latin1")
 
-# Merge, giving preference to GBIF for overlapping herbaria
+# Merge, keeping the herbaria of speciesLink first, and from GBIF only the others
 combined_df <- barroso_cat(
   list_sources = list(
     GBIF = gbif,
     speciesLink = splink
   ),
-  keep_source = "GBIF"
+  keep_source = c("speciesLink", "GBIF")
 )
 
 table(combined_df$datasource)
 ```
 
-For example, when combining 15,841 GBIF, 6,286 speciesLink, 1,898 REFLORA and 2,026 JABOT records of *Ormosia*, the records of herbaria also available in GBIF are removed from the other sources, resulting in 16,415 records (15,841 from GBIF, 366 from speciesLink and 208 from JABOT). Without standardizing the herbarium acronyms first, 2,427 more records would be kept, e.g. speciesLink records of `NL-Botany`, `MO-Duplicates` and `F-Seedplants`, which are `L`, `MO` and `F` in GBIF.
+For example, when combining 15,841 GBIF, 6,286 speciesLink, 1,898 REFLORA and 2,026 JABOT records of *Ormosia*:
+
+| `keep_source` | Records | GBIF | speciesLink | REFLORA | JABOT |
+|---|---|---|---|---|---|
+| `c("GBIF", "speciesLink", "REFLORA", "JABOT")` | 16,242 | 15,841 | 366 | 0 | 35 |
+| `c("JABOT", "speciesLink", "REFLORA", "GBIF")` | 11,631 | 4,140 | 5,441 | 24 | 2,026 |
+
+The order matters, as a herbarium is kept with the records of the first source that has it, whatever their number in the other sources: with JABOT first, the 925 GBIF records of the 50 herbaria also in JABOT are removed, even when JABOT has fewer of their records. Without standardizing the herbarium acronyms first, many more records would be kept twice, e.g. speciesLink records of `NL-Botany`, `MO-Duplicates` and `F-Seedplants`, which are `L`, `MO` and `F` in GBIF.
 
 
 ## How It Works
@@ -109,11 +115,11 @@ jabot <- jabot_records(herbarium = c("MBM", "UPCB"), taxon = "Ormosia", save = F
 
 combined_df <- barroso_cat(
   list_sources = list(GBIF = gbif, speciesLink = splink, REFLORA = reflora, JABOT = jabot),
-  keep_source = "GBIF"
+  keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF")
 )
 ```
 
-The REFLORA collection of RB is fed by JABOT, so the same RB specimens are often found in both sources, and also in GBIF. With `keep_source = "GBIF"`, they are kept just once.
+The REFLORA collection of RB is fed by JABOT, so the same RB specimens are often found in both sources, and also in GBIF. With JABOT first, they are kept just once, from JABOT.
 
 ### 3. Herbarium acronyms are standardized in each source
 
@@ -127,11 +133,21 @@ The same herbarium is often written differently in each source, e.g. `MO-Duplica
 
 The original codes are kept in `collectionCodeOriginal`. So unvouchered collections like `INPA-Carpoteca`, whose acronym becomes `INPA`, are still removed later by `barroso_std()`. Index Herbariorum is downloaded once for all sources, and if it cannot be reached, a warning is given and the acronyms are standardized with the regular expressions only.
 
-### 4. Overlapping herbaria are removed when `keep_source` is given
+### 4. Overlapping herbaria are kept from a single source
 
-Overlapping herbaria are detected with `collectionCode`. When `keep_source = "GBIF"`, the records of any herbarium present in GBIF are removed from the other sources. Herbaria shared only among the other sources (e.g. present in both speciesLink and JABOT, but not in GBIF) are kept in all of them, and their duplicates can then be flagged with `barroso_flag_duplicates()`.
+Overlapping herbaria are detected with `collectionCode`, and the sources are compared one after the other, in the order of `keep_source`. With `keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF")`:
 
-### 5. Columns are aligned
+1. The herbaria of JABOT are removed from speciesLink, REFLORA and GBIF.
+2. The remaining herbaria of speciesLink are removed from REFLORA and GBIF.
+3. The remaining herbaria of REFLORA are removed from GBIF.
+
+So no herbarium is kept from two sources, and GBIF adds only the herbaria that are in none of the other sources. A message tells how many records and herbaria were removed from each source, and why, e.g. `removing 845 records of 70 herbaria from speciesLink also present in JABOT`. Duplicates among different herbaria (e.g. the same collection at RB and K) are then flagged with [`barroso_flag_duplicates()`](/articles/detect_duplicates.qmd).
+
+### 5. Identifiers of the records are kept
+
+The identifier of each record in its source is kept as it is: `occurrenceID` in GBIF, REFLORA and JABOT (and `gbifID` in GBIF), with the source in `datasource`. They are used to find the records already in a database when it is updated with new downloads, see [Update a Database with New Downloads](/articles/update_database.qmd). Records without a unique identifier, from any source, are compared by their catalog numbers instead, and a message tells how many there are, e.g. `all records of speciesLink have no unique identifier (no column gbifID or occurrenceID)`, or `2 of 15841 records of GBIF have no unique identifier (gbifID or occurrenceID)`.
+
+### 6. Columns are aligned
 
 - Columns missing in some sources are filled with `NA`.
 - Columns with different types across sources (e.g. `year` as numbers in GBIF and as text in speciesLink) are combined as text, instead of failing.
@@ -142,7 +158,7 @@ Overlapping herbaria are detected with `collectionCode`. When `keep_source = "GB
 
 - Name each data source in `list_sources`, e.g. `list(GBIF = gbif, speciesLink = splink)`
 - Ensure each dataset includes a `collectionCode` column, otherwise overlapping herbaria cannot be detected for that source
-- Use `keep_source = NULL` if you want to preserve all records
+- Give first the sources with the most complete data of their herbaria, e.g. the source managed by the herbarium itself, as each herbarium is kept from the first source that has it
 - Use [`barroso_fix_names()`](/articles/fix_names.qmd) after combining to fix misspelled names and synonyms, and then `barroso_std()` to clean the remaining fields and flag duplicates
 
 ```r

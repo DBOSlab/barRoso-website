@@ -14,17 +14,24 @@ barRoso::barroso_cat()
 ### Description
 
 Merges herbarium records from two or more biodiversity data sources into a single
-harmonized data frame. Optionally prioritizes specific sources when duplicates
-are detected across herbaria, retaining records based on a flexible exclusion
-strategy.
+harmonized data frame, keeping the records of each herbarium from a single source,
+chosen by an order of priority of the sources.
 
 ### Details
 
 This function aligns column structures, removes redundant records from overlapping
-herbaria, and merges all sources into a single output. Duplicate filtering is
-based on matching `collectionCode` across sources: when `keep_source` is given,
-the records of any herbarium that is also present in `keep_source` are removed
-from the other sources. Herbaria shared only among the other sources are kept.
+herbaria, and merges all sources into a single output. The same herbarium is often
+in several sources, e.g. the RB collection in JABOT, REFLORA and GBIF, so its
+records would be repeated. Overlapping herbaria are found by their `collectionCode`
+and kept from a single source, following the order of priority in `keep_source`,
+e.g. with `keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF")`:
+
+1. the herbaria of JABOT are removed from speciesLink, REFLORA and GBIF;
+2. the remaining herbaria of speciesLink are removed from REFLORA and GBIF;
+3. the remaining herbaria of REFLORA are removed from GBIF.
+
+So each herbarium comes from the first source that has it, and GBIF adds only the
+herbaria that are in none of the other sources.
 
 Each source is first formatted into Darwin Core column names and values with
 `barroso_dwc()`, e.g. the columns of speciesLink downloads (`collector`,
@@ -41,6 +48,14 @@ recognized in all sources, e.g. `"MOBOT_BR"` in speciesLink and `"MO"` in GBIF, 
 `collectionCodeOriginal`, so unvouchered collections like `"INPA-Carpoteca"` can
 still be removed by `barroso_std()`.
 
+The identifiers of the records in their sources, `occurrenceID` in GBIF, REFLORA
+and JABOT (and `gbifID` in GBIF), are kept as they are, with the source of each
+record in `datasource`, so that the records already in a database can be found when
+it is updated with new downloads (see the argument `database` of `barroso_std()`).
+Records without a unique identifier, from any source (e.g. speciesLink downloads
+made with plantR, or some GBIF records without `gbifID`), are compared with the
+database by their catalog numbers instead, and a message tells how many there are.
+
 Columns with different types across sources (e.g. numeric `year` in one source
 and character in another) are combined as character. A column `datasource`
 records the source of each record.
@@ -50,7 +65,7 @@ records the source of each record.
 | Argument | Description |
 |---|---|
 | list_sources | A named list of data frames. Each element represents a herbarium data source. The names of the list are used to track the source origin for internal filtering. |
-| keep_source | Optional character string specifying the preferred data source (e.g., "GBIF") for resolving duplicate `collectionCode` conflicts. If NULL, all records are retained. |
+| keep_source | Character vector with the names of all sources of `list_sources`, in order of priority, e.g. `c("JABOT", "speciesLink", "REFLORA", "GBIF")`. The herbaria of each source are removed from the sources after it, so each herbarium is kept from the first source that has it. |
 | index_herbariorum | Logical; if `TRUE`, the herbarium acronyms of each source are checked against the API of Index Herbariorum after the regular expressions of `std_collection()` (default: `TRUE`). Use `FALSE` to work offline. |
 
 ### Value
@@ -69,7 +84,7 @@ combined_df <- barroso_cat(list_sources = list(GBIF = gbif_data,
                                                speciesLink = splink_data,
                                                REFLORA = reflora,
                                                JABOT = jabot),
-                           keep_source = "GBIF")
+                           keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF"))
 ```
 
 

@@ -80,12 +80,16 @@ website:
             href: articles/fix_names.qmd
           - text: Standardize Specimen Records 
             href: articles/standardize_specimens.qmd
+          - text: Update a Database with New Downloads
+            href: articles/update_database.qmd
           - text: Flexible Column Names 
             href: articles/custom_column_names.qmd   
         - section: Duplicate Detection
           contents:
           - text: Detect and Flag Duplicates 
             href: articles/detect_duplicates.qmd
+          - text: Flag Identifications by Specialists
+            href: articles/flag_specialists.qmd
         - section: Geographic Coordinates
           contents:
           - text: Fix and Flag Coordinates 

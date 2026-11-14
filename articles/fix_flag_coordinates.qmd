@@ -125,7 +125,7 @@ However, in line with the `barRoso` philosophy, consider reviewing the flagged r
 Checking the coordinates of 12,979 *Ormosia* records from GBIF and speciesLink combined with `barroso_cat()`:
 
 ```r
-combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = "GBIF")
+combined <- barroso_cat(list(GBIF = gbif, speciesLink = splink), keep_source = c("GBIF", "speciesLink"))
 combined <- std_coordinates(combined)
 ```
 

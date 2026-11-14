@@ -27,6 +27,38 @@ handles multilingual field names, missing data, inconsistent formatting,
 and dataset chunking for large inputs. The function also detects and optionally
 removes duplicate records and specimens lacking voucher information.
 
+**The same collector written in other ways**
+
+After standardizing, the same collector can still be written in other ways, e.g.
+`"L. Queiroz"` and `"L. P. Queiroz"`, which may be two people with the same
+collector number by chance, e.g. Luis Queiroz and Luciano Paganucci de Queiroz. So,
+with `match_collectors = TRUE`, a deep search is made across the whole data (not in
+chunks) for records with the same first initial, surname and collector number, but
+written in other ways. Compound surnames are compared in the same form, e.g.
+`"A. Delgado-Salinas"`, `"A. Delgado Salinas"` and `"A. D. Salinas"` all as initials
+A D and surname `Salinas`. A record gets the most complete name (with more
+initials, then the longest, e.g. `"A. Delgado-Salinas"`) only when:
+
+- its initials are among those of the complete name, with the same first initial, e.g. `"L."` in `"L. P."`, but not `"L. M."` in `"L. P."`;
+- it has the same date (day, month and year) or the same municipality of a record with the complete name, which shows that they are the same collection;
+- when several complete names fit, the one that agrees the most with the record is chosen, with 4 points for the same full date, 2 for the same year and month, 1 for the same year and 1 for the same municipality, e.g. `"E. H. A. Rodrigues"` of the same date and municipality rather than `"E. M. A. Rodrigues"` of the same municipality, for `"E. A. Rodrigues"`. When different people agree as much, e.g. `"L. Queiroz"` with `"L. P. Queiroz"` and `"L. M. Queiroz"`, the record is kept.
+
+**Updating a database**
+
+With `database`, new downloads are added to a database already standardized by
+`barroso_std()`, e.g. after duplicates were removed and records were corrected by
+hand, without standardizing it again and without losing the corrections:
+
+1. New records already in the database are removed by their identifiers, the same `occurrenceID` (or `gbifID`, when present) of the same `datasource`.
+2. The other new records are standardized as usual.
+3. New records whose herbarium and catalog number, e.g. `"MO 2839102"`, are in the database, in `catalogNumber` or among the duplicates of its records (`duplicateCatalogNumbers`), are removed, as they are the same herbarium sheet.
+4. Duplicates are flagged (and removed, with `rm_duplicates = TRUE`) among the new records.
+5. New records that are duplicates of a record of the database (same collector and number) are added to its duplicate columns, e.g. their herbaria and catalog numbers to `duplicateCollectionCodes` and `duplicateCatalogNumbers`, and, with `rm_duplicates = TRUE`, removed. A different name sets `identificationConflict`, but the name of the database is kept.
+
+The records of the database are not changed, except their duplicate columns in
+step 5. The result has the records of the database and the new records, with the
+column `newRecord` (`TRUE` for the new records), so that they can be checked.
+
 The final data frame is sorted by species, `recordedBy` and `recordNumber`. All
 records of a block of duplicates stay together under the name of the block, which
 is the most frequent name among its duplicates. For example, a duplicate identified
@@ -43,8 +75,11 @@ as `"Ormosia ruddiana"` goes together with its three duplicates identified as
 | flag_missid | Reserved for future use. Currently not implemented. |
 | flag_duplicates | Logical; if `TRUE`, flags duplicates with a logical column (default: `TRUE`). |
 | rm_duplicates | Logical; if `TRUE`, removes duplicate specimens (default: `FALSE`). |
-| specialists | Optional character vector of names of specialists, whose identifications are preferred when removing duplicates with conflicting identifications. See `barroso_flag_duplicates()` (default: `NULL`). |
+| specialists | Optional data frame with the columns `specialist` and `taxon` (a family, genus or species of expertise), e.g. `data.frame(specialist = "D. B. O. S. Cardoso", taxon = "Leguminosae")`, whose identifications are preferred when removing duplicates with conflicting identifications. See `barroso_flag_duplicates()` (default: `NULL`). |
+| flag_specialists | Logical; if `TRUE`, the records identified by the `specialists` are flagged in the columns `specialistIdentification`, `specialistName` and `specialistEvidence`, before duplicates are removed, so that a record kept from a block of duplicates is flagged when one of its duplicates with the same name was identified by a specialist. See `barroso_flag_specialists()` (default: `FALSE`). |
 | rm_tied_conflicts | Logical; with `rm_duplicates = TRUE`, if `TRUE`, blocks of duplicates whose conflicting names are equally frequent are removed entirely; if `FALSE`, all their records are kept. See `barroso_flag_duplicates()` (default: `FALSE`). |
+| database | Optional data frame, or path to an .xlsx, .csv or .rds file, with records already standardized by `barroso_std()`, to which the new records are added. See Details (default: `NULL`). |
+| match_collectors | Logical; if `TRUE`, the same collector written in other ways across the whole data, e.g. `"L. Queiroz"` and `"L. P. Queiroz"`, or `"A. D. Salinas"`, `"A. Delgado Salinas"` and `"A. Delgado-Salinas"`, gets the most complete name, before duplicates are found. See Details (default: `TRUE`). |
 | index_herbariorum | Logical; if `TRUE`, checks collection codes against the API of Index Herbariorum, always keeping the original codes. See `std_collection()`. Use `FALSE` to work offline (default: `TRUE`). |
 | colname_recordedBy | Column name for collector names. |
 | colname_recordNumber | Column name for collector number. |
@@ -62,6 +97,7 @@ as `"Ormosia ruddiana"` goes together with its three duplicates identified as
 | colname_genus | Column name for genus. |
 | colname_specificEpithet | Column name for specific epithet. |
 | rm_original_column | Logical; if `TRUE`, remove original columns after standardization, except that of collection codes when `index_herbariorum = TRUE`. |
+| std_collection | Logical; if `FALSE`, the function will not standardize the collection codes according to Index Herbariorum. |
 
 ### Value
 

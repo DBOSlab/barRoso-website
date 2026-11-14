@@ -1,0 +1,159 @@
+---
+title: "Update a Database with New Downloads"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Overview
+
+A database of herbarium records is rarely finished in one go. You download the records of your group from GBIF, speciesLink, REFLORA and JABOT, standardize them with [`barroso_std()`](/articles/standardize_specimens.qmd), remove the duplicates, and then spend weeks correcting names, localities and coordinates by hand. Months later, new records are online: newly digitized herbaria, specimens of recent expeditions, or taxa you did not download before.
+
+Downloading everything again and running `barroso_std()` from scratch would bring back all records you already have, and lose all your corrections. With the argument `database`, `barroso_std()` instead **adds only the new records to your corrected database**:
+
+```r
+updated <- barroso_std(new_records,
+                       rm_duplicates = TRUE,
+                       database = "results/Ormosia_database.xlsx")
+```
+
+The records of your database are not standardized again and not changed, except that new duplicates of their specimens are added to their duplicate columns. Only the new records are standardized, which is also much faster.
+
+
+## The workflow
+
+### 1. Build and correct your database
+
+```r
+library(barRoso)
+
+sources <- list(GBIF = data_gbif, speciesLink = data_speciesLink,
+                REFLORA = data_reflora, JABOT = data_jabot)
+
+data_all <- barroso_cat(sources, keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF"))
+data_all <- barroso_fix_names(data_all)
+data_all <- barroso_std(data_all, rm_duplicates = TRUE)
+
+openxlsx::write.xlsx(data_all, "results/Ormosia_database.xlsx")
+```
+
+Then correct the spreadsheet by hand as needed. Keep these columns, which are used to recognize the records already in the database:
+
+| Column | Used for |
+|---|---|
+| `datasource`, `occurrenceID` (and `gbifID`, if you keep it) | Records already in the database, by their identifiers (step 2) |
+| `collectionCode`, `catalogNumber`, `duplicateCatalogNumbers` | Herbarium sheets already in the database (step 4) |
+| `recordedBy`, `recordNumber`, `genus`, `specificEpithet`, `year`, `month`, `day` | Duplicates of the specimens of the database (step 6) |
+| `duplicate`, `duplicateGroup`, `duplicateIdentifications`, `duplicateCollectionCodes` | Updated with the new duplicates (step 6) |
+
+You can add your own columns, e.g. notes or traits; they are kept, and empty for the new records.
+
+### 2. Download the records again, and add them to the database
+
+```r
+new_sources <- list(GBIF = new_gbif, speciesLink = new_speciesLink,
+                    REFLORA = new_reflora, JABOT = new_jabot)
+
+new_records <- barroso_cat(new_sources, keep_source = c("JABOT", "speciesLink", "REFLORA", "GBIF"))
+new_records <- barroso_fix_names(new_records)
+
+updated <- barroso_std(new_records,
+                       rm_duplicates = TRUE,
+                       database = "results/Ormosia_database.xlsx")
+
+# The new records, to be checked
+subset(updated, newRecord)
+
+openxlsx::write.xlsx(updated, "results/Ormosia_database_updated.xlsx")
+```
+
+Use the same arguments of `barroso_cat()` and `barroso_std()` you used to build the database (e.g. the order of `keep_source`), so that the new records are standardized in the same way. The database can be a data frame, or the path to an .xlsx, .csv or .rds file.
+
+
+## How the new records are compared with the database
+
+The new records go through six steps. Each one removes the records found in the database, so the next steps only deal with the remaining ones.
+
+### Step 1: the database is read
+
+The database is read as it is. It is not standardized again.
+
+### Step 2: records with the same identifier
+
+Each source gives a unique identifier to each record, which stays the same when the record is downloaded again: `occurrenceID`, found in GBIF, REFLORA and JABOT records (GBIF also has `gbifID`, which is used too when kept, but is not needed). `barroso_cat()` keeps them, with the source of each record in `datasource`. New records with the same identifier of the same source as a record of the database are removed **before standardizing**, so most records already in the database are not standardized again.
+
+Records without an identifier, from any source, are simply recognized by their catalog numbers in step 4. This is the case of all records of speciesLink downloads made with plantR, and of a few records of other sources, e.g. GBIF records without `gbifID`, or records whose identifier column was not kept in the database. `barroso_cat()` tells how many there are, e.g.:
+
+```
+barroso_cat: all records of speciesLink have no unique identifier (no column gbifID or occurrenceID); when updating a database with barroso_std(database = ...), they are compared by their catalog numbers
+barroso_cat: 2 of 15841 records of GBIF have no unique identifier (gbifID or occurrenceID); when updating a database with barroso_std(database = ...), they are compared by their catalog numbers
+```
+
+### Step 3: the other new records are standardized
+
+As usual: collectors, determiners, herbaria, catalog numbers, places, names, types and dates.
+
+### Step 4: herbarium sheets already in the database
+
+New records whose herbarium and catalog number, e.g. `MO 2839102`, are already in the database are removed, as they are the same herbarium sheet. The catalog numbers of the database are taken from `catalogNumber` and from `duplicateCatalogNumbers`, which keeps the catalog numbers of the duplicates removed with `rm_duplicates = TRUE`.
+
+This is why `duplicateCatalogNumbers` matters. When you built the database, the duplicate of *D. Cardoso 1350* at K was removed, and only its record at MO was kept, with `MO 2839102 | K000123` in `duplicateCatalogNumbers`. The record at K is downloaded again, with a `gbifID` that is not in the database, but its catalog number is found in `duplicateCatalogNumbers`, so it is not added again.
+
+Records without catalog number are compared by all their standardized fields: herbarium, collector, number, name, date and place. A record like *E. Ule s.n. (US)* of *Ormosia arborea*, without number, date or catalog number, is removed when the database has the same record.
+
+### Step 5: duplicates among the new records
+
+Duplicates are flagged among the new records, and removed with `rm_duplicates = TRUE`, as described in [Detect and Flag Duplicates](/articles/detect_duplicates.qmd), with `specialists` and `rm_tied_conflicts` if given.
+
+### Step 6: duplicates of the specimens of the database
+
+A new record can be a new herbarium sheet of a specimen already in the database, e.g. a duplicate of *L. P. Queiroz 200* at NY, newly digitized. It is found by the same collector and number (or the same species, collector and date, without number), also when the collector is written in another way, e.g. `L. Queiroz` in the database and `L. P. Queiroz` in the new record, with the same date or municipality (see [the same collector written in other ways](/articles/detect_duplicates.qmd#the-same-collector-written-in-other-ways)). New records not in the database also get the most complete name of their collector in the database. Then:
+
+- Its herbarium, catalog number and name are added to the duplicate columns of the record of the database: `duplicateCollectionCodes` becomes `HUEFS | NY`, `duplicateCatalogNumbers` becomes `HUEFS1 | NY555`.
+- With `rm_duplicates = TRUE`, it is removed, as the specimen is already in the database. With `rm_duplicates = FALSE`, it is kept, with the same `duplicateGroup` of the record of the database.
+- If it has another name, e.g. *Ormosia arborea* for a specimen of *Ormosia fastigiata* in the database, `identificationConflict` becomes `TRUE`, so that you can check it, but **the name of the database is kept**, as it may have been corrected by you.
+
+Blocks of duplicates of the new records are numbered after those of the database, so `duplicateGroup` never mixes blocks.
+
+
+## The result
+
+The result has all records of the database, followed by the new records, sorted by species, collector and number, with the column `newRecord`:
+
+| `newRecord` | Records |
+|---|---|
+| `FALSE` | The records of the database, as they were, with new duplicates added to their duplicate columns |
+| `TRUE` | The new records, standardized |
+
+The messages tell what happened in each step, e.g. for *Ormosia*, when a database of 6,755 records was updated with the same four sources downloaded again, plus 300 GBIF records that were not in the first download:
+
+```
+barroso_std: database with 6755 records
+barroso_std: 3773 of 11631 new records already in the database (same gbifID or occurrenceID of the same datasource) removed; 5443 new records without identifier are compared by their catalog numbers
+barroso_std: 6429 of 6521 new records of herbarium sheets already in the database removed (6374 by catalogNumber or duplicateCatalogNumbers, 55 without catalog number, with the same fields)
+barroso_std: 46 new records are duplicates of 46 records of the database, added to their duplicate columns and removed
+barroso_std: 41 new records added to the database of 6755 records (newRecord == TRUE)
+```
+
+All 41 added records were among the 300 GBIF records left out of the first download. Of these 300, 224 were removed by `barroso_cat()`, as their herbaria come from sources before GBIF in `keep_source`, and of the other 76, 41 were new specimens, and most of the rest new sheets of specimens already in the database. The records of the database were unchanged, except the duplicate columns of 42 of them. The update took a few seconds, as only 6,521 records were standardized.
+
+When nothing is new, the database is returned as it is:
+
+```
+barroso_std: no new records to add to the database
+```
+
+
+## Tips
+
+- Keep the columns `datasource` and `occurrenceID` in your database (`gbifID` is not needed), even if you select just some columns to work with. Without them, all new records are standardized and compared only by their catalog numbers and fields, which is slower and misses records without catalog number whose fields were corrected by hand.
+- Keep `duplicateCatalogNumbers` and `duplicateCollectionCodes`: they tell which herbarium sheets were removed as duplicates.
+- Check the new records with `subset(updated, newRecord)`, and the records of the database with new conflicts with `subset(updated, !newRecord & identificationConflict)`.
+- Save the updated database with a new name, so that you can go back to the previous one.
+
+## See Also
+
+- [`barroso_std()` reference](/reference/barroso_std.qmd)
+- [Compare Herbarium Sources](/articles/compare_herbarium_sources.qmd)
+- [Detect and Flag Duplicates](/articles/detect_duplicates.qmd)
